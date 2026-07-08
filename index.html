@@ -4,60 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HKO 鏡片編號查詢系統</title>
-    <!-- 使用 Tailwind CSS 快速美化介面 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* 整個畫面字體加大 */
+        body {
+            font-size: 18px; 
+        }
+        select, button, input {
+            font-size: 18px !important;
+        }
+        label {
+            font-size: 16px !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
-        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">HKO 鏡片編號查詢</h1>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-xl border border-gray-100">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">HKO 鏡片編號查詢</h1>
         
-        <!-- 1. 鏡片類型 -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">鏡片類型</label>
-            <select id="lensType" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateColors()">
+        <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2">鏡片類型</label>
+            <select id="lensType" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateFields()">
                 <option value="染色鏡片">染色鏡片</option>
                 <option value="腮紅鏡片">腮紅鏡片</option>
                 <option value="Photoshade">Photoshade</option>
             </select>
         </div>
 
-        <!-- 2. 折射率 -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">折射率 (Index)</label>
-            <select id="index" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+        <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2">折射率 (Index)</label>
+            <select id="index" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
                 <option value="1.6">1.6</option>
                 <option value="1.67">1.67</option>
             </select>
         </div>
 
-        <!-- 3. 鍍膜 -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">鍍膜 (Coating)</label>
-            <select id="coating" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+        <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2">鍍膜 (Coating)</label>
+            <select id="coating" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
                 <option value="沒有">沒有鍍膜</option>
                 <option value="抗刮">抗刮 (HC)</option>
                 <option value="抗刮+超透光">抗刮 + 超透光 (HMC)</option>
             </select>
         </div>
 
-        <!-- 4. 顏色 (會根據類型聯動變更) -->
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">顏色</label>
-            <select id="color" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
-                <!-- 由 JavaScript 動態動態生成 -->
+        <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2">顏色</label>
+            <select id="color" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                </select>
+        </div>
+
+        <div class="mb-6 hidden" id="densityContainer">
+            <label class="block font-semibold text-gray-700 mb-2">顏色濃度</label>
+            <select id="density" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                <option value="85%">85%</option>
+                <option value="50%">50%</option>
+                <option value="25%">25%</option>
+                <option value="15%">15%</option>
             </select>
         </div>
 
-        <!-- 查詢按鈕 -->
-        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-200 shadow-md">
+        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-lg transition duration-200 shadow-md text-xl cursor-pointer">
             查詢鏡片編號
         </button>
 
-        <!-- 結果顯示區域 -->
-        <div class="mt-6 p-4 bg-gray-100 rounded-xl text-center hidden" id="resultBox">
-            <p class="text-sm text-gray-500 font-medium">對應 HKO 鏡片編號</p>
-            <p class="text-3xl font-black text-gray-900 mt-1 tracking-wider" id="resultCode">------</p>
+        <div class="mt-8 p-6 bg-gray-100 rounded-xl text-center hidden" id="resultBox">
+            <p class="text-base text-gray-500 font-semibold">對應 HKO 鏡片編號</p>
+            <p class="text-4xl font-black text-gray-900 mt-2 tracking-wider" id="resultCode">------</p>
+            
+            <button id="copyBtn" onclick="copyToClipboard()" class="mt-4 inline-flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-lg transition duration-150 text-base cursor-pointer">
+                <span>複製編號</span>
+            </button>
+            <p id="copySuccess" class="text-green-600 text-sm mt-1 font-medium hidden">✓ 已成功複製到剪貼簿</p>
         </div>
     </div>
 
@@ -69,31 +88,35 @@
             "Photoshade": ["灰", "棕"]
         };
 
-        // 模擬的 HKO 編號資料庫 (你可以根據實際編號修改這裡的 Mapping)
-        // 格式： "類型-折射率-鍍膜-顏色": "實際編號"
+        // 模擬的 HKO 編號資料庫 Mapping
         const hkoDatabase = {
             "染色鏡片-1.6-抗刮-灰": "HKO60T-GY-H",
             "染色鏡片-1.67-抗刮+超透光-藍": "HKO67T-BL-HMC",
             "腮紅鏡片-1.6-沒有-紅": "HKO60B-RD-UC",
             "Photoshade-1.67-抗刮+超透光-棕": "HKO67P-BR-HMC",
-            // ... 在這裡自由添加你的對應數據
         };
 
-        // 根據選擇的鏡片類型，自動更新顏色選項
-        function updateColors() {
+        // 更新欄位：顏色與濃度顯示
+        function updateFields() {
             const type = document.getElementById("lensType").value;
             const colorSelect = document.getElementById("color");
+            const densityContainer = document.getElementById("densityContainer");
             
-            // 清空舊選項
+            // 1. 更新顏色選項
             colorSelect.innerHTML = "";
-            
-            // 插入新選項
             colorMap[type].forEach(color => {
                 const opt = document.createElement("option");
                 opt.value = color;
                 opt.textContent = color;
                 colorSelect.appendChild(opt);
             });
+
+            // 2. 判斷是否顯示「顏色濃度」
+            if (type === "染色鏡片") {
+                densityContainer.classList.remove("hidden");
+            } else {
+                densityContainer.classList.add("hidden");
+            }
         }
 
         // 執行查詢
@@ -102,16 +125,27 @@
             const idx = document.getElementById("index").value;
             const coating = document.getElementById("coating").value;
             const color = document.getElementById("color").value;
+            
+            // 重置複製按鈕狀態
+            document.getElementById("copySuccess").classList.add("hidden");
 
             // 組裝用來查詢的 Key
             const searchKey = `${type}-${idx}-${coating}-${color}`;
             
-            // 從資料庫找編號，找不到就自動動態生成一個臨時編號
             let finalCode = hkoDatabase[searchKey];
             
             if (!finalCode) {
-                // 臨時生成的邏輯例子 (若資料庫沒精準配對)
-                finalCode = `HKO-${idx}-${color}`; 
+                // 如果是染色鏡片，自動把濃度也加進臨時編號裡
+                if (type === "染色鏡片") {
+                    const density = document.getElementById("density").value;
+                    finalCode = `HKO-${idx}-${color}-${density}`;
+                } else {
+                    finalCode = `HKO-${idx}-${color}`; 
+                }
+            } else if (type === "染色鏡片") {
+                // 如果資料庫有基礎編號，且是染色鏡片，後面附帶濃度
+                const density = document.getElementById("density").value;
+                finalCode = `${finalCode}-${density}`;
             }
 
             // 顯示結果
@@ -119,8 +153,25 @@
             document.getElementById("resultBox").classList.remove("hidden");
         }
 
-        // 網頁載入時先初始化一次顏色選單
-        window.onload = updateColors;
+        // 複製到剪貼簿功能
+        function copyToClipboard() {
+            const codeText = document.getElementById("resultCode").textContent;
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                const successText = document.getElementById("copySuccess");
+                successText.classList.remove("hidden");
+                
+                // 3秒後自動隱藏提示
+                setTimeout(() => {
+                    successText.classList.add("hidden");
+                }, 3000);
+            }).catch(err => {
+                alert("複製失敗，請手動複製。");
+            });
+        }
+
+        // 網頁載入時先初始化一次
+        window.onload = updateFields;
     </script>
 </body>
 </html>
