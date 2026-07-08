@@ -73,6 +73,16 @@
             "腮紅鏡片": ["紅", "橙"],
             "Photoshade": ["灰", "棕"]
         };
+
+        // 定義每種顏色文字對應的 Tailwind 背景色與邊框
+        const colorStyles = {
+            "灰": { bg: "bg-slate-200 text-slate-800", active: "bg-slate-400 border-slate-600 text-slate-950 font-black ring-4 ring-slate-200" },
+            "藍": { bg: "bg-sky-100 text-sky-800", active: "bg-sky-300 border-sky-500 text-sky-950 font-black ring-4 ring-sky-100" },
+            "紅": { bg: "bg-rose-100 text-rose-800", active: "bg-rose-300 border-rose-500 text-rose-950 font-black ring-4 ring-rose-100" },
+            "橙": { bg: "bg-orange-100 text-orange-800", active: "bg-orange-300 border-orange-500 text-orange-950 font-black ring-4 ring-orange-100" },
+            "棕": { bg: "bg-amber-100 text-amber-900", active: "bg-amber-300 border-amber-600 text-amber-950 font-black ring-4 ring-amber-100" }
+        };
+
         const densities = ["85%", "50%", "25%", "15%"];
 
         let selectedColor = "";
@@ -84,16 +94,23 @@
             const densityWrapper = document.getElementById("densityWrapper");
             const densityContainer = document.getElementById("densityContainer");
             
-            // 生成顏色方塊
+            // 生成具備背景顏色的顏色方塊
             colorContainer.innerHTML = "";
             colorMap[type].forEach((color, idx) => {
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = `p-3 border rounded-xl font-semibold transition cursor-pointer text-center ${idx === 0 ? 'bg-blue-50 border-blue-500 text-blue-600 font-bold shadow-xs' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                
+                // 基礎樣式
+                btn.className = `p-4 border border-slate-200 rounded-xl font-semibold transition cursor-pointer text-center ${colorStyles[color].bg}`;
                 btn.textContent = color;
-                btn.onclick = () => selectRadio('color', color, btn);
+                btn.onclick = () => selectColorBox(color, btn);
+                
                 colorContainer.appendChild(btn);
-                if(idx === 0) selectedColor = color;
+                
+                // 預設選取第一個
+                if(idx === 0) {
+                    selectColorBox(color, btn);
+                }
             });
 
             // 處理濃度方塊
@@ -103,32 +120,48 @@
                 densities.forEach((ds, idx) => {
                     const btn = document.createElement("button");
                     btn.type = "button";
-                    btn.className = `p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center ${idx === 0 ? 'bg-blue-50 border-blue-500 text-blue-600 font-bold shadow-xs' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                    btn.className = `p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50`;
                     btn.textContent = ds;
-                    btn.onclick = () => selectRadio('density', ds, btn);
+                    btn.onclick = () => selectDensityBox(ds, btn);
                     densityContainer.appendChild(btn);
-                    if(idx === 0) selectedDensity = ds;
+                    
+                    if(idx === 0) {
+                        selectDensityBox(ds, btn);
+                    }
                 });
             } else {
                 densityWrapper.classList.add("hidden");
             }
             
-            // 隱藏上一次的結果
             document.getElementById("resultBox").classList.add("hidden");
         }
 
-        function selectRadio(type, value, element) {
-            if(type === 'color') selectedColor = value;
-            if(type === 'density') selectedDensity = value;
+        // 專門處理色彩方塊選取的函數
+        function selectColorBox(color, element) {
+            selectedColor = color;
             
-            // 切換按鈕高亮樣式
+            // 還原所有顏色按鈕到它們的預設淺色狀態
+            const siblings = element.parentNode.children;
+            const currentTypeColors = colorMap[document.getElementById("lensType").value];
+            
+            for(let i = 0; i < siblings.length; i++) {
+                const cName = currentTypeColors[i];
+                siblings[i].className = `p-4 border border-slate-200 rounded-xl font-semibold transition cursor-pointer text-center ${colorStyles[cName].bg} hover:brightness-95`;
+            }
+            
+            // 為選中的按鈕加上專屬的深色高亮與外圈（ring）
+            element.className = `p-4 border rounded-xl transition cursor-pointer text-center shadow-md ${colorStyles[color].active}`;
+        }
+
+        // 處理濃度方塊選取
+        function selectDensityBox(value, element) {
+            selectedDensity = value;
+            
             const siblings = element.parentNode.children;
             for(let btn of siblings) {
-                btn.className = "p-3 border rounded-xl font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50";
-                if(type === 'density') btn.className = "p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50";
+                btn.className = "p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50";
             }
-            element.className = `p-3 border rounded-xl font-bold transition cursor-pointer text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs`;
-            if(type === 'density') element.className = `p-2.5 border rounded-xl text-base font-bold transition cursor-pointer text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs`;
+            element.className = `p-2.5 border rounded-xl text-base font-bold transition cursor-pointer text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100`;
         }
 
         function lookupCode() {
@@ -156,7 +189,6 @@
             const copyBtnText = document.getElementById("copyBtnText");
             
             navigator.clipboard.writeText(codeText).then(() => {
-                // 複製成功：按鈕變綠色
                 copyBtn.className = "mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer";
                 copyBtnText.textContent = "✓ 已成功複製";
             }).catch(err => {
