@@ -1,143 +1,126 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="zh-HK">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Songti TC'; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Songti TC'; -webkit-text-stroke: #000000; min-height: 17.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKO 鏡片編號查詢系統</title>
+    <!-- 使用 Tailwind CSS 快速美化介面 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="zh-HK"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;HKO 鏡片編號查詢系統&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 使用 Tailwind CSS 快速美化介面 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h1 class="text-2xl font-bold text-center text-blue-600 mb-6"&gt;HKO 鏡片編號查詢&lt;/h1&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 1. 鏡片類型 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;鏡片類型&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="lensType" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateColors()"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="染色鏡片"&gt;染色鏡片&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="腮紅鏡片"&gt;腮紅鏡片&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="Photoshade"&gt;Photoshade&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 2. 折射率 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;折射率 (Index)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="index" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="1.6"&gt;1.6&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="1.67"&gt;1.67&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 3. 鍍膜 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;鍍膜 (Coating)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="coating" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="沒有"&gt;沒有鍍膜&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="抗刮"&gt;抗刮 (HC)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="抗刮+超透光"&gt;抗刮 + 超透光 (HMC)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 4. 顏色 (會根據類型聯動變更) --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mb-6"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;顏色&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="color" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;!-- 由 JavaScript 動態動態生成 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 查詢按鈕 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-200 shadow-md"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>查詢鏡片編號</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 結果顯示區域 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mt-6 p-4 bg-gray-100 rounded-xl text-center hidden" id="resultBox"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="text-sm text-gray-500 font-medium"&gt;對應 HKO 鏡片編號&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="text-3xl font-black text-gray-900 mt-1 tracking-wider" id="resultCode"&gt;------&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 顏色聯動關係</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const colorMap = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"染色鏡片": ["灰", "藍"],</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"腮紅鏡片": ["紅", "橙"],</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Photoshade": ["灰", "棕"]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 模擬的 HKO 編號資料庫 (你可以根據實際編號修改這裡的 Mapping)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 格式： "類型-折射率-鍍膜-顏色": "實際編號"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const hkoDatabase = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"染色鏡片-1.6-抗刮-灰": "HKO60T-GY-H",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"染色鏡片-1.67-抗刮+超透光-藍": "HKO67T-BL-HMC",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"腮紅鏡片-1.6-沒有-紅": "HKO60B-RD-UC",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>"Photoshade-1.67-抗刮+超透光-棕": "HKO67P-BR-HMC",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// ... 在這裡自由添加你的對應數據</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 根據選擇的鏡片類型，自動更新顏色選項</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function updateColors() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const type = document.getElementById("lensType").value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const colorSelect = document.getElementById("color");</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 清空舊選項</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>colorSelect.innerHTML = "";</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 插入新選項</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>colorMap[type].forEach(color =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const opt = document.createElement("option");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>opt.value = color;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>opt.textContent = color;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>colorSelect.appendChild(opt);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 執行查詢</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function lookupCode() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const type = document.getElementById("lensType").value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const idx = document.getElementById("index").value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const coating = document.getElementById("coating").value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const color = document.getElementById("color").value;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 組裝用來查詢的 Key</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const searchKey = `${type}-${idx}-${coating}-${color}`;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 從資料庫找編號，找不到就自動動態生成一個臨時編號</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let finalCode = hkoDatabase[searchKey];</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!finalCode) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 臨時生成的邏輯例子 (若資料庫沒精準配對)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>finalCode = `HKO-${idx}-${color}`;<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 顯示結果</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById("resultCode").textContent = finalCode;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById("resultBox").classList.remove("hidden");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 網頁載入時先初始化一次顏色選單</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.onload = updateColors;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">HKO 鏡片編號查詢</h1>
+        
+        <!-- 1. 鏡片類型 -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">鏡片類型</label>
+            <select id="lensType" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateColors()">
+                <option value="染色鏡片">染色鏡片</option>
+                <option value="腮紅鏡片">腮紅鏡片</option>
+                <option value="Photoshade">Photoshade</option>
+            </select>
+        </div>
+
+        <!-- 2. 折射率 -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">折射率 (Index)</label>
+            <select id="index" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                <option value="1.6">1.6</option>
+                <option value="1.67">1.67</option>
+            </select>
+        </div>
+
+        <!-- 3. 鍍膜 -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">鍍膜 (Coating)</label>
+            <select id="coating" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                <option value="沒有">沒有鍍膜</option>
+                <option value="抗刮">抗刮 (HC)</option>
+                <option value="抗刮+超透光">抗刮 + 超透光 (HMC)</option>
+            </select>
+        </div>
+
+        <!-- 4. 顏色 (會根據類型聯動變更) -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1">顏色</label>
+            <select id="color" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                <!-- 由 JavaScript 動態動態生成 -->
+            </select>
+        </div>
+
+        <!-- 查詢按鈕 -->
+        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-200 shadow-md">
+            查詢鏡片編號
+        </button>
+
+        <!-- 結果顯示區域 -->
+        <div class="mt-6 p-4 bg-gray-100 rounded-xl text-center hidden" id="resultBox">
+            <p class="text-sm text-gray-500 font-medium">對應 HKO 鏡片編號</p>
+            <p class="text-3xl font-black text-gray-900 mt-1 tracking-wider" id="resultCode">------</p>
+        </div>
+    </div>
+
+    <script>
+        // 顏色聯動關係
+        const colorMap = {
+            "染色鏡片": ["灰", "藍"],
+            "腮紅鏡片": ["紅", "橙"],
+            "Photoshade": ["灰", "棕"]
+        };
+
+        // 模擬的 HKO 編號資料庫 (你可以根據實際編號修改這裡的 Mapping)
+        // 格式： "類型-折射率-鍍膜-顏色": "實際編號"
+        const hkoDatabase = {
+            "染色鏡片-1.6-抗刮-灰": "HKO60T-GY-H",
+            "染色鏡片-1.67-抗刮+超透光-藍": "HKO67T-BL-HMC",
+            "腮紅鏡片-1.6-沒有-紅": "HKO60B-RD-UC",
+            "Photoshade-1.67-抗刮+超透光-棕": "HKO67P-BR-HMC",
+            // ... 在這裡自由添加你的對應數據
+        };
+
+        // 根據選擇的鏡片類型，自動更新顏色選項
+        function updateColors() {
+            const type = document.getElementById("lensType").value;
+            const colorSelect = document.getElementById("color");
+            
+            // 清空舊選項
+            colorSelect.innerHTML = "";
+            
+            // 插入新選項
+            colorMap[type].forEach(color => {
+                const opt = document.createElement("option");
+                opt.value = color;
+                opt.textContent = color;
+                colorSelect.appendChild(opt);
+            });
+        }
+
+        // 執行查詢
+        function lookupCode() {
+            const type = document.getElementById("lensType").value;
+            const idx = document.getElementById("index").value;
+            const coating = document.getElementById("coating").value;
+            const color = document.getElementById("color").value;
+
+            // 組裝用來查詢的 Key
+            const searchKey = `${type}-${idx}-${coating}-${color}`;
+            
+            // 從資料庫找編號，找不到就自動動態生成一個臨時編號
+            let finalCode = hkoDatabase[searchKey];
+            
+            if (!finalCode) {
+                // 臨時生成的邏輯例子 (若資料庫沒精準配對)
+                finalCode = `HKO-${idx}-${color}`; 
+            }
+
+            // 顯示結果
+            document.getElementById("resultCode").textContent = finalCode;
+            document.getElementById("resultBox").classList.remove("hidden");
+        }
+
+        // 網頁載入時先初始化一次顏色選單
+        window.onload = updateColors;
+    </script>
 </body>
 </html>
