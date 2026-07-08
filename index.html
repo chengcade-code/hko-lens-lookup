@@ -6,171 +6,164 @@
     <title>HKO 鏡片編號查詢系統</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* 整個畫面字體加大 */
-        body {
-            font-size: 18px; 
-        }
-        select, button, input {
-            font-size: 18px !important;
-        }
-        label {
-            font-size: 16px !important;
-        }
+        body { font-size: 18px; }
+        select, button { font-size: 18px !important; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-6">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-xl border border-gray-100">
-        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">HKO 鏡片編號查詢</h1>
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100">
+        <h1 class="text-3xl font-extrabold text-center text-blue-600 mb-8 tracking-wide">HKO 鏡片編號查詢</h1>
         
-        <div class="mb-5">
-            <label class="block font-semibold text-gray-700 mb-2">鏡片類型</label>
-            <select id="lensType" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateFields()">
-                <option value="染色鏡片">染色鏡片</option>
-                <option value="腮紅鏡片">腮紅鏡片</option>
-                <option value="Photoshade">Photoshade</option>
+        <div class="mb-6">
+            <label class="block font-bold text-slate-700 mb-2 text-base">鏡片類型</label>
+            <select id="lensType" class="w-full p-3.5 border border-slate-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" onchange="updateFields()">
+                <option value="染色鏡片">染色鏡片 (Tinted)</option>
+                <option value="腮紅鏡片">腮紅鏡片 (Blush)</option>
+                <option value="Photoshade">Photoshade (變色)</option>
             </select>
         </div>
 
-        <div class="mb-5">
-            <label class="block font-semibold text-gray-700 mb-2">折射率 (Index)</label>
-            <select id="index" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
-                <option value="1.6">1.6</option>
+        <div class="mb-6">
+            <label class="block font-bold text-slate-700 mb-2 text-base">折射率 (Index)</label>
+            <select id="index" class="w-full p-3.5 border border-slate-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                <option value="1.6">1.60</option>
                 <option value="1.67">1.67</option>
             </select>
         </div>
 
-        <div class="mb-5">
-            <label class="block font-semibold text-gray-700 mb-2">鍍膜 (Coating)</label>
-            <select id="coating" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
-                <option value="沒有">沒有鍍膜</option>
-                <option value="抗刮">抗刮 (HC)</option>
-                <option value="抗刮+超透光">抗刮 + 超透光 (HMC)</option>
+        <div class="mb-6">
+            <label class="block font-bold text-slate-700 mb-2 text-base">鍍膜 (Coating)</label>
+            <select id="coating" class="w-full p-3.5 border border-slate-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                <option value="沒有">UC (沒有鍍膜)</option>
+                <option value="抗刮">HC (抗刮鍍膜)</option>
+                <option value="抗刮+超透光">HMC (抗刮 + 超透光)</option>
             </select>
         </div>
 
-        <div class="mb-5">
-            <label class="block font-semibold text-gray-700 mb-2">顏色</label>
-            <select id="color" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
-                </select>
+        <div class="mb-6">
+            <label class="block font-bold text-slate-700 mb-2 text-base">顏色</label>
+            <div id="colorContainer" class="grid grid-cols-2 gap-3">
+                </div>
         </div>
 
-        <div class="mb-6 hidden" id="densityContainer">
-            <label class="block font-semibold text-gray-700 mb-2">顏色濃度</label>
-            <select id="density" class="w-full p-3.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
-                <option value="85%">85%</option>
-                <option value="50%">50%</option>
-                <option value="25%">25%</option>
-                <option value="15%">15%</option>
-            </select>
+        <div class="mb-8 hidden" id="densityWrapper">
+            <label class="block font-bold text-slate-700 mb-2 text-base">顏色濃度</label>
+            <div id="densityContainer" class="grid grid-cols-4 gap-2">
+                </div>
         </div>
 
-        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-lg transition duration-200 shadow-md text-xl cursor-pointer">
-            查詢鏡片編號
+        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition duration-200 shadow-md text-xl cursor-pointer">
+            產生鏡片編號
         </button>
 
-        <div class="mt-8 p-6 bg-gray-100 rounded-xl text-center hidden" id="resultBox">
-            <p class="text-base text-gray-500 font-semibold">對應 HKO 鏡片編號</p>
-            <p class="text-4xl font-black text-gray-900 mt-2 tracking-wider" id="resultCode">------</p>
+        <div class="mt-8 p-6 bg-slate-100 rounded-2xl text-center hidden" id="resultBox">
+            <p class="text-sm text-slate-500 font-semibold tracking-wider uppercase">對應 HKO 鏡片編號</p>
+            <p class="text-4xl font-black text-slate-900 mt-2 tracking-wider select-all" id="resultCode">------</p>
             
-            <button id="copyBtn" onclick="copyToClipboard()" class="mt-4 inline-flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-lg transition duration-150 text-base cursor-pointer">
-                <span>複製編號</span>
+            <button id="copyBtn" onclick="copyToClipboard()" class="mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer">
+                <span id="copyBtnText">複製編號</span>
             </button>
-            <p id="copySuccess" class="text-green-600 text-sm mt-1 font-medium hidden">✓ 已成功複製到剪貼簿</p>
         </div>
     </div>
 
     <script>
-        // 顏色聯動關係
         const colorMap = {
             "染色鏡片": ["灰", "藍"],
             "腮紅鏡片": ["紅", "橙"],
             "Photoshade": ["灰", "棕"]
         };
+        const densities = ["85%", "50%", "25%", "15%"];
 
-        // 模擬的 HKO 編號資料庫 Mapping
-        const hkoDatabase = {
-            "染色鏡片-1.6-抗刮-灰": "HKO60T-GY-H",
-            "染色鏡片-1.67-抗刮+超透光-藍": "HKO67T-BL-HMC",
-            "腮紅鏡片-1.6-沒有-紅": "HKO60B-RD-UC",
-            "Photoshade-1.67-抗刮+超透光-棕": "HKO67P-BR-HMC",
-        };
+        let selectedColor = "";
+        let selectedDensity = "85%";
 
-        // 更新欄位：顏色與濃度顯示
         function updateFields() {
             const type = document.getElementById("lensType").value;
-            const colorSelect = document.getElementById("color");
+            const colorContainer = document.getElementById("colorContainer");
+            const densityWrapper = document.getElementById("densityWrapper");
             const densityContainer = document.getElementById("densityContainer");
             
-            // 1. 更新顏色選項
-            colorSelect.innerHTML = "";
-            colorMap[type].forEach(color => {
-                const opt = document.createElement("option");
-                opt.value = color;
-                opt.textContent = color;
-                colorSelect.appendChild(opt);
+            // 生成顏色方塊
+            colorContainer.innerHTML = "";
+            colorMap[type].forEach((color, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = `p-3 border rounded-xl font-semibold transition cursor-pointer text-center ${idx === 0 ? 'bg-blue-50 border-blue-500 text-blue-600 font-bold shadow-xs' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                btn.textContent = color;
+                btn.onclick = () => selectRadio('color', color, btn);
+                colorContainer.appendChild(btn);
+                if(idx === 0) selectedColor = color;
             });
 
-            // 2. 判斷是否顯示「顏色濃度」
+            // 處理濃度方塊
             if (type === "染色鏡片") {
-                densityContainer.classList.remove("hidden");
+                densityWrapper.classList.remove("hidden");
+                densityContainer.innerHTML = "";
+                densities.forEach((ds, idx) => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = `p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center ${idx === 0 ? 'bg-blue-50 border-blue-500 text-blue-600 font-bold shadow-xs' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+                    btn.textContent = ds;
+                    btn.onclick = () => selectRadio('density', ds, btn);
+                    densityContainer.appendChild(btn);
+                    if(idx === 0) selectedDensity = ds;
+                });
             } else {
-                densityContainer.classList.add("hidden");
+                densityWrapper.classList.add("hidden");
             }
+            
+            // 隱藏上一次的結果
+            document.getElementById("resultBox").classList.add("hidden");
         }
 
-        // 執行查詢
+        function selectRadio(type, value, element) {
+            if(type === 'color') selectedColor = value;
+            if(type === 'density') selectedDensity = value;
+            
+            // 切換按鈕高亮樣式
+            const siblings = element.parentNode.children;
+            for(let btn of siblings) {
+                btn.className = "p-3 border rounded-xl font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50";
+                if(type === 'density') btn.className = "p-2.5 border rounded-xl text-base font-semibold transition cursor-pointer text-center bg-white border-slate-200 hover:bg-slate-50";
+            }
+            element.className = `p-3 border rounded-xl font-bold transition cursor-pointer text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs`;
+            if(type === 'density') element.className = `p-2.5 border rounded-xl text-base font-bold transition cursor-pointer text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs`;
+        }
+
         function lookupCode() {
             const type = document.getElementById("lensType").value;
             const idx = document.getElementById("index").value;
-            const coating = document.getElementById("coating").value;
-            const color = document.getElementById("color").value;
+            let finalCode = `HKO-${idx}-${selectedColor}`;
             
-            // 重置複製按鈕狀態
-            document.getElementById("copySuccess").classList.add("hidden");
-
-            // 組裝用來查詢的 Key
-            const searchKey = `${type}-${idx}-${coating}-${color}`;
-            
-            let finalCode = hkoDatabase[searchKey];
-            
-            if (!finalCode) {
-                // 如果是染色鏡片，自動把濃度也加進臨時編號裡
-                if (type === "染色鏡片") {
-                    const density = document.getElementById("density").value;
-                    finalCode = `HKO-${idx}-${color}-${density}`;
-                } else {
-                    finalCode = `HKO-${idx}-${color}`; 
-                }
-            } else if (type === "染色鏡片") {
-                // 如果資料庫有基礎編號，且是染色鏡片，後面附帶濃度
-                const density = document.getElementById("density").value;
-                finalCode = `${finalCode}-${density}`;
+            if (type === "染色鏡片") {
+                finalCode += `-${selectedDensity}`;
             }
 
-            // 顯示結果
             document.getElementById("resultCode").textContent = finalCode;
             document.getElementById("resultBox").classList.remove("hidden");
+            
+            // 還原複製按鈕
+            const copyBtn = document.getElementById("copyBtn");
+            const copyBtnText = document.getElementById("copyBtnText");
+            copyBtn.className = "mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer";
+            copyBtnText.textContent = "複製編號";
         }
 
-        // 複製到剪貼簿功能
         function copyToClipboard() {
             const codeText = document.getElementById("resultCode").textContent;
+            const copyBtn = document.getElementById("copyBtn");
+            const copyBtnText = document.getElementById("copyBtnText");
             
             navigator.clipboard.writeText(codeText).then(() => {
-                const successText = document.getElementById("copySuccess");
-                successText.classList.remove("hidden");
-                
-                // 3秒後自動隱藏提示
-                setTimeout(() => {
-                    successText.classList.add("hidden");
-                }, 3000);
+                // 複製成功：按鈕變綠色
+                copyBtn.className = "mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer";
+                copyBtnText.textContent = "✓ 已成功複製";
             }).catch(err => {
-                alert("複製失敗，請手動複製。");
+                alert("複製失敗，請手動全選複製。");
             });
         }
 
-        // 網頁載入時先初始化一次
         window.onload = updateFields;
     </script>
 </body>
