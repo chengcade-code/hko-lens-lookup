@@ -1,0 +1,135 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2821
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 <!DOCTYPE html>\
+<html lang="zh-HK">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>HKO \uc0\u37857 \u29255 \u32232 \u34399 \u26597 \u35426 \u31995 \u32113 </title>\
+    <!-- \uc0\u20351 \u29992  Tailwind CSS \u24555 \u36895 \u32654 \u21270 \u20171 \u38754  -->\
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>\
+</head>\
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4">\
+\
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">\
+        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">HKO \uc0\u37857 \u29255 \u32232 \u34399 \u26597 \u35426 </h1>\
+        \
+        <!-- 1. \uc0\u37857 \u29255 \u39006 \u22411  -->\
+        <div class="mb-4">\
+            <label class="block text-sm font-medium text-gray-700 mb-1">\uc0\u37857 \u29255 \u39006 \u22411 </label>\
+            <select id="lensType" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden" onchange="updateColors()">\
+                <option value="\uc0\u26579 \u33394 \u37857 \u29255 ">\u26579 \u33394 \u37857 \u29255 </option>\
+                <option value="\uc0\u33134 \u32005 \u37857 \u29255 ">\u33134 \u32005 \u37857 \u29255 </option>\
+                <option value="Photoshade">Photoshade</option>\
+            </select>\
+        </div>\
+\
+        <!-- 2. \uc0\u25240 \u23556 \u29575  -->\
+        <div class="mb-4">\
+            <label class="block text-sm font-medium text-gray-700 mb-1">\uc0\u25240 \u23556 \u29575  (Index)</label>\
+            <select id="index" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">\
+                <option value="1.6">1.6</option>\
+                <option value="1.67">1.67</option>\
+            </select>\
+        </div>\
+\
+        <!-- 3. \uc0\u37709 \u33180  -->\
+        <div class="mb-4">\
+            <label class="block text-sm font-medium text-gray-700 mb-1">\uc0\u37709 \u33180  (Coating)</label>\
+            <select id="coating" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">\
+                <option value="\uc0\u27794 \u26377 ">\u27794 \u26377 \u37709 \u33180 </option>\
+                <option value="\uc0\u25239 \u21038 ">\u25239 \u21038  (HC)</option>\
+                <option value="\uc0\u25239 \u21038 +\u36229 \u36879 \u20809 ">\u25239 \u21038  + \u36229 \u36879 \u20809  (HMC)</option>\
+            </select>\
+        </div>\
+\
+        <!-- 4. \uc0\u38991 \u33394  (\u26371 \u26681 \u25818 \u39006 \u22411 \u32879 \u21205 \u35722 \u26356 ) -->\
+        <div class="mb-6">\
+            <label class="block text-sm font-medium text-gray-700 mb-1">\uc0\u38991 \u33394 </label>\
+            <select id="color" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden">\
+                <!-- \uc0\u30001  JavaScript \u21205 \u24907 \u21205 \u24907 \u29983 \u25104  -->\
+            </select>\
+        </div>\
+\
+        <!-- \uc0\u26597 \u35426 \u25353 \u37397  -->\
+        <button onclick="lookupCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-200 shadow-md">\
+            \uc0\u26597 \u35426 \u37857 \u29255 \u32232 \u34399 \
+        </button>\
+\
+        <!-- \uc0\u32080 \u26524 \u39023 \u31034 \u21312 \u22495  -->\
+        <div class="mt-6 p-4 bg-gray-100 rounded-xl text-center hidden" id="resultBox">\
+            <p class="text-sm text-gray-500 font-medium">\uc0\u23565 \u25033  HKO \u37857 \u29255 \u32232 \u34399 </p>\
+            <p class="text-3xl font-black text-gray-900 mt-1 tracking-wider" id="resultCode">------</p>\
+        </div>\
+    </div>\
+\
+    <script>\
+        // \uc0\u38991 \u33394 \u32879 \u21205 \u38364 \u20418 \
+        const colorMap = \{\
+            "\uc0\u26579 \u33394 \u37857 \u29255 ": ["\u28784 ", "\u34253 "],\
+            "\uc0\u33134 \u32005 \u37857 \u29255 ": ["\u32005 ", "\u27225 "],\
+            "Photoshade": ["\uc0\u28784 ", "\u26837 "]\
+        \};\
+\
+        // \uc0\u27169 \u25836 \u30340  HKO \u32232 \u34399 \u36039 \u26009 \u24235  (\u20320 \u21487 \u20197 \u26681 \u25818 \u23526 \u38555 \u32232 \u34399 \u20462 \u25913 \u36889 \u35041 \u30340  Mapping)\
+        // \uc0\u26684 \u24335 \u65306  "\u39006 \u22411 -\u25240 \u23556 \u29575 -\u37709 \u33180 -\u38991 \u33394 ": "\u23526 \u38555 \u32232 \u34399 "\
+        const hkoDatabase = \{\
+            "\uc0\u26579 \u33394 \u37857 \u29255 -1.6-\u25239 \u21038 -\u28784 ": "HKO60T-GY-H",\
+            "\uc0\u26579 \u33394 \u37857 \u29255 -1.67-\u25239 \u21038 +\u36229 \u36879 \u20809 -\u34253 ": "HKO67T-BL-HMC",\
+            "\uc0\u33134 \u32005 \u37857 \u29255 -1.6-\u27794 \u26377 -\u32005 ": "HKO60B-RD-UC",\
+            "Photoshade-1.67-\uc0\u25239 \u21038 +\u36229 \u36879 \u20809 -\u26837 ": "HKO67P-BR-HMC",\
+            // ... \uc0\u22312 \u36889 \u35041 \u33258 \u30001 \u28155 \u21152 \u20320 \u30340 \u23565 \u25033 \u25976 \u25818 \
+        \};\
+\
+        // \uc0\u26681 \u25818 \u36984 \u25799 \u30340 \u37857 \u29255 \u39006 \u22411 \u65292 \u33258 \u21205 \u26356 \u26032 \u38991 \u33394 \u36984 \u38917 \
+        function updateColors() \{\
+            const type = document.getElementById("lensType").value;\
+            const colorSelect = document.getElementById("color");\
+            \
+            // \uc0\u28165 \u31354 \u33290 \u36984 \u38917 \
+            colorSelect.innerHTML = "";\
+            \
+            // \uc0\u25554 \u20837 \u26032 \u36984 \u38917 \
+            colorMap[type].forEach(color => \{\
+                const opt = document.createElement("option");\
+                opt.value = color;\
+                opt.textContent = color;\
+                colorSelect.appendChild(opt);\
+            \});\
+        \}\
+\
+        // \uc0\u22519 \u34892 \u26597 \u35426 \
+        function lookupCode() \{\
+            const type = document.getElementById("lensType").value;\
+            const idx = document.getElementById("index").value;\
+            const coating = document.getElementById("coating").value;\
+            const color = document.getElementById("color").value;\
+\
+            // \uc0\u32068 \u35037 \u29992 \u20358 \u26597 \u35426 \u30340  Key\
+            const searchKey = `$\{type\}-$\{idx\}-$\{coating\}-$\{color\}`;\
+            \
+            // \uc0\u24478 \u36039 \u26009 \u24235 \u25214 \u32232 \u34399 \u65292 \u25214 \u19981 \u21040 \u23601 \u33258 \u21205 \u21205 \u24907 \u29983 \u25104 \u19968 \u20491 \u33256 \u26178 \u32232 \u34399 \
+            let finalCode = hkoDatabase[searchKey];\
+            \
+            if (!finalCode) \{\
+                // \uc0\u33256 \u26178 \u29983 \u25104 \u30340 \u37007 \u36655 \u20363 \u23376  (\u33509 \u36039 \u26009 \u24235 \u27794 \u31934 \u28310 \u37197 \u23565 )\
+                finalCode = `HKO-$\{idx\}-$\{color\}`; \
+            \}\
+\
+            // \uc0\u39023 \u31034 \u32080 \u26524 \
+            document.getElementById("resultCode").textContent = finalCode;\
+            document.getElementById("resultBox").classList.remove("hidden");\
+        \}\
+\
+        // \uc0\u32178 \u38913 \u36617 \u20837 \u26178 \u20808 \u21021 \u22987 \u21270 \u19968 \u27425 \u38991 \u33394 \u36984 \u21934 \
+        window.onload = updateColors;\
+    </script>\
+</body>\
+</html>}
