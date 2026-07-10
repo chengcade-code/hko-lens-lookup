@@ -3,254 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKO PhotoShade 變色查詢系統</title>
+    <title>HKO 鏡片代碼查詢系統</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { font-size: 18px; }
-        select, button { font-size: 18px !important; }
+        body { font-size: 15px; }
+        select, button { font-size: 15px !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-3 sm:p-4">
 
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100">
-        <h1 class="text-3xl font-extrabold text-center text-blue-600 mb-8 tracking-wide">PhotoShade 鏡片查詢</h1>
+    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-lg w-full max-w-lg border border-slate-100">
+        <h1 class="text-xl font-bold text-center text-blue-600 mb-4 tracking-wide">HKO 鏡片代碼查詢系統</h1>
         
-        <!-- 1. 折射率 -->
-        <div class="mb-5">
-            <label class="block font-bold text-slate-700 mb-2 text-base">1. 折射率 (Index)</label>
-            <div id="indexContainer" class="grid grid-cols-2 gap-3">
-                <button type="button" onclick="selectParam('index', '1.6')" id="idx-1.6" class="p-3.5 border rounded-xl font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs">1.60</button>
-                <button type="button" onclick="selectParam('index', '1.67')" id="idx-1.67" class="p-3.5 border border-slate-200 rounded-xl font-semibold transition text-center bg-white hover:bg-slate-50">1.67</button>
+        <div class="mb-3">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">鏡片系列</label>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="selectSeries('PhotoShade')" id="series-PhotoShade" class="py-2 px-3 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs text-sm">PhotoShade 變色</button>
+                <button type="button" onclick="selectSeries('Tinted')" id="series-Tinted" class="py-2 px-3 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 text-sm">染色鏡片 (Tinted)</button>
             </div>
         </div>
 
-        <!-- 2. 鏡片類型 (單光 / 漸進) -->
-        <div class="mb-5">
-            <label class="block font-bold text-slate-700 mb-2 text-base">2. 鏡片類型</label>
-            <div id="typeContainer" class="grid grid-cols-2 gap-3">
-                <button type="button" onclick="selectParam('type', 'Single')" id="type-Single" class="p-3.5 border rounded-xl font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs">單光鏡片 (Single Vision)</button>
-                <button type="button" onclick="selectParam('type', 'Progressive')" id="type-Progressive" class="p-3.5 border border-slate-200 rounded-xl font-semibold transition text-center bg-white hover:bg-slate-50">漸進鏡片 (PAL)</button>
+        <div class="mb-3">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">1. 折射率 (Index)</label>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="selectParam('index', '1.6')" id="idx-1.6" class="py-2 border rounded-lg font-bold transition text-center text-sm">1.60</button>
+                <button type="button" onclick="selectParam('index', '1.67')" id="idx-1.67" class="py-2 border rounded-lg font-bold transition text-center text-sm">1.67</button>
             </div>
         </div>
 
-        <!-- 2.5 漸進設計子選項 (僅在選擇漸進時出現) -->
-        <div id="palDesignWrapper" class="mb-5 hidden">
-            <label class="block font-bold text-slate-700 mb-2 text-base">2.5 漸進系列設計</label>
-            <div class="grid grid-cols-2 gap-3">
-                <button type="button" onclick="selectParam('design', 'Progressive')" id="ds-Progressive" class="p-3.5 border rounded-xl font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs">Progressive</button>
-                <button type="button" onclick="selectParam('design', 'Premium')" id="ds-Premium" class="p-3.5 border border-slate-200 rounded-xl font-semibold transition text-center bg-white hover:bg-slate-50">Premium Steady</button>
+        <div class="mb-3">
+            <label id="typeLabel" class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">2. 鏡片類型</label>
+            <div id="typeContainer" class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="selectParam('type', 'Single')" id="type-Single" class="py-2 border rounded-lg font-bold transition text-center text-sm">單光鏡片 (SV)</button>
+                <button type="button" onclick="selectParam('type', 'Progressive')" id="type-Progressive" class="py-2 border rounded-lg font-bold transition text-center text-sm">漸進鏡片 (PAL)</button>
+            </div>
+            <div id="uv420Container" class="grid grid-cols-2 gap-2 hidden">
+                <button type="button" onclick="selectParam('uv420', 'No')" id="uv-No" class="py-2 border rounded-lg font-bold transition text-center text-sm">一般透明</button>
+                <button type="button" onclick="selectParam('uv420', 'Yes')" id="uv-Yes" class="py-2 border rounded-lg font-bold transition text-center text-sm">+UV420 藍光</button>
             </div>
         </div>
 
-        <!-- 3. 供應類型 (庫存 / 訂做) -->
-        <div class="mb-5">
-            <label class="block font-bold text-slate-700 mb-2 text-base">3. 供應類型</label>
-            <div id="supplyContainer" class="grid grid-cols-2 gap-3">
-                <button type="button" onclick="selectParam('supply', 'Stock')" id="sup-Stock" class="p-3.5 border rounded-xl font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs">庫存鏡片 (Stock)</button>
-                <button type="button" onclick="selectParam('supply', 'RX')" id="sup-RX" class="p-3.5 border border-slate-200 rounded-xl font-semibold transition text-center bg-white hover:bg-slate-50">訂做鏡片 (RX)</button>
+        <div id="palDesignWrapper" class="mb-3 hidden">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">2.5 漸進系列設計</label>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="selectParam('design', 'Progressive')" id="ds-Progressive" class="py-2 border rounded-lg font-bold transition text-center text-sm">Progressive</button>
+                <button type="button" onclick="selectParam('design', 'Premium')" id="ds-Premium" class="py-2 border rounded-lg font-bold transition text-center text-sm">Premium Steady</button>
             </div>
         </div>
 
-        <!-- 4. 鍍膜選擇 -->
-        <div class="mb-5">
-            <label class="block font-bold text-slate-700 mb-2 text-base">4. 鍍膜 (Coating)</label>
-            <select id="coatingSelect" class="w-full p-3.5 border border-slate-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" onchange="hideResult()">
-                <!-- 動態注入 -->
-            </select>
-        </div>
-
-        <!-- 5. 顏色選擇 -->
-        <div class="mb-8">
-            <label class="block font-bold text-slate-700 mb-2 text-base">5. 選擇變色色彩</label>
-            <div id="colorGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <!-- 動態注入具備實際色彩視覺效果的按鈕 -->
+        <div class="mb-3">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">3. 供應類型</label>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="selectParam('supply', 'Stock')" id="sup-Stock" class="py-2 border rounded-lg font-bold transition text-center text-sm">庫存鏡片 (Stock)</button>
+                <button type="button" onclick="selectParam('supply', 'RX')" id="sup-RX" class="py-2 border rounded-lg font-bold transition text-center text-sm">訂做鏡片 (RX)</button>
             </div>
         </div>
 
-        <!-- 查詢按鈕 -->
-        <button onclick="generateHkoCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-xl transition duration-200 shadow-md text-xl cursor-pointer">
-            產生 HKO 鏡片代碼
+        <div class="mb-3">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">4. 鍍膜 (Coating)</label>
+            <select id="coatingSelect" class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-xs focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer text-sm" onchange="hideResult()">
+                </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-bold text-slate-600 mb-1 text-xs uppercase tracking-wider">5. 選擇色彩代碼</label>
+            <div id="colorGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                </div>
+        </div>
+
+        <button onclick="generateHkoCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2.5 rounded-lg transition duration-200 shadow-md text-base cursor-pointer">
+            產生 HKO 鏡片與顏色代碼
         </button>
 
-        <!-- 結果顯示區域 -->
-        <div class="mt-8 p-6 bg-slate-100 rounded-2xl text-center hidden" id="resultBox">
-            <p class="text-sm text-slate-500 font-semibold tracking-wider uppercase">對應 HKO 鏡片完整編號</p>
-            <p class="text-3xl font-black text-slate-900 mt-2 tracking-wider select-all" id="resultCode">------</p>
+        <div class="mt-4 p-4 bg-slate-100 rounded-xl text-center hidden" id="resultBox">
+            <div id="photoShadeResult" class="hidden">
+                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">對應 HKO 鏡片完整編號</p>
+                <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultCode">------</p>
+            </div>
+            <div id="tintedResult" class="hidden grid grid-cols-2 gap-2 text-left">
+                <div class="bg-white p-2 rounded-lg border border-slate-200">
+                    <p class="text-[11px] text-slate-400 font-bold">HKO 鏡種代碼 (Lens Code)</p>
+                    <p class="text-base font-black text-slate-800 mt-0.5 select-all" id="lensCodeOut">---</p>
+                </div>
+                <div class="bg-white p-2 rounded-lg border border-slate-200">
+                    <p class="text-[11px] text-slate-400 font-bold">HKO 顏色代碼 (Color Code)</p>
+                    <p class="text-base font-black text-slate-800 mt-0.5 select-all" id="colorCodeOut">---</p>
+                </div>
+            </div>
             
-            <button id="copyBtn" onclick="copyToClipboard()" class="mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer">
-                <span id="copyBtnText">複製編號</span>
+            <button id="copyBtn" onclick="copyToClipboard()" class="mt-3 w-full sm:w-auto inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-xs cursor-pointer">
+                <span id="copyBtnText">複製資訊</span>
             </button>
         </div>
     </div>
 
     <script>
-        // 初始化設定
+        let currentSeries = 'PhotoShade'; // 'PhotoShade' 或 'Tinted'
         let state = {
-            index: '1.6',
-            type: 'Single',
-            design: 'Progressive',
-            supply: 'Stock',
-            color: 'Pebble'
+            index: '1.6', type: 'Single', design: 'Progressive', supply: 'Stock', uv420: 'No', color: ''
         };
 
-        // 真實色彩按鈕樣式定義 (仿鏡片變色後的效果)
+        // 樣式對應
         const colorStyles = {
-            "Pebble": { label: "Pebble (灰)", bg: "bg-slate-200 text-slate-800", active: "bg-slate-500 border-slate-700 text-white font-black ring-4 ring-slate-200" },
-            "Hojicha": { label: "Hojicha (棕)", bg: "bg-amber-100 text-amber-900", active: "bg-amber-600 border-amber-800 text-white font-black ring-4 ring-amber-100" },
-            "Matcha": { label: "Matcha (綠)", bg: "bg-emerald-100 text-emerald-900", active: "bg-emerald-600 border-emerald-800 text-white font-black ring-4 ring-emerald-100" },
-            "Indigo": { label: "Indigo (藍)", bg: "bg-sky-100 text-sky-800", active: "bg-sky-500 border-sky-700 text-white font-black ring-4 ring-sky-100" },
-            "Sakura": { label: "Sakura (粉)", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-4 ring-rose-100" },
-            "Lavender": { label: "Lavender (紫)", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-4 ring-purple-100" }
-        };
-
-        // 顏色編碼對應碼
-        const colorCodeLetter = {
-            "Pebble": "G", "Hojicha": "B", "Matcha": "R", "Indigo": "L", "Sakura": "N", "Lavender": "P"
-        };
-
-        function selectParam(field, value) {
-            state[field] = value;
-            
-            // 邏輯控制：若選擇漸進鏡片，強迫切換為 RX (訂做)，並顯示設計子選項
-            if (field === 'type') {
-                const palDesignWrapper = document.getElementById('palDesignWrapper');
-                if (value === 'Progressive') {
-                    palDesignWrapper.classList.remove('hidden');
-                    state.supply = 'RX';
-                } else {
-                    palDesignWrapper.classList.add('hidden');
-                }
-            }
-
-            // 邏輯控制：若選擇庫存鏡片，強迫切換回單光
-            if (field === 'supply' && value === 'Stock') {
-                state.type = 'Single';
-                document.getElementById('palDesignWrapper').classList.add('hidden');
-            }
-
-            uiSync();
-        }
-
-        function uiSync() {
-            // 1. 同步按鈕高亮狀態
-            const updateGroup = (prefix, activeVal) => {
-                const buttons = document.querySelectorAll(`[id^="${prefix}-"]`);
-                buttons.forEach(btn => {
-                    if (btn.id === `${prefix}-${activeVal}`) {
-                        btn.className = "p-3.5 border rounded-xl font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100";
-                    } else {
-                        btn.className = "p-3.5 border border-slate-200 rounded-xl font-semibold transition text-center bg-white hover:bg-slate-50";
-                    }
-                });
-            };
-
-            updateGroup('idx', state.index);
-            updateGroup('type', state.type);
-            updateGroup('ds', state.design);
-            updateGroup('sup', state.supply);
-
-            // 2. 庫存鏡片不支援漸進，將庫存按鈕在漸進被選中時加上視覺暗示或鎖定（此處直接藉由選單連動切換切走）
-            
-            // 3. 根據供應種類刷新鍍膜選項
-            const coatingSelect = document.getElementById('coatingSelect');
-            coatingSelect.innerHTML = "";
-            if (state.supply === 'Stock') {
-                // 庫存只有 ETC
-                coatingSelect.innerHTML = '<option value="ETC">ETC (基本 HMC 鍍膜)</option>';
-            } else {
-                // 訂做有 ETC, UTC, UDC
-                coatingSelect.innerHTML = `
-                    <option value="ETC">ETC (基本 HMC 鍍膜)</option>
-                    <option value="UTC">UTC (SRC 強化抗刮)</option>
-                    <option value="UDC">UDC (SRC WH 低反光強化抗刮)</option>
-                `;
-            }
-
-            // 4. 根據庫存/訂製限制顏色
-            const colorGrid = document.getElementById('colorGrid');
-            colorGrid.innerHTML = "";
-            
-            // 庫存鏡片(Stock)只有灰色和棕色；訂做鏡片(RX)支援完整6色
-            let availableColors = (state.supply === 'Stock') ? ["Pebble", "Hojicha"] : ["Pebble", "Hojicha", "Matcha", "Indigo", "Sakura", "Lavender"];
-            
-            // 如果當前選擇的顏色不合規，自動校正
-            if (!availableColors.includes(state.color)) {
-                state.color = availableColors[0];
-            }
-
-            availableColors.forEach(color => {
-                const btn = document.createElement('button');
-                btn.type = "button";
-                btn.onclick = () => { state.color = color; uiSync(); };
-                
-                if (state.color === color) {
-                    btn.className = `p-4 border rounded-xl text-center shadow-md transition cursor-pointer ${colorStyles[color].active}`;
-                } else {
-                    btn.className = `p-4 border border-slate-200 rounded-xl text-center font-semibold transition cursor-pointer ${colorStyles[color].bg} hover:brightness-95`;
-                }
-                btn.textContent = colorStyles[color].label;
-                colorGrid.appendChild(btn);
-            });
-
-            hideResult();
-        }
-
-        function hideResult() {
-            document.getElementById("resultBox").classList.add("hidden");
-        }
-
-        function generateHkoCode() {
-            const coat = document.getElementById('coatingSelect').value;
-            const cLetter = colorCodeLetter[state.color];
-            const idxShort = state.index === '1.6' ? '6' : '7';
-            let finalCode = "";
-
-            if (state.type === 'Single') {
-                if (state.supply === 'Stock') {
-                    // 單光庫存格式：FOD[6/7]ASF3[G/B]ET
-                    finalCode = `FOD${idxShort}ASF3${cLetter}ET`;
-                } else {
-                    // 單光訂做格式：XOD[6/7]ASB3[G/B/R/L/N/P][ET/UT/UD]
-                    // 對應後綴：ETC->ET, UTC->UT, UDC->UD
-                    const coatShort = coat === 'ETC' ? 'ET' : (coat === 'UTC' ? 'UT' : 'UD');
-                    finalCode = `XOD${idxShort}ASB3${cLetter}${coatShort}`;
-                }
-            } else {
-                // 漸進鏡片
-                const prefix = state.design === 'Progressive' ? 'POD' : 'POD'; 
-                const designCode = state.design === 'Progressive' ? 'IDS3' : 'ESS3';
-                const suffix = state.design === 'Progressive' ? '11' : '09';
-                const coatShort = coat === 'ETC' ? 'ET' : (coat === 'UTC' ? 'UT' : 'UD');
-                
-                // 漸進格式：POD[6/7][IDS3/ESS3][G/B/R/L/N/P][ET/UT/UD][11/09]
-                finalCode = `${prefix}${idxShort}${designCode}${cLetter}${coatShort}${suffix}`;
-            }
-
-            document.getElementById("resultCode").textContent = finalCode;
-            document.getElementById("resultBox").classList.remove("hidden");
-            
-            // 重設複製按鈕
-            const copyBtn = document.getElementById("copyBtn");
-            const copyBtnText = document.getElementById("copyBtnText");
-            copyBtn.className = "mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer";
-            copyBtnText.textContent = "複製編號";
-        }
-
-        function copyToClipboard() {
-            const codeText = document.getElementById("resultCode").textContent;
-            const copyBtn = document.getElementById("copyBtn");
-            const copyBtnText = document.getElementById("copyBtnText");
-            
-            navigator.clipboard.writeText(codeText).then(() => {
-                copyBtn.className = "mt-4 w-full sm:w-auto inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-8 rounded-xl transition duration-150 text-base cursor-pointer";
-                copyBtnText.textContent = "✓ 已成功複製";
-            }).catch(err => {
-                alert("複製失敗");
-            });
-        }
-
-        // 頁面加載完成後首次同步
-        window.onload = uiSync;
-    </script>
-</body>
-</html>
+            "Pebble": { label: "Pebble (灰)", bg: "bg-slate-200 text-slate-800", active: "bg-slate-500 border-slate-700 text-white font-black ring-2 ring-slate-200" },
+            "Hojicha": { label: "Hojicha (棕)", bg: "bg-amber-100 text-amber-900", active: "bg-amber-600 border-amber-800 text-white font-black ring-2 ring-amber-100" },
+            "Matcha": { label: "Matcha (綠)", bg: "bg-emerald-100 text-emerald-900", active: "bg-emerald-600 border-emerald-800 text-white font-black ring-2 ring-emerald-100" },
+            "Indigo": { label: "Indigo (藍)", bg: "bg-sky-100 text-sky-800", active: "bg-sky-500 border-sky-700 text-white font-black ring-2 ring-sky-100" },
+            "Sakura": { label: "Sakura (粉)", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
+            "Lavender": { label: "Lavender (紫)", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" },
+            // 染色系列常用色
+            "CS-Blue": { label: "CS-Blue (藍14%)", bg: "bg-sky-50 text-sky-700", active: "bg-sky-400 border-sky-600 text-white font-black ring-2 ring-sky-100" },
+            "DGY85": { label: "DGY85 (灰85%)", bg: "bg-zinc-200 text-zinc-800", active: "bg-zinc-600 border-zinc-800 text-white font-black ring-2 ring-zinc-200" },
+            "MG-Gray": { label: "MG-Gray (灰49%)", bg: "bg-slate-200 text-slate-700", active: "bg-slate-500 border-slate-700 text-white font-black ring-2 ring-slate-200" },
+            "FORE50": { label: "FORE50 (綠50%)", bg: "bg-teal-50 text-teal-800", active: "bg-teal-500 border-teal-700 text-white font
