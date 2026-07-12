@@ -9,11 +9,12 @@
         html, body { height: 100%; }
         body { font-size: 16px; }
         select, button, input { font-size: 16px !important; }
+        #mainCard { transform-origin: center center; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-full flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden">
 
-    <div class="bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
+    <div id="mainCard" class="bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
         <h1 class="text-xl sm:text-2xl font-extrabold text-center text-blue-600 mb-3 tracking-wide">HKO 鏡片代碼查詢系統</h1>
 
         <!-- 鏡片系列 -->
@@ -414,8 +415,50 @@
             });
         }
 
-        // 頁面加載完成後首次同步
-        window.onload = uiSync;
+        // ===== 電腦使用時自動縮放字體，避免要上下滑動 =====
+        function fitCardToScreen() {
+            const card = document.getElementById('mainCard');
+            if (!card) return;
+
+            const isDesktop = window.matchMedia('(min-width: 640px)').matches;
+
+            // 手機維持原本可上下滑動嘅設計，唔做縮放
+            if (!isDesktop) {
+                card.style.transform = 'none';
+                card.style.maxHeight = '';
+                card.style.overflowY = 'auto';
+                return;
+            }
+
+            // 先重置縮放先量度真實高度
+            card.style.transform = 'none';
+            card.style.maxHeight = 'none';
+            card.style.overflowY = 'visible';
+
+            const naturalHeight = card.scrollHeight;
+            const naturalWidth = card.offsetWidth;
+            const availableHeight = window.innerHeight - 24; // 預留少少邊距
+            const availableWidth = window.innerWidth - 24;
+
+            const scale = Math.min(1, availableHeight / naturalHeight, availableWidth / naturalWidth);
+
+            if (scale < 1) {
+                card.style.transform = `scale(${scale})`;
+            }
+        }
+
+        // 監察卡片內容變化 (例如切換染色/PhotoShade 令欄位增減)，自動重新縮放
+        const cardResizeObserver = new ResizeObserver(() => {
+            window.requestAnimationFrame(fitCardToScreen);
+        });
+
+        window.addEventListener('load', () => {
+            uiSync();
+            const card = document.getElementById('mainCard');
+            if (card) cardResizeObserver.observe(card);
+            fitCardToScreen();
+        });
+        window.addEventListener('resize', fitCardToScreen);
     </script>
 </body>
 </html>
