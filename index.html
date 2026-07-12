@@ -120,6 +120,29 @@
         </div>
     </div>
 
+    <!-- 右下角 + 按鈕：進入 散光度數對應查詢 -->
+    <button id="fabAddBtn" onclick="openView2()" title="散光度數對應查詢" class="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-3xl leading-none font-bold shadow-lg flex items-center justify-center z-50 cursor-pointer">+</button>
+
+    <!-- 第二版面：HKO-2 散光度數對應查詢 -->
+    <div id="view2Card" class="hidden bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
+        <div class="flex items-center mb-3">
+            <button onclick="closeView2()" class="mr-2 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold cursor-pointer">←</button>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-center text-blue-600 tracking-wide flex-1">散光度數對應查詢</h1>
+        </div>
+
+        <div id="view2Steps"></div>
+
+        <!-- 結果顯示區域 -->
+        <div class="mt-2.5 p-3 bg-slate-100 rounded-lg text-center hidden" id="resultBox2">
+            <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase" id="resultLabel2">對應 HKO 鏡片編號</p>
+            <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultCode2">------</p>
+            <p class="text-xs text-slate-500 mt-1" id="resultNote2"></p>
+            <button id="copyBtn2" onclick="copyToClipboard2()" class="mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer">
+                <span id="copyBtnText2">複製編號</span>
+            </button>
+        </div>
+    </div>
+
     <script>
         // 初始化設定
         let state = {
@@ -416,8 +439,13 @@
         }
 
         // ===== 電腦使用時自動縮放字體，避免要上下滑動 =====
+        function getActiveCardId() {
+            const v2 = document.getElementById('view2Card');
+            return (v2 && !v2.classList.contains('hidden')) ? 'view2Card' : 'mainCard';
+        }
+
         function fitCardToScreen() {
-            const card = document.getElementById('mainCard');
+            const card = document.getElementById(getActiveCardId());
             if (!card) return;
 
             const isDesktop = window.matchMedia('(min-width: 640px)').matches;
@@ -452,13 +480,427 @@
             window.requestAnimationFrame(fitCardToScreen);
         });
 
+        function observeActiveCard() {
+            cardResizeObserver.disconnect();
+            const card = document.getElementById(getActiveCardId());
+            if (card) cardResizeObserver.observe(card);
+        }
+
+        function openView2() {
+            document.getElementById('mainCard').classList.add('hidden');
+            document.getElementById('fabAddBtn').classList.add('hidden');
+            document.getElementById('view2Card').classList.remove('hidden');
+            renderView2();
+            observeActiveCard();
+            fitCardToScreen();
+        }
+
+        function closeView2() {
+            document.getElementById('view2Card').classList.add('hidden');
+            document.getElementById('mainCard').classList.remove('hidden');
+            document.getElementById('fabAddBtn').classList.remove('hidden');
+            observeActiveCard();
+            fitCardToScreen();
+        }
+
         window.addEventListener('load', () => {
             uiSync();
-            const card = document.getElementById('mainCard');
-            if (card) cardResizeObserver.observe(card);
+            observeActiveCard();
             fitCardToScreen();
         });
         window.addEventListener('resize', fitCardToScreen);
     </script>
+
+<script>
+    // ============================================================
+    // 第二版面：HKO-2 散光度數對應查詢 (單光 / 漸進 / 近視控制)
+    // 資料來源：無標題的試算表_-_HKO-2.pdf
+    // ⚠ 注意：174 RX UV420 Ext Cyl (JPN) 喺兩個來源入面有分歧
+    //   PDF 試算表寫 XOD8ASBU3PE，另一份資料寫 XOD8ASBU3RE
+    //   此工具暫用 PE，請人手核對後再用
+    // ============================================================
+
+    const svDB = {
+        '160': {
+            extCyl: { code: 'FOD6ASFNUHM', min: 225, max: 300 },
+            rx:     { code: 'RXA161ASUVETC', min: 300, hyperopeMin: 200 },
+            ph:     { code: 'FOD6ASFNGHM', max: 200 },
+            pol:    { colors: { '灰': 'RXA16BASPLGYETC', '茶': 'RXA16BASPLBRETC' } },
+            uv420: {
+                nonJpn: { stock: 'A16ASK3ETC', rx: 'RXA16BASK3ETC', max: 200 },
+                jpn: {
+                    normal: { code: 'FOD6ASFU3ET', max: 200 },
+                    extCyl: { code: 'XOD6ASBU3ET', min: 200 }
+                }
+            }
+        },
+        '167': {
+            extCyl: { code: 'FOD7ASFNUET', min: 225, max: 300 },
+            rx:     { code: 'RXA167ASUVETC', min: 300, hyperopeMin: 200 },
+            uv420: {
+                nonJpn: { stock: 'A67ASK3ETC', rx: 'RXA67BASK3ETC', max: 200 },
+                jpn: {
+                    normal: { code: 'FOD7ASFU3ET', max: 200 },
+                    extCyl: { code: 'XOD7ASBU3ET', min: 200 }
+                },
+                das: {
+                    normal: { code: 'FOD7ASDU3ET', max: 200 },
+                    extCyl: { code: 'XOD7ASDU3ET', min: 200 }
+                }
+            }
+        },
+        '174': {
+            extCyl: { code: 'FOD8ASFNUET', min: 225, max: 300 },
+            rx:     { code: 'RXA174ASUVETC', min: 300, hyperopeMin: 200 },
+            uv420: {
+                nonJpn: { code: 'RXA74BASU3ETC', min: 300, hyperopeMin: 200 },
+                jpn: {
+                    normal: { code: 'FOD8ASFU3ET', max: 200 },
+                    extCyl: { code: 'XOD8ASBU3PE', min: 200, disputed: true }
+                },
+                das: {
+                    normal: { code: 'FOD8ASDU3ET', max: 200 },
+                    extCyl: { code: 'XOD8ASDU3ET', min: 200 }
+                }
+            }
+        }
+    };
+
+    const palDB = {
+        '160': {
+            basic:    { '07': 'POD6ESSNUET07', '09': 'POD6ESSNUET09' },
+            uv420:    { '07': 'POD6ESSN3ET07', '09': 'POD6ESSN3ET09' },
+            uv420Jpn: { '07': 'POD6ESSU3ET07', '09': 'POD6ESSU3ET09' },
+            ph: {
+                '灰': { '07': 'POD6ESSIGET07', '09': 'POD6ESSIGET09' },
+                '棕': { '07': 'POD6ESSIBET07', '09': 'POD6ESSIBET09' }
+            }
+        },
+        '167': {
+            basic:    { '07': 'POD7ESSNUET07', '09': 'POD7ESSNUET09' },
+            uv420:    { '07': 'POD7ESSN3ET07', '09': 'POD7ESSN3ET09' },
+            uv420Jpn: { '07': 'POD7ESSU3ET07', '09': 'POD7ESSU3ET09' },
+            ph: {
+                '灰': { '07': 'POD7ESSIGET07', '09': 'POD7ESSIGET09' },
+                '棕': { '07': 'POD7ESSIBET07', '09': 'POD7ESSIBET09' }
+            }
+        },
+        '174': {
+            basic:    { '07': 'POD8ESSNUET07', '09': 'POD8ESSNUET09' },
+            uv420Jpn: { '07': 'POD8ESSU3ET07', '09': 'POD8ESSU3ET09' }
+        }
+    };
+
+    const myDB = {
+        '160': { basic: 'POD6MYLNUET', uv420: 'POD6MYLN3ET', ph: { '灰': 'POD6MYLIGET', '棕': 'POD6MYLIBET' } },
+        '167': { basic: 'POD7MYLNUET', uv420: 'POD7MYLN3ET', ph: { '灰': 'POD7MYLIGET', '棕': 'POD7MYLIBET' } }
+    };
+
+    const stepOrder2 = ['category', 'index', 'feature', 'jpn', 'das', 'supply', 'color', 'corridor'];
+
+    let state2 = {
+        category: null, index: null, feature: null, jpn: null, das: null,
+        supply: null, color: null, corridor: null, astig: '', hyperope: false
+    };
+
+    function setState2(field, value) {
+        const i = stepOrder2.indexOf(field);
+        state2[field] = value;
+        for (let k = i + 1; k < stepOrder2.length; k++) state2[stepOrder2[k]] = null;
+        state2.astig = '';
+        state2.hyperope = false;
+        renderView2();
+    }
+
+    function onAstigInput2(val) {
+        state2.astig = val;
+        renderResult2();
+    }
+
+    function onHyperopeToggle2() {
+        state2.hyperope = !state2.hyperope;
+        renderView2();
+    }
+
+    function btnGroup2(field, options, current) {
+        return `<div class="grid grid-cols-2 gap-1.5">` + options.map(([val, label]) => {
+            const active = current === val;
+            const cls = active
+                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
+                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
+            return `<button type="button" onclick="setState2('${field}','${val}')" class="${cls}">${label}</button>`;
+        }).join('') + `</div>`;
+    }
+
+    function stepLabel2(n, title) {
+        return `<label class="block font-bold text-slate-700 mb-1 text-sm mt-2.5">${n}. ${title}</label>`;
+    }
+
+    function renderView2() {
+        const container = document.getElementById('view2Steps');
+        let html = '';
+        let n = 1;
+
+        // Step 1：種類
+        html += stepLabel2(n++, '鏡片種類');
+        html += btnGroup2('category', [['SV', '單光'], ['PAL', '漸進 (PAL)'], ['MY', '近視控制']], state2.category);
+
+        if (!state2.category) { container.innerHTML = html; hideResult2(); return; }
+
+        // Step 2：折射率
+        const indexOptions = state2.category === 'MY'
+            ? [['160', '1.60'], ['167', '1.67']]
+            : [['160', '1.60'], ['167', '1.67'], ['174', '1.74']];
+        html += stepLabel2(n++, '折射率 (Index)');
+        html += btnGroup2('index', indexOptions, state2.index);
+
+        if (!state2.index) { container.innerHTML = html; hideResult2(); return; }
+
+        // Step 3：特性
+        let featureOptions = [];
+        if (state2.category === 'SV') {
+            featureOptions = [['basic', '基本 (Ext Cyl / RX)'], ['uv420', 'UV420 防藍光']];
+            if (state2.index === '160') featureOptions.push(['ph', 'PH 變色'], ['pol', 'POL 偏光']);
+        } else if (state2.category === 'PAL') {
+            featureOptions = [['basic', '基本']];
+            if (state2.index !== '174') featureOptions.push(['uv420', 'UV420']);
+            featureOptions.push(['uv420Jpn', 'UV420 (日本製)']);
+            if (state2.index !== '174') featureOptions.push(['ph', 'PH 變色']);
+        } else if (state2.category === 'MY') {
+            featureOptions = [['basic', '基本'], ['uv420', 'UV420 防藍光'], ['ph', 'PH 變色']];
+        }
+        html += stepLabel2(n++, '鏡片特性');
+        html += btnGroup2('feature', featureOptions, state2.feature);
+
+        if (!state2.feature) { container.innerHTML = html; hideResult2(); return; }
+
+        // ---- SV 分支 ----
+        if (state2.category === 'SV') {
+            if (state2.feature === 'uv420') {
+                html += stepLabel2(n++, '是否日本製 (JPN)');
+                html += btnGroup2('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state2.jpn);
+                if (!state2.jpn) { container.innerHTML = html; hideResult2(); return; }
+
+                if (state2.jpn === 'yes' && (state2.index === '167' || state2.index === '174')) {
+                    html += stepLabel2(n++, '是否雙非面 (DAS)');
+                    html += btnGroup2('das', [['no', '否'], ['yes', '是']], state2.das);
+                    if (!state2.das) { container.innerHTML = html; hideResult2(); return; }
+                }
+
+                if (state2.jpn === 'no' && state2.index !== '174') {
+                    html += stepLabel2(n++, '供應類型');
+                    html += btnGroup2('supply', [['Stock', '庫存 (Stock)'], ['RX', '訂做 (RX)']], state2.supply);
+                    if (!state2.supply) { container.innerHTML = html; hideResult2(); return; }
+                }
+            }
+
+            if (state2.feature === 'pol') {
+                html += stepLabel2(n++, '顏色');
+                html += btnGroup2('color', [['灰', '灰色'], ['茶', '茶色']], state2.color);
+                if (!state2.color) { container.innerHTML = html; hideResult2(); return; }
+            }
+
+            // 散光度數輸入：basic / uv420(非174日本非JPN以外皆需) 都需要；ph/pol 唔需要輸入先出到碼，但都俾機會驗證
+            const needAstig = (state2.feature === 'basic') || (state2.feature === 'uv420');
+            if (needAstig) {
+                html += stepLabel2(n++, '散光度數 (輸入數字，例如 275)');
+                html += `<div class="flex items-center gap-2">
+                    <input type="number" inputmode="numeric" placeholder="例如 275" value="${state2.astig}"
+                        oninput="onAstigInput2(this.value)"
+                        class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                </div>`;
+                if (state2.feature === 'basic' || (state2.feature === 'uv420' && state2.jpn === 'no' && state2.index !== '174' && false)) {
+                    // hyperope checkbox 只適用於門檻含「遠視+散光」嘅組合 (basic 及 174 UV420 非JPN)
+                }
+                const showHyperope = (state2.feature === 'basic') || (state2.feature === 'uv420' && state2.jpn === 'no' && state2.index === '174');
+                if (showHyperope) {
+                    html += `<label class="flex items-center gap-2 mt-1.5 text-sm text-slate-600 cursor-pointer">
+                        <input type="checkbox" ${state2.hyperope ? 'checked' : ''} onchange="onHyperopeToggle2()" class="w-4 h-4" />
+                        處方同時有遠視 (Plus 度數)
+                    </label>`;
+                }
+            }
+        }
+
+        // ---- PAL 分支 ----
+        if (state2.category === 'PAL') {
+            if (state2.feature === 'ph') {
+                html += stepLabel2(n++, '顏色');
+                html += btnGroup2('color', [['灰', '灰色'], ['棕', '棕色']], state2.color);
+                if (!state2.color) { container.innerHTML = html; hideResult2(); return; }
+            }
+            html += stepLabel2(n++, '漸進走廊 (Corridor)');
+            html += btnGroup2('corridor', [['07', '07'], ['09', '09']], state2.corridor);
+            if (!state2.corridor) { container.innerHTML = html; hideResult2(); return; }
+        }
+
+        // ---- MY 分支 ----
+        if (state2.category === 'MY') {
+            if (state2.feature === 'ph') {
+                html += stepLabel2(n++, '顏色');
+                html += btnGroup2('color', [['灰', '灰色'], ['棕', '棕色']], state2.color);
+                if (!state2.color) { container.innerHTML = html; hideResult2(); return; }
+            }
+        }
+
+        container.innerHTML = html;
+        renderResult2();
+    }
+
+    function hideResult2() {
+        document.getElementById('resultBox2').classList.add('hidden');
+    }
+
+    function showResult2(code, note, warn) {
+        document.getElementById('resultCode2').textContent = code;
+        document.getElementById('resultNote2').textContent = (note || '') + (warn ? '　' + warn : '');
+        document.getElementById('resultLabel2').textContent = '對應 HKO 鏡片編號';
+        const copyBtn = document.getElementById('copyBtn2');
+        const copyBtnText = document.getElementById('copyBtnText2');
+        copyBtn.className = "mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+        copyBtnText.textContent = "複製編號";
+        document.getElementById('resultBox2').classList.remove('hidden');
+    }
+
+    function showPrompt2(msg) {
+        document.getElementById('resultLabel2').textContent = msg;
+        document.getElementById('resultCode2').textContent = '------';
+        document.getElementById('resultNote2').textContent = '';
+        document.getElementById('resultBox2').classList.remove('hidden');
+    }
+
+    function renderResult2() {
+        if (!state2.category || !state2.index || !state2.feature) { hideResult2(); return; }
+
+        let result = null;
+
+        if (state2.category === 'SV') result = computeSVResult2();
+        else if (state2.category === 'PAL') result = computePALResult2();
+        else if (state2.category === 'MY') result = computeMYResult2();
+
+        if (!result) { hideResult2(); return; }
+
+        if (result.status === 'need_astig') { showPrompt2('請輸入散光度數'); return; }
+        if (result.status === 'need_color') { showPrompt2('請先選擇顏色'); return; }
+        if (result.status === 'need_supply') { showPrompt2('請先選擇供應類型'); return; }
+        if (result.status === 'need_jpn') { showPrompt2('請先選擇是否日本製'); return; }
+        if (result.status === 'need_das') { showPrompt2('請先選擇是否雙非面'); return; }
+        if (result.status === 'no_match') { showPrompt2(result.note || '此度數暫未有對應編號，請人手核對'); return; }
+        if (result.code) { showResult2(result.code, result.note, result.warn); return; }
+
+        hideResult2();
+    }
+
+    function computeSVResult2() {
+        const idx = state2.index;
+        const db = svDB[idx];
+
+        if (state2.feature === 'ph') {
+            return { code: db.ph.code, note: '散光-200或以下 (PH 灰)' };
+        }
+
+        if (state2.feature === 'pol') {
+            if (!state2.color) return { status: 'need_color' };
+            return { code: db.pol.colors[state2.color], note: 'POL 偏光 ' + state2.color + '色' };
+        }
+
+        if (state2.feature === 'basic') {
+            const astig = parseFloat(state2.astig);
+            if (isNaN(astig)) return { status: 'need_astig' };
+            const mag = Math.abs(astig);
+            if (mag >= db.extCyl.min && mag <= db.extCyl.max) {
+                return { code: db.extCyl.code, note: `左右眼散光在 ${db.extCyl.min}-${db.extCyl.max} 內` };
+            }
+            if (mag > db.rx.min || (state2.hyperope && mag >= db.rx.hyperopeMin)) {
+                return { code: db.rx.code, note: `散光 ${db.rx.min} 以上／遠視+散光 ${db.rx.hyperopeMin} 以上` };
+            }
+            return { status: 'no_match', note: '此度數暫未有對應編號，請人手核對或使用一般單光鏡片' };
+        }
+
+        if (state2.feature === 'uv420') {
+            if (!state2.jpn) return { status: 'need_jpn' };
+
+            if (state2.jpn === 'no') {
+                if (idx === '174') {
+                    const astig = parseFloat(state2.astig);
+                    if (isNaN(astig)) return { status: 'need_astig' };
+                    const mag = Math.abs(astig);
+                    if (mag > db.uv420.nonJpn.min || (state2.hyperope && mag >= db.uv420.nonJpn.hyperopeMin)) {
+                        return { code: db.uv420.nonJpn.code, note: `散光 ${db.uv420.nonJpn.min} 以上／遠視+散光 ${db.uv420.nonJpn.hyperopeMin} 以上` };
+                    }
+                    return { status: 'no_match' };
+                }
+                if (!state2.supply) return { status: 'need_supply' };
+                const astig = parseFloat(state2.astig);
+                if (isNaN(astig)) return { status: 'need_astig' };
+                const mag = Math.abs(astig);
+                if (mag <= db.uv420.nonJpn.max) {
+                    const code = state2.supply === 'Stock' ? db.uv420.nonJpn.stock : db.uv420.nonJpn.rx;
+                    return { code, note: `散光 ${db.uv420.nonJpn.max} 或以下` };
+                }
+                return { status: 'no_match', note: '散光超過 200，此非日本製 UV420 版本未有對應編號，建議改用日本製版本' };
+            }
+
+            // JPN
+            const dasAvailable = (idx === '167' || idx === '174');
+            if (dasAvailable && !state2.das) return { status: 'need_das' };
+            const useDas = dasAvailable && state2.das === 'yes';
+            const astig = parseFloat(state2.astig);
+            if (isNaN(astig)) return { status: 'need_astig' };
+            const mag = Math.abs(astig);
+            const branch = useDas ? db.uv420.das : db.uv420.jpn;
+            if (mag <= branch.normal.max) return { code: branch.normal.code, note: `散光 ${branch.normal.max} 或以下` };
+            const warn = branch.extCyl.disputed ? '⚠ 資料來源有分歧 (PE/RE)，請人手核對' : null;
+            return { code: branch.extCyl.code, note: `散光 ${branch.extCyl.min} 以上`, warn };
+        }
+
+        return null;
+    }
+
+    function computePALResult2() {
+        const idx = state2.index;
+        const db = palDB[idx];
+        let base = null;
+
+        if (state2.feature === 'basic') base = db.basic;
+        else if (state2.feature === 'uv420') base = db.uv420;
+        else if (state2.feature === 'uv420Jpn') base = db.uv420Jpn;
+        else if (state2.feature === 'ph') {
+            if (!state2.color) return { status: 'need_color' };
+            base = db.ph ? db.ph[state2.color] : null;
+        }
+
+        if (!base) return { status: 'no_match', note: '此折射率未有此特性嘅編號' };
+        if (!state2.corridor) return null;
+        return { code: base[state2.corridor], note: state2.corridor + ' 走廊' };
+    }
+
+    function computeMYResult2() {
+        const idx = state2.index;
+        const db = myDB[idx];
+        if (!db) return { status: 'no_match', note: '此折射率未有近視控制編號' };
+
+        if (state2.feature === 'basic') return { code: db.basic };
+        if (state2.feature === 'uv420') return { code: db.uv420 };
+        if (state2.feature === 'ph') {
+            if (!state2.color) return { status: 'need_color' };
+            return { code: db.ph[state2.color] };
+        }
+        return null;
+    }
+
+    function copyToClipboard2() {
+        const copyBtn = document.getElementById('copyBtn2');
+        const copyBtnText = document.getElementById('copyBtnText2');
+        const codeText = document.getElementById('resultCode2').textContent;
+        navigator.clipboard.writeText(codeText).then(() => {
+            copyBtn.className = "mt-2 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+            copyBtnText.textContent = "✓ 已複製";
+        }).catch(() => {
+            alert("複製失敗");
+        });
+    }
+</script>
+
 </body>
 </html>
