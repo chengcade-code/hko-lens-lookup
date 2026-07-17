@@ -29,7 +29,7 @@
             <div id="resultTintedWrapper" class="hidden">
                 <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase">鏡片代碼</p>
                 <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultLensCode">------</p>
-                <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase mt-2">Owndays 顏色代碼</p>
+                <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase mt-2" id="resultColorLabel">Owndays 顏色代碼</p>
                 <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultColorCode">------</p>
             </div>
             <p class="text-xs text-slate-500 mt-1" id="resultNote"></p>
@@ -43,8 +43,9 @@
 <script>
     // ============================================================
     // HKO 鏡片代碼查詢系統 — 單一畫面統一版
-    // 涵蓋：單光 (SV，含近視控制) / 漸進 (PAL) / PhotoShade / 染色鏡片 (Tinted)
-    // 資料來源：無標題的試算表_-_HKO-3.pdf ＋ 原有 PhotoShade/染色鏡片資料
+    // 涵蓋：單光 (SV，含近視控制) / 漸進 (PAL) / PhotoShade / 染色鏡片 (Tinted) / 腮紅鏡片 (Cheek Color)
+    // 資料來源：無標題的試算表_-_HKO-3.pdf ＋ 原有 PhotoShade/染色鏡片資料 ＋ 鏡片對照表_202607_ver_-_HKO.pdf (腮紅)
+    // ⚠ 腮紅鏡片暫時只有 1.60/1.67 資料，冇 1.74
     // ⚠ 注意：174 RX UV420 Ext Cyl (JPN) 喺兩個來源入面有分歧
     //   PDF 試算表寫 XOD8ASBU3PE，另一份資料寫 XOD8ASBU3RE
     //   此工具暫用 PE，請人手核對後再用
@@ -98,10 +99,40 @@
         ["來片對單色", "對單色"], ["來片對雙色", "對雙色"]
     ];
 
+    // 腮紅鏡片 (Cheek Color)：HKO 鏡片代碼查表 (依 鏡片系列/折射率/鍍膜)
+    // 資料來源：鏡片對照表_202607_ver_-_HKO.pdf ── 暫時只有 1.60/1.67，冇 1.74
+    const cheekLensCodes = {
+        SV: {
+            '160': { ETC: 'XOD6ASBNUET', UTC: 'XOD6ASBNUUT', UDC: 'XOD6ASBNUUD', UV420_ETC: 'XOD6ASBN3ET', UV420_UTC: 'XOD6ASBN3UT', UV420_UDC: 'XOD6ASBN3UD' },
+            '167': { ETC: 'XOD7ASBNUET', UTC: 'XOD7ASBNUUT', UDC: 'XOD7ASBNUUD', UV420_ETC: 'XOD7ASBN3ET', UV420_UTC: 'XOD7ASBN3UT', UV420_UDC: 'XOD7ASBN3UD' }
+        },
+        Progressive: {
+            '160': { ETC: 'POD6IDSNUET11', UTC: 'POD6IDSNUUT11', UDC: 'POD6IDSNUUD11', UV420_ETC: 'POD6IDSN3ET11', UV420_UTC: 'POD6IDSN3UT11', UV420_UDC: 'POD6IDSN3UD11' },
+            '167': { ETC: 'POD7IDSNUET11', UTC: 'POD7IDSNUUT11', UDC: 'POD7IDSNUUD11', UV420_ETC: 'POD7IDSN3ET11', UV420_UTC: 'POD7IDSN3UT11', UV420_UDC: 'POD7IDSN3UD11' }
+        },
+        Premium: {
+            '160': { ETC: 'POD6ESSNUET11', UTC: 'POD6ESSNUUT11', UDC: 'POD6ESSNUUD11', UV420_ETC: 'POD6ESSN3ET11', UV420_UTC: 'POD6ESSN3UT11', UV420_UDC: 'POD6ESSN3UD11' },
+            '167': { ETC: 'POD7ESSNUET11', UTC: 'POD7ESSNUUT11', UDC: 'POD7ESSNUUD11', UV420_ETC: 'POD7ESSN3ET11', UV420_UTC: 'POD7ESSN3UT11', UV420_UDC: 'POD7ESSN3UD11' }
+        }
+    };
+
+    // 腮紅鏡片：腮紅顏色卡片樣式 (仿 PhotoShade 顏色卡片形式)
+    const cheekColorStyles = {
+        "Purple": { label: "紫色 Purple", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" },
+        "Peach":  { label: "蜜桃色 Peach", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
+        "Orange": { label: "橙色 Orange", bg: "bg-orange-100 text-orange-800", active: "bg-orange-500 border-orange-700 text-white font-black ring-2 ring-orange-100" }
+    };
+
+    // 腮紅鏡片：顏色名稱 → Owndays 顏色代碼
+    const cheekColorCode = {
+        "Purple": "HKPP10R", "Peach": "HKPE10R", "Orange": "HKOR10R"
+    };
+
     // 單光 (SV) 散光度數資料庫
     const svDB = {
         '160': {
             extCyl: { code: 'FOD6ASFNUHM', min: 225, max: 300 },
+            basicLow: { code: 'FOD6ASFNUET', max: 200 },
             rx:     { code: 'RXA161ASUVETC', min: 300, hyperopeMin: 200 },
             ph:     { code: 'FOD6ASFNGHM', max: 200 },
             pol:    { colors: { '灰': 'RXA16BASPLGYETC', '茶': 'RXA16BASPLBRETC' } },
@@ -112,6 +143,7 @@
         },
         '167': {
             extCyl: { code: 'FOD7ASFNUET', min: 225, max: 300 },
+            basicLow: { code: 'FOD7ASFNUET', max: 200 },
             rx:     { code: 'RXA167ASUVETC', min: 300, hyperopeMin: 200 },
             uv420: {
                 nonJpn: { low: 'A67ASK3ETC', high: 'RXA67BASK3ETC' },
@@ -121,6 +153,7 @@
         },
         '174': {
             extCyl: { code: 'FOD8ASFNUET', min: 225, max: 300 },
+            basicLow: { code: 'FOD8ASFNUET', max: 200 },
             rx:     { code: 'RXA174ASUVETC', min: 300, hyperopeMin: 200 },
             uv420: {
                 nonJpn: { all: 'RXA74BASU3ETC' },
@@ -168,26 +201,29 @@
         'index', 'category',
         'feature', 'myFeature', 'jpn', 'das', 'color', 'astigBand', 'corridor',
         'psSupply', 'psDesign', 'psCoating', 'psColor',
-        'tSupply', 'tCoatingBase', 'tColor'
+        'tSupply', 'tCoatingBase', 'tColor',
+        'ccDesign', 'ccCoating', 'ccColor'
     ];
 
     let state = {
         category: null, index: null,
         feature: null, myFeature: null, jpn: null, das: null, color: null, astigBand: null, corridor: null, hyperope: false,
         psSupply: null, psDesign: null, psCoating: null, psColor: null,
-        tSupply: null, tCoatingBase: null, tUv420: false, tColor: null
+        tSupply: null, tCoatingBase: null, tUv420: false, tColor: null,
+        ccDesign: null, ccCoating: null, ccUv420: false, ccColor: null
     };
 
     function setState(field, value) {
         const i = stepOrder.indexOf(field);
         state[field] = value;
         for (let k = i + 1; k < stepOrder.length; k++) state[stepOrder[k]] = null;
-        if (field === 'index' || field === 'category') { state.hyperope = false; state.tUv420 = false; }
+        if (field === 'index' || field === 'category') { state.hyperope = false; state.tUv420 = false; state.ccUv420 = false; }
         render();
     }
 
     function onHyperopeToggle() { state.hyperope = !state.hyperope; render(); }
     function toggleTUv420() { state.tUv420 = !state.tUv420; render(); }
+    function toggleCcUv420() { state.ccUv420 = !state.ccUv420; render(); }
 
     function idxShort(index) { return index === '160' ? '6' : '7'; }
     function idxDot(index) { return index === '160' ? '1.6' : '1.67'; }
@@ -220,10 +256,11 @@
         }).join('') + `</div>`;
     }
 
-    // PhotoShade 顏色色塊 (仿鏡片變色視覺效果)
-    function colorSwatchGroup(field, colors, current) {
+    // PhotoShade / 腮紅 共用的顏色色塊 (仿鏡片變色視覺效果)
+    function colorSwatchGroup(field, colors, current, stylesMap) {
+        const styles = stylesMap || colorStyles;
         return `<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">` + colors.map(c => {
-            const style = colorStyles[c];
+            const style = styles[c];
             const cls = current === c
                 ? `p-2 border rounded-lg text-center shadow-md transition cursor-pointer ${style.active}`
                 : `p-2 border border-slate-200 rounded-lg text-center font-semibold transition cursor-pointer ${style.bg} hover:brightness-95`;
@@ -243,6 +280,22 @@
             mk('ETC', '基本 (ETC)', current === 'ETC', "setState('tCoatingBase','ETC')") +
             mk('UV420', 'UV420', uv420, "toggleTUv420()") +
             mk('UTC', '抗刮 (UTC)', current === 'UTC', "setState('tCoatingBase','UTC')") +
+            `</div>`;
+    }
+
+    // 腮紅鏡片鍍膜卡：基本(ETC)/UV420/抗刮(SRC/UTC)/超透光(WH/UDC) 四選，UV420 獨立可同時選中
+    function cheekCoatingGroup(current, uv420) {
+        const mk = (val, label, active, onclick) => {
+            const cls = active
+                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
+                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
+            return `<button type="button" onclick="${onclick}" class="${cls}">${label}</button>`;
+        };
+        return `<div class="grid grid-cols-2 gap-1.5">` +
+            mk('ETC', '基本 (ETC)', current === 'ETC', "setState('ccCoating','ETC')") +
+            mk('UV420', 'UV420', uv420, "toggleCcUv420()") +
+            mk('UTC', '抗刮 (SRC/UTC)', current === 'UTC', "setState('ccCoating','UTC')") +
+            mk('UDC', '超透光 (WH/UDC)', current === 'UDC', "setState('ccCoating','UDC')") +
             `</div>`;
     }
 
@@ -275,6 +328,7 @@
         // 染色鏡片、近視控制、POL 偏光 只限單光 SV；PhotoShade/PH變色 174 冇資料
         let featureOptions = [['basic', '基本'], ['uv420', 'UV420']];
         if (state.index !== '174') featureOptions.push(['ps', 'PhotoShade']);
+        if (state.index !== '174') featureOptions.push(['cheek', '腮紅鏡片']);
         if (state.category === 'SV' && state.index !== '174') featureOptions.push(['tinted', '染色鏡片']);
         if ((state.category === 'SV' && state.index === '160') || (state.category === 'PAL' && state.index !== '174')) {
             featureOptions.push(['ph', 'PH 變色']);
@@ -390,6 +444,23 @@
             if (!state.psColor) { container.innerHTML = html; hideResult(); return; }
         }
 
+        // ---- 腮紅鏡片 (Cheek Color) 分支 (SV/PAL 共用) ----
+        if (state.feature === 'cheek') {
+            if (state.category === 'PAL') {
+                html += stepLabel(n++, '漸進系列設計');
+                html += btnGroup('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign);
+                if (!state.ccDesign) { container.innerHTML = html; hideResult(); return; }
+            }
+
+            html += stepLabel(n++, '鍍膜 (Coating)');
+            html += cheekCoatingGroup(state.ccCoating, state.ccUv420);
+            if (!state.ccCoating) { container.innerHTML = html; hideResult(); return; }
+
+            html += stepLabel(n++, '腮紅顏色');
+            html += colorSwatchGroup('ccColor', ['Purple', 'Peach', 'Orange'], state.ccColor, cheekColorStyles);
+            if (!state.ccColor) { container.innerHTML = html; hideResult(); return; }
+        }
+
         // ---- 染色鏡片 (Tinted) 分支 (只限單光 SV) ----
         if (state.feature === 'tinted') {
             html += stepLabel(n++, '供應類型');
@@ -433,7 +504,7 @@
             }
             if (state.astigBand === 'low') {
                 if (state.hyperope) return { code: db.rx.code, note: `遠視+散光 ${db.rx.hyperopeMin} 以上` };
-                return { code: db.rx.code, note: '散光-200或以下' };
+                return { code: db.basicLow.code, note: '散光-200或以下' };
             }
             return { code: db.rx.code, note: `散光 ${db.rx.min} 以上` };
         }
@@ -542,6 +613,24 @@
         return { code: lensCode, colorCode: state.tColor, kind: 'tinted' };
     }
 
+    function computeCCResult() {
+        const idx = state.index;
+        let table;
+        if (state.category === 'SV') {
+            table = cheekLensCodes.SV[idx];
+        } else {
+            if (!state.ccDesign) return { status: 'need_design' };
+            table = state.ccDesign === 'Progressive' ? cheekLensCodes.Progressive[idx] : cheekLensCodes.Premium[idx];
+        }
+        if (!state.ccCoating) return { status: 'need_coating' };
+        if (!state.ccColor) return { status: 'need_color' };
+
+        const key = (state.ccUv420 ? 'UV420_' : '') + state.ccCoating;
+        const lensCode = table ? table[key] : null;
+        if (!lensCode) return { status: 'no_match', note: '此組合暫未有對應編號，請人手核對' };
+        return { code: lensCode, colorCode: cheekColorCode[state.ccColor], kind: 'cheek' };
+    }
+
     // ---- 結果顯示 ----
 
     function renderResult() {
@@ -550,6 +639,7 @@
         let result = null;
         if (state.feature === 'ps') result = computePSResult();
         else if (state.feature === 'tinted') result = computeTResult();
+        else if (state.feature === 'cheek') result = computeCCResult();
         else if (state.category === 'SV') result = computeSVResult();
         else if (state.category === 'PAL') result = computePALResult();
 
@@ -567,7 +657,8 @@
         if (result.status && promptMap[result.status]) { showPrompt(promptMap[result.status]); return; }
         if (result.status === 'no_match') { showPrompt(result.note || '此度數暫未有對應編號，請人手核對'); return; }
 
-        if (result.kind === 'tinted') { showTintedResult(result.code, result.colorCode); return; }
+        if (result.kind === 'tinted') { showTintedResult(result.code, result.colorCode, 'Owndays 顏色代碼'); return; }
+        if (result.kind === 'cheek') { showTintedResult(result.code, result.colorCode, '腮紅色代碼'); return; }
         if (result.code) { showResult(result.code, result.note, result.warn); return; }
 
         hideResult();
@@ -590,11 +681,12 @@
         document.getElementById('resultBox').classList.remove('hidden');
     }
 
-    function showTintedResult(lensCode, colorCode) {
+    function showTintedResult(lensCode, colorCode, colorLabel) {
         document.getElementById('resultSingleWrapper').classList.add('hidden');
         document.getElementById('resultTintedWrapper').classList.remove('hidden');
         document.getElementById('resultLensCode').textContent = lensCode;
         document.getElementById('resultColorCode').textContent = colorCode;
+        document.getElementById('resultColorLabel').textContent = colorLabel || 'Owndays 顏色代碼';
         document.getElementById('resultNote').textContent = '';
         resetCopyBtn();
         document.getElementById('resultBox').classList.remove('hidden');
