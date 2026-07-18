@@ -11,16 +11,13 @@
         select, button, input { font-size: 14px !important; }
         #mainCard { transform-origin: center center; }
     </style>
+<base target="_blank">
 </head>
 <body class="bg-slate-50 text-slate-800 h-full flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden">
 
     <div id="mainCard" class="bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
         <h1 class="text-xl sm:text-2xl font-extrabold text-center text-blue-600 mb-3 tracking-wide">HKO 鏡片代碼查詢系統</h1>
-
-        <!-- 所有步驟：動態注入 -->
         <div id="stepsContainer"></div>
-
-        <!-- 結果顯示區域 -->
         <div class="mt-2.5 p-3 bg-slate-100 rounded-lg text-center hidden" id="resultBox">
             <div id="resultSingleWrapper">
                 <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase" id="resultLabel">對應 HKO 鏡片編號</p>
@@ -33,7 +30,6 @@
                 <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultColorCode">------</p>
             </div>
             <p class="text-xs text-slate-500 mt-1" id="resultNote"></p>
-
             <button id="copyBtn" onclick="copyToClipboard()" class="mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer">
                 <span id="copyBtnText">複製編號</span>
             </button>
@@ -42,25 +38,14 @@
 
 <script>
     // ============================================================
-    // HKO 鏡片代碼查詢系統 — 單一畫面統一版
-    // 涵蓋：單光 (SV，含近視控制) / 漸進 (PAL) / PhotoShade / 染色鏡片 (Tinted) / 腮紅鏡片 (Cheek Color)
-    // 資料來源：無標題的試算表_-_HKO-3.pdf ＋ 原有 PhotoShade/染色鏡片資料 ＋ 鏡片對照表_202607_ver_-_HKO.pdf (腮紅)
-    // ⚠ 腮紅鏡片暫時只有 1.60/1.67 資料，冇 1.74
-    // ⚠ 注意：174 RX UV420 Ext Cyl (JPN) 喺兩個來源入面有分歧
-    //   PDF 試算表寫 XOD8ASBU3PE，另一份資料寫 XOD8ASBU3RE
-    //   此工具暫用 PE，請人手核對後再用
-    //
-    // UI 流程 (2026-07 改版)：
-    //   Step1 折射率 (1.6/1.67/1.74)
-    //   Step2 鏡片系列 (單光 SV / 漸進 PAL)
-    //   Step3 鏡片特性 (基本/UV420/PhotoShade/染色鏡片/PH變色/近視控制/POL)
-    //   — 染色鏡片、近視控制、POL 偏光：只限單光 (SV)
-    //   — PhotoShade：SV/PAL 皆有，PAL 底下自動使用 RX 訂製 (冇「鏡片類型」呢步)
+    // HKO 鏡片代碼查詢系統 — 精簡版 v3.1
+    // 更新：PhotoShade 鍍膜按鈕移除庫存/訂製標示
     // ============================================================
 
-    // ---- 共用資料 ----
+    const A_CLS = "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer";
+    const I_CLS = "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
 
-    // PhotoShade 真實色彩按鈕樣式定義 (仿鏡片變色後的效果)
+    // ---- 共用資料 ----
     const colorStyles = {
         "Pebble": { label: "Pebble (灰)", bg: "bg-slate-200 text-slate-800", active: "bg-slate-500 border-slate-700 text-white font-black ring-2 ring-slate-200" },
         "Hojicha": { label: "Hojicha (棕)", bg: "bg-amber-100 text-amber-900", active: "bg-amber-600 border-amber-800 text-white font-black ring-2 ring-amber-100" },
@@ -69,17 +54,12 @@
         "Sakura": { label: "Sakura (粉)", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
         "Lavender": { label: "Lavender (紫)", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" }
     };
+    const colorCodeLetter = { "Pebble": "G", "Hojicha": "B", "Matcha": "R", "Indigo": "L", "Sakura": "N", "Lavender": "P" };
 
-    // PhotoShade 顏色編碼對應碼
-    const colorCodeLetter = {
-        "Pebble": "G", "Hojicha": "B", "Matcha": "R", "Indigo": "L", "Sakura": "N", "Lavender": "P"
-    };
-
-    // 染色鏡片：HKO 鏡片代碼查表 (依 供應/折射率/鍍膜)
     const tintedLensCodes = {
         Stock: {
-            '1.6':  { ETC: 'FOD6ASFNUET', UV420_ETC: 'A16ASK3ETC',   UTC: 'A16ASUVUTC',   UV420_UTC: 'A16ASK3UTC'   },
-            '1.67': { ETC: 'FOD7ASFNUET', UV420_ETC: 'A67ASK3ETC',   UTC: 'A67ASUVUTC',   UV420_UTC: 'A67ASK3UTC'   }
+            '1.6':  { ETC: 'FOD6ASFNUET', UV420_ETC: 'A16ASK3ETC', UTC: 'A16ASUVUTC', UV420_UTC: 'A16ASK3UTC' },
+            '1.67': { ETC: 'FOD7ASFNUET', UV420_ETC: 'A67ASK3ETC', UTC: 'A67ASUVUTC', UV420_UTC: 'A67ASK3UTC' }
         },
         RX: {
             '1.6':  { ETC: 'RXA161ASUVETC', UV420_ETC: 'RXA16BASK3ETC', UTC: 'RXA16ASUVUTC', UV420_UTC: 'RXA16BASK3UTC' },
@@ -87,48 +67,37 @@
         }
     };
 
-    // 染色鏡片：Owndays 顏色列表 [顏色名稱, 顏色代碼]
     const tintedColors = [
-        ["CL-Yellow", "ODYL05F"], ["COPR85", "COPR85F"], ["CS-Blue", "ODBL14F"], ["DGY85", "ODGY85F"],
-        ["FORE50", "FORE50F"], ["FORE85", "FORE85F"], ["MG-Gray", "ODMG49F"], ["RB-04", "ODRB44F"],
-        ["RB-06", "ODRB70F"], ["RBL-04", "ODYG40F"], ["RBL-05", "ODYU45F"], ["RG-03", "ODRG25F"],
-        ["RG-06", "ODBG45F"], ["RG-12", "ODRG85F"], ["RO-02", "ODRO20F"], ["RP-03", "ODYR35F"],
-        ["RS-09", "ODRS68F"], ["RV-01", "ODYP20F"], ["RV-02", "ODYN34F"], ["SMOK85", "SMOK85F"],
-        ["V-G01", "ODDP60F"], ["SMOK85G", "SMOK85G"], ["FORE85G", "FORE85G"], ["COPR85G", "COPR85G"],
-        ["V-G01G", "ODYP65G"], ["RP-03G", "ODRN28G"], ["DGY85G", "ODGY85G"],
-        ["來片對單色", "對單色"], ["來片對雙色", "對雙色"]
+        ["CL-Yellow","ODYL05F"],["COPR85","COPR85F"],["CS-Blue","ODBL14F"],["DGY85","ODGY85F"],
+        ["FORE50","FORE50F"],["FORE85","FORE85F"],["MG-Gray","ODMG49F"],["RB-04","ODRB44F"],
+        ["RB-06","ODRB70F"],["RBL-04","ODYG40F"],["RBL-05","ODYU45F"],["RG-03","ODRG25F"],
+        ["RG-06","ODBG45F"],["RG-12","ODRG85F"],["RO-02","ODRO20F"],["RP-03","ODYR35F"],
+        ["RS-09","ODRS68F"],["RV-01","ODYP20F"],["RV-02","ODYN34F"],["SMOK85","SMOK85F"],
+        ["V-G01","ODDP60F"],
+        ["來片對單色","對單色"],["來片對雙色","對雙色"]
     ];
 
-    // 腮紅鏡片 (Cheek Color)：HKO 鏡片代碼查表 (依 鏡片系列/折射率/鍍膜)
-    // 資料來源：鏡片對照表_202607_ver_-_HKO.pdf ── 暫時只有 1.60/1.67，冇 1.74
-    const cheekLensCodes = {
-        SV: {
-            '160': { ETC: 'XOD6ASBNUET', UTC: 'XOD6ASBNUUT', UDC: 'XOD6ASBNUUD', UV420_ETC: 'XOD6ASBN3ET', UV420_UTC: 'XOD6ASBN3UT', UV420_UDC: 'XOD6ASBN3UD' },
-            '167': { ETC: 'XOD7ASBNUET', UTC: 'XOD7ASBNUUT', UDC: 'XOD7ASBNUUD', UV420_ETC: 'XOD7ASBN3ET', UV420_UTC: 'XOD7ASBN3UT', UV420_UDC: 'XOD7ASBN3UD' }
-        },
-        Progressive: {
-            '160': { ETC: 'POD6IDSNUET11', UTC: 'POD6IDSNUUT11', UDC: 'POD6IDSNUUD11', UV420_ETC: 'POD6IDSN3ET11', UV420_UTC: 'POD6IDSN3UT11', UV420_UDC: 'POD6IDSN3UD11' },
-            '167': { ETC: 'POD7IDSNUET11', UTC: 'POD7IDSNUUT11', UDC: 'POD7IDSNUUD11', UV420_ETC: 'POD7IDSN3ET11', UV420_UTC: 'POD7IDSN3UT11', UV420_UDC: 'POD7IDSN3UD11' }
-        },
-        Premium: {
-            '160': { ETC: 'POD6ESSNUET11', UTC: 'POD6ESSNUUT11', UDC: 'POD6ESSNUUD11', UV420_ETC: 'POD6ESSN3ET11', UV420_UTC: 'POD6ESSN3UT11', UV420_UDC: 'POD6ESSN3UD11' },
-            '167': { ETC: 'POD7ESSNUET11', UTC: 'POD7ESSNUUT11', UDC: 'POD7ESSNUUD11', UV420_ETC: 'POD7ESSN3ET11', UV420_UTC: 'POD7ESSN3UT11', UV420_UDC: 'POD7ESSN3UD11' }
+    const cheekLensCodes = {};
+    const cheekMap = { SV: ['XOD','ASBN',''], Progressive: ['POD','IDSN','11'], Premium: ['POD','ESSN','11'] };
+    for (const [ser, [pre, mid, sfx]] of Object.entries(cheekMap)) {
+        cheekLensCodes[ser] = {};
+        for (const idx of ['160','167']) {
+            const i = idx === '160' ? '6' : '7';
+            cheekLensCodes[ser][idx] = {};
+            for (const coat of ['ETC','UTC','UDC']) {
+                const c0 = coat[0], c1 = coat[1];
+                cheekLensCodes[ser][idx][coat] = `${pre}${i}${mid}U${c0}${c1}${sfx}`;
+                cheekLensCodes[ser][idx][`UV420_${coat}`] = `${pre}${i}${mid}3${c0}${c1}${sfx}`;
+            }
         }
-    };
-
-    // 腮紅鏡片：腮紅顏色卡片樣式 (仿 PhotoShade 顏色卡片形式)
+    }
     const cheekColorStyles = {
         "Purple": { label: "紫色 Purple", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" },
         "Peach":  { label: "蜜桃色 Peach", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
         "Orange": { label: "橙色 Orange", bg: "bg-orange-100 text-orange-800", active: "bg-orange-500 border-orange-700 text-white font-black ring-2 ring-orange-100" }
     };
+    const cheekColorCode = { "Purple": "HKPP10R", "Peach": "HKPE10R", "Orange": "HKOR10R" };
 
-    // 腮紅鏡片：顏色名稱 → Owndays 顏色代碼
-    const cheekColorCode = {
-        "Purple": "HKPP10R", "Peach": "HKPE10R", "Orange": "HKOR10R"
-    };
-
-    // 單光 (SV) 散光度數資料庫
     const svDB = {
         '160': {
             extCyl: { code: 'FOD6ASFNUHM', min: 225, max: 300 },
@@ -162,54 +131,43 @@
             }
         }
     };
-
-    // 漸進 (PAL) 資料庫
     const palDB = {
         '160': {
             basic:    { '07': 'POD6ESSNUET07', '09': 'POD6ESSNUET09' },
             uv420:    { '07': 'POD6ESSN3ET07', '09': 'POD6ESSN3ET09' },
             uv420Jpn: { '07': 'POD6ESSU3ET07', '09': 'POD6ESSU3ET09' },
-            ph: {
-                '灰': { '07': 'POD6ESSIGET07', '09': 'POD6ESSIGET09' },
-                '棕': { '07': 'POD6ESSIBET07', '09': 'POD6ESSIBET09' }
-            }
+            ph: { '灰': { '07': 'POD6ESSIGET07', '09': 'POD6ESSIGET09' }, '棕': { '07': 'POD6ESSIBET07', '09': 'POD6ESSIBET09' } }
         },
         '167': {
             basic:    { '07': 'POD7ESSNUET07', '09': 'POD7ESSNUET09' },
             uv420:    { '07': 'POD7ESSN3ET07', '09': 'POD7ESSN3ET09' },
             uv420Jpn: { '07': 'POD7ESSU3ET07', '09': 'POD7ESSU3ET09' },
-            ph: {
-                '灰': { '07': 'POD7ESSIGET07', '09': 'POD7ESSIGET09' },
-                '棕': { '07': 'POD7ESSIBET07', '09': 'POD7ESSIBET09' }
-            }
+            ph: { '灰': { '07': 'POD7ESSIGET07', '09': 'POD7ESSIGET09' }, '棕': { '07': 'POD7ESSIBET07', '09': 'POD7ESSIBET09' } }
         },
         '174': {
             basic:    { '07': 'POD8ESSNUET07', '09': 'POD8ESSNUET09' },
             uv420Jpn: { '07': 'POD8ESSU3ET07', '09': 'POD8ESSU3ET09' }
         }
     };
-
-    // 近視控制 (Myopia Control) 資料庫 — 已併入單光鏡片特性
     const myDB = {
         '160': { basic: 'POD6MYLNUET', uv420: 'POD6MYLN3ET', ph: { '灰': 'POD6MYLIGET', '棕': 'POD6MYLIBET' } },
         '167': { basic: 'POD7MYLNUET', uv420: 'POD7MYLN3ET', ph: { '灰': 'POD7MYLIGET', '棕': 'POD7MYLIBET' } }
     };
 
+    const PS_STOCK_COLORS = ['Pebble', 'Hojicha'];
+
     // ---- 統一狀態 ----
-    // 新流程：折射率 → 鏡片系列 (SV/PAL) → 鏡片特性
     const stepOrder = [
-        'index', 'category',
-        'feature', 'myFeature', 'jpn', 'das', 'color', 'astigBand', 'corridor',
-        'psSupply', 'psDesign', 'psCoating', 'psColor',
-        'tSupply', 'tCoatingBase', 'tColor',
+        'index', 'category', 'feature', 'myFeature', 'jpn', 'das', 'color', 'astigBand', 'corridor',
+        'psDesign', 'psColor', 'psCoating',
+        'tCoatingBase', 'tColor',
         'ccDesign', 'ccCoating', 'ccColor'
     ];
-
     let state = {
-        category: null, index: null,
-        feature: null, myFeature: null, jpn: null, das: null, color: null, astigBand: null, corridor: null, hyperope: false,
-        psSupply: null, psDesign: null, psCoating: null, psColor: null,
-        tSupply: null, tCoatingBase: null, tUv420: false, tColor: null,
+        category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
+        color: null, astigBand: null, corridor: null, hyperope: false,
+        psDesign: null, psColor: null, psCoating: null,
+        tCoatingBase: null, tUv420: false, tColor: null,
         ccDesign: null, ccCoating: null, ccUv420: false, ccColor: null
     };
 
@@ -220,545 +178,361 @@
         if (field === 'index' || field === 'category') { state.hyperope = false; state.tUv420 = false; state.ccUv420 = false; }
         render();
     }
-
     function onHyperopeToggle() { state.hyperope = !state.hyperope; render(); }
     function toggleTUv420() { state.tUv420 = !state.tUv420; render(); }
     function toggleCcUv420() { state.ccUv420 = !state.ccUv420; render(); }
-
     function idxShort(index) { return index === '160' ? '6' : '7'; }
     function idxDot(index) { return index === '160' ? '1.6' : '1.67'; }
 
-    // ---- UI 組件 (字串渲染) ----
-
-    function stepLabel(n, title) {
-        return `<label class="block font-bold text-slate-700 mb-1 text-sm mt-2.5">${n}. ${title}</label>`;
+    // ---- UI 組件 ----
+    function mkBtn(txt, onclk, act) {
+        return `<button type="button" onclick="${onclk}" class="${act ? A_CLS : I_CLS}">${txt}</button>`;
     }
-
-    function btnGroup(field, options, current) {
-        return `<div class="grid grid-cols-2 gap-1.5">` + options.map(([val, label]) => {
-            const active = current === val;
-            const cls = active
-                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
-                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
-            return `<button type="button" onclick="setState('${field}','${val}')" class="${cls}">${label}</button>`;
-        }).join('') + `</div>`;
+    function gridBtns(field, opts, cur, cols) {
+        const c = { 2: 'grid-cols-2', 3: 'grid-cols-3', 6: 'grid-cols-3 sm:grid-cols-6' }[cols] || 'grid-cols-2';
+        return `<div class="grid ${c} gap-1.5">${opts.map(([v, l]) => mkBtn(l, `setState('${field}','${v}')`, cur === v)).join('')}</div>`;
     }
+    function stepLbl(n, t) { return `<label class="block font-bold text-slate-700 mb-1 text-sm mt-2.5">${n}. ${t}</label>`; }
 
-    // 散光度數卡片：2 張 (低/高) 或 3 張 (低/中/高)
-    function astigBandGroup(bands, current) {
-        const cols = bands.length === 3 ? 'grid-cols-3' : 'grid-cols-2';
-        return `<div class="grid ${cols} gap-1.5">` + bands.map(([val, label]) => {
-            const active = current === val;
-            const cls = active
-                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
-                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
-            return `<button type="button" onclick="setState('astigBand','${val}')" class="${cls}">${label}</button>`;
-        }).join('') + `</div>`;
-    }
-
-    // PhotoShade / 腮紅 共用的顏色色塊 (仿鏡片變色視覺效果)
-    function colorSwatchGroup(field, colors, current, stylesMap) {
-        const styles = stylesMap || colorStyles;
+    function colorSwatch(field, colors, current, stylesMap) {
+        const sm = stylesMap || colorStyles;
         return `<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">` + colors.map(c => {
-            const style = styles[c];
+            const s = sm[c];
             const cls = current === c
-                ? `p-2 border rounded-lg text-center shadow-md transition cursor-pointer ${style.active}`
-                : `p-2 border border-slate-200 rounded-lg text-center font-semibold transition cursor-pointer ${style.bg} hover:brightness-95`;
-            return `<button type="button" onclick="setState('${field}','${c}')" class="${cls}">${style.label}</button>`;
+                ? `p-2 border rounded-lg text-center shadow-md transition cursor-pointer ${s.active}`
+                : `p-2 border border-slate-200 rounded-lg text-center font-semibold transition cursor-pointer ${s.bg} hover:brightness-95`;
+            return `<button type="button" onclick="setState('${field}','${c}')" class="${cls}">${s.label}</button>`;
         }).join('') + `</div>`;
     }
 
-    // 染色鏡片鍍膜卡：ETC 與 UTC 互斥，UV420 獨立可同時選中
-    function tintedCoatingGroup(current, uv420) {
-        const mk = (val, label, active, onclick) => {
-            const cls = active
-                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
-                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
-            return `<button type="button" onclick="${onclick}" class="${cls}">${label}</button>`;
-        };
+    function tintedCoatingGroup(cur, uv420) {
         return `<div class="grid grid-cols-3 gap-1.5">` +
-            mk('ETC', '基本 (ETC)', current === 'ETC', "setState('tCoatingBase','ETC')") +
-            mk('UV420', 'UV420', uv420, "toggleTUv420()") +
-            mk('UTC', '抗刮 (UTC)', current === 'UTC', "setState('tCoatingBase','UTC')") +
-            `</div>`;
+            mkBtn('基本 (ETC)', "setState('tCoatingBase','ETC')", cur === 'ETC') +
+            mkBtn('UV420', "toggleTUv420()", uv420) +
+            mkBtn('抗刮 (UTC)', "setState('tCoatingBase','UTC')", cur === 'UTC') +
+        `</div>`;
     }
-
-    // 腮紅鏡片鍍膜卡：基本(ETC)/UV420/抗刮(SRC/UTC)/超透光(WH/UDC) 四選，UV420 獨立可同時選中
-    function cheekCoatingGroup(current, uv420) {
-        const mk = (val, label, active, onclick) => {
-            const cls = active
-                ? "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer"
-                : "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
-            return `<button type="button" onclick="${onclick}" class="${cls}">${label}</button>`;
-        };
+    function cheekCoatingGroup(cur, uv420) {
         return `<div class="grid grid-cols-2 gap-1.5">` +
-            mk('ETC', '基本 (ETC)', current === 'ETC', "setState('ccCoating','ETC')") +
-            mk('UV420', 'UV420', uv420, "toggleCcUv420()") +
-            mk('UTC', '抗刮 (SRC/UTC)', current === 'UTC', "setState('ccCoating','UTC')") +
-            mk('UDC', '超透光 (WH/UDC)', current === 'UDC', "setState('ccCoating','UDC')") +
-            `</div>`;
-    }
-
-    // 通用下拉選單 (Owndays 顏色用)
-    function selectField(field, options, current, placeholder) {
-        return `<select onchange="setState('${field}', this.value)"
-            class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
-            <option value="" disabled ${current ? '' : 'selected'}>${placeholder}</option>
-            ${options.map(([v, label]) => `<option value="${v}" ${current === v ? 'selected' : ''}>${label}</option>`).join('')}
-        </select>`;
+            mkBtn('基本 (ETC)', "setState('ccCoating','ETC')", cur === 'ETC') +
+            mkBtn('UV420', "toggleCcUv420()", uv420) +
+            mkBtn('抗刮 (SRC/UTC)', "setState('ccCoating','UTC')", cur === 'UTC') +
+            mkBtn('超透光 (WH/UDC)', "setState('ccCoating','UDC')", cur === 'UDC') +
+        `</div>`;
     }
 
     // ---- 主渲染流程 ----
     function render() {
-        const container = document.getElementById('stepsContainer');
-        let html = '';
-        let n = 1;
+        const c = document.getElementById('stepsContainer');
+        let h = '', n = 1;
+        const need = (f) => { if (!state[f]) { c.innerHTML = h; hideResult(); return true; } return false; };
 
-        // Step 1：折射率
-        html += stepLabel(n++, '折射率 (Index)');
-        html += btnGroup('index', [['160', '1.60'], ['167', '1.67'], ['174', '1.74']], state.index);
-        if (!state.index) { container.innerHTML = html; hideResult(); return; }
+        h += stepLbl(n++, '折射率 (Index)');
+        h += gridBtns('index', [['160', '1.60'], ['167', '1.67'], ['174', '1.74']], state.index, 2);
+        if (need('index')) return;
 
-        // Step 2：鏡片系列
-        html += stepLabel(n++, '鏡片系列');
-        html += btnGroup('category', [['SV', '單光 SV'], ['PAL', '漸進 PAL']], state.category);
-        if (!state.category) { container.innerHTML = html; hideResult(); return; }
+        h += stepLbl(n++, '鏡片系列');
+        h += gridBtns('category', [['SV', '單光 SV'], ['PAL', '漸進 PAL']], state.category, 2);
+        if (need('category')) return;
 
-        // Step 3：鏡片特性 (基本/UV420/PhotoShade/染色鏡片/PH變色/近視控制/POL)
-        // 染色鏡片、近視控制、POL 偏光 只限單光 SV；PhotoShade/PH變色 174 冇資料
-        let featureOptions = [['basic', '基本'], ['uv420', 'UV420']];
-        if (state.index !== '174') featureOptions.push(['ps', 'PhotoShade']);
-        if (state.index !== '174') featureOptions.push(['cheek', '腮紅鏡片']);
-        if (state.category === 'SV' && state.index !== '174') featureOptions.push(['tinted', '染色鏡片']);
-        if ((state.category === 'SV' && state.index === '160') || (state.category === 'PAL' && state.index !== '174')) {
-            featureOptions.push(['ph', 'PH 變色']);
-        }
-        if (state.category === 'SV' && state.index !== '174') featureOptions.push(['myopia', '近視控制']);
-        if (state.category === 'SV' && state.index === '160') featureOptions.push(['pol', 'POL 偏光']);
+        let fopts = [['basic', '基本'], ['uv420', 'UV420']];
+        if (state.index !== '174') fopts.push(['ps', 'PhotoShade'], ['cheek', '腮紅鏡片']);
+        if (state.category === 'SV' && state.index !== '174') fopts.push(['tinted', '染色鏡片']);
+        if ((state.category === 'SV' && state.index === '160') || (state.category === 'PAL' && state.index !== '174')) fopts.push(['ph', 'PH 變色']);
+        if (state.category === 'SV' && state.index !== '174') fopts.push(['myopia', '近視控制']);
+        if (state.category === 'SV' && state.index === '160') fopts.push(['pol', 'POL 偏光']);
+        h += stepLbl(n++, '鏡片特性');
+        h += gridBtns('feature', fopts, state.feature, 2);
+        if (need('feature')) return;
 
-        html += stepLabel(n++, '鏡片特性');
-        html += btnGroup('feature', featureOptions, state.feature);
-        if (!state.feature) { container.innerHTML = html; hideResult(); return; }
-
-        // ---- SV 分支 (含近視控制) ----
+        // SV branch
         if (state.category === 'SV' && state.feature !== 'ps' && state.feature !== 'tinted') {
             if (state.feature === 'myopia') {
-                html += stepLabel(n++, '近視控制 - 鏡片特性');
-                html += btnGroup('myFeature', [['basic', '基本'], ['uv420', 'UV420 防藍光'], ['ph', 'PH 變色']], state.myFeature);
-                if (!state.myFeature) { container.innerHTML = html; hideResult(); return; }
-
-                if (state.myFeature === 'ph') {
-                    html += stepLabel(n++, '顏色');
-                    html += btnGroup('color', [['灰', '灰色'], ['棕', '棕色']], state.color);
-                    if (!state.color) { container.innerHTML = html; hideResult(); return; }
-                }
+                h += stepLbl(n++, '近視控制 - 鏡片特性');
+                h += gridBtns('myFeature', [['basic', '基本'], ['uv420', 'UV420 防藍光'], ['ph', 'PH 變色']], state.myFeature, 2);
+                if (need('myFeature')) return;
+                if (state.myFeature === 'ph') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['棕', '棕色']], state.color, 2); if (need('color')) return; }
             } else {
                 if (state.feature === 'uv420') {
-                    html += stepLabel(n++, '是否日本製 (JPN)');
-                    html += btnGroup('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn);
-                    if (!state.jpn) { container.innerHTML = html; hideResult(); return; }
-
+                    h += stepLbl(n++, '是否日本製 (JPN)');
+                    h += gridBtns('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn, 2);
+                    if (need('jpn')) return;
                     if (state.jpn === 'yes' && (state.index === '167' || state.index === '174')) {
-                        html += stepLabel(n++, '是否雙非面 (DAS)');
-                        html += btnGroup('das', [['no', '否'], ['yes', '是']], state.das);
-                        if (!state.das) { container.innerHTML = html; hideResult(); return; }
+                        h += stepLbl(n++, '是否雙非面 (DAS)');
+                        h += gridBtns('das', [['no', '否'], ['yes', '是']], state.das, 2);
+                        if (need('das')) return;
                     }
                 }
+                if (state.feature === 'pol') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['茶', '茶色']], state.color, 2); if (need('color')) return; }
 
-                if (state.feature === 'pol') {
-                    html += stepLabel(n++, '顏色');
-                    html += btnGroup('color', [['灰', '灰色'], ['茶', '茶色']], state.color);
-                    if (!state.color) { container.innerHTML = html; hideResult(); return; }
-                }
-
-                const skip174NonJpnUv420 = (state.feature === 'uv420' && state.jpn === 'no' && state.index === '174');
-                const needAstigCards = (state.feature === 'basic') || (state.feature === 'uv420' && !skip174NonJpnUv420);
-
-                if (needAstigCards) {
-                    html += stepLabel(n++, '散光度數');
+                const skip174 = (state.feature === 'uv420' && state.jpn === 'no' && state.index === '174');
+                const needAstig = (state.feature === 'basic') || (state.feature === 'uv420' && !skip174);
+                if (needAstig) {
+                    h += stepLbl(n++, '散光度數');
                     if (state.feature === 'basic') {
-                        html += astigBandGroup([
-                            ['low', '-200度或以下'], ['mid', '-225至-300度'], ['high', '-325或以上']
-                        ], state.astigBand);
-                        html += `<label class="flex items-center gap-2 mt-1.5 text-sm text-slate-600 cursor-pointer">
-                            <input type="checkbox" ${state.hyperope ? 'checked' : ''} onchange="onHyperopeToggle()" class="w-4 h-4" />
-                            處方同時有遠視 (Plus 度數)
-                        </label>`;
+                        h += gridBtns('astigBand', [['low', '-200度或以下'], ['mid', '-225至-300度'], ['high', '-325或以上']], state.astigBand, 3);
+                        h += `<label class="flex items-center gap-2 mt-1.5 text-sm text-slate-600 cursor-pointer"><input type="checkbox" ${state.hyperope ? 'checked' : ''} onchange="onHyperopeToggle()" class="w-4 h-4"/>處方同時有遠視 (Plus 度數)</label>`;
                     } else {
-                        html += astigBandGroup([
-                            ['low', '-200度或以下'], ['high', '-225或以上']
-                        ], state.astigBand);
+                        h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
                     }
-                    if (!state.astigBand) { container.innerHTML = html; hideResult(); return; }
+                    if (need('astigBand')) return;
                 }
             }
         }
 
-        // ---- PAL 分支 ----
+        // PAL branch
         if (state.category === 'PAL' && state.feature !== 'ps') {
-            if (state.feature === 'ph') {
-                html += stepLabel(n++, '顏色');
-                html += btnGroup('color', [['灰', '灰色'], ['棕', '棕色']], state.color);
-                if (!state.color) { container.innerHTML = html; hideResult(); return; }
-            }
-
-            if (state.feature === 'uv420' && state.index !== '174') {
-                html += stepLabel(n++, '是否日本製 (JPN)');
-                html += btnGroup('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn);
-                if (!state.jpn) { container.innerHTML = html; hideResult(); return; }
-            }
-
-            html += stepLabel(n++, '漸進走廊 (Corridor)');
-            html += btnGroup('corridor', [['07', '07'], ['09', '09']], state.corridor);
-            if (!state.corridor) { container.innerHTML = html; hideResult(); return; }
+            if (state.feature === 'ph') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['棕', '棕色']], state.color, 2); if (need('color')) return; }
+            if (state.feature === 'uv420' && state.index !== '174') { h += stepLbl(n++, '是否日本製 (JPN)'); h += gridBtns('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn, 2); if (need('jpn')) return; }
+            h += stepLbl(n++, '漸進走廊 (Corridor)');
+            h += gridBtns('corridor', [['07', '07'], ['09', '09']], state.corridor, 2);
+            if (need('corridor')) return;
         }
 
-        // ---- PhotoShade 分支 (SV/PAL 共用) ----
+        // PhotoShade — 顏色 → 鍍膜（顏色+鍍膜自動決定 Stock/RX，鍍膜按鈕不顯示供應類型）
         if (state.feature === 'ps') {
-            let effSupply = 'RX';
-            if (state.category === 'SV') {
-                html += stepLabel(n++, '供應類型');
-                html += btnGroup('psSupply', [['Stock', '庫存 (Stock)'], ['RX', '訂製 (RX)']], state.psSupply);
-                if (!state.psSupply) { container.innerHTML = html; hideResult(); return; }
-                effSupply = state.psSupply;
-            }
+            if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('psDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.psDesign, 2); if (need('psDesign')) return; }
 
-            if (state.category === 'PAL') {
-                html += stepLabel(n++, '漸進系列設計');
-                html += btnGroup('psDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.psDesign);
-                if (!state.psDesign) { container.innerHTML = html; hideResult(); return; }
-            }
+            h += stepLbl(n++, '選擇變色色彩');
+            h += colorSwatch('psColor', ['Pebble', 'Hojicha', 'Matcha', 'Indigo', 'Sakura', 'Lavender'], state.psColor);
+            if (need('psColor')) return;
 
-            html += stepLabel(n++, '鍍膜 (Coating)');
-            const coatingOptions = (effSupply === 'Stock')
-                ? [['ETC', 'ETC (基本 HMC 鍍膜)']]
-                : [['ETC', 'ETC (基本 HMC 鍍膜)'], ['UTC', 'UTC (SRC 強化抗刮)'], ['UDC', 'UDC (SRC WH 低反光強化抗刮)']];
-            html += btnGroup('psCoating', coatingOptions, state.psCoating);
-            if (!state.psCoating) { container.innerHTML = html; hideResult(); return; }
-
-            html += stepLabel(n++, '選擇變色色彩');
-            const psColors = (effSupply === 'Stock')
-                ? ["Pebble", "Hojicha"]
-                : ["Pebble", "Hojicha", "Matcha", "Indigo", "Sakura", "Lavender"];
-            html += colorSwatchGroup('psColor', psColors, state.psColor);
-            if (!state.psColor) { container.innerHTML = html; hideResult(); return; }
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += gridBtns('psCoating', [
+                ['ETC', 'ETC (基本 HMC 鍍膜)'],
+                ['UTC', 'UTC (SRC 強化抗刮)'],
+                ['UDC', 'UDC (SRC WH 低反光強化抗刮)']
+            ], state.psCoating, 2);
+            if (need('psCoating')) return;
         }
 
-        // ---- 腮紅鏡片 (Cheek Color) 分支 (SV/PAL 共用) ----
+        // Cheek Color
         if (state.feature === 'cheek') {
-            if (state.category === 'PAL') {
-                html += stepLabel(n++, '漸進系列設計');
-                html += btnGroup('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign);
-                if (!state.ccDesign) { container.innerHTML = html; hideResult(); return; }
-            }
-
-            html += stepLabel(n++, '鍍膜 (Coating)');
-            html += cheekCoatingGroup(state.ccCoating, state.ccUv420);
-            if (!state.ccCoating) { container.innerHTML = html; hideResult(); return; }
-
-            html += stepLabel(n++, '腮紅顏色');
-            html += colorSwatchGroup('ccColor', ['Purple', 'Peach', 'Orange'], state.ccColor, cheekColorStyles);
-            if (!state.ccColor) { container.innerHTML = html; hideResult(); return; }
+            if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign, 2); if (need('ccDesign')) return; }
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += cheekCoatingGroup(state.ccCoating, state.ccUv420);
+            if (need('ccCoating')) return;
+            h += stepLbl(n++, '腮紅顏色');
+            h += colorSwatch('ccColor', ['Purple', 'Peach', 'Orange'], state.ccColor, cheekColorStyles);
+            if (need('ccColor')) return;
         }
 
-        // ---- 染色鏡片 (Tinted) 分支 (只限單光 SV) ----
+        // Tinted — 散光自動判斷 Stock/RX，只顯示度數
         if (state.feature === 'tinted') {
-            html += stepLabel(n++, '供應類型');
-            html += btnGroup('tSupply', [['Stock', '庫存 (Stock)'], ['RX', '訂製 (RX)']], state.tSupply);
-            if (!state.tSupply) { container.innerHTML = html; hideResult(); return; }
+            h += stepLbl(n++, '散光度數');
+            h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
+            if (need('astigBand')) return;
 
-            html += stepLabel(n++, '鍍膜 (Coating)');
-            html += tintedCoatingGroup(state.tCoatingBase, state.tUv420);
-            if (!state.tCoatingBase) { container.innerHTML = html; hideResult(); return; }
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += tintedCoatingGroup(state.tCoatingBase, state.tUv420);
+            if (need('tCoatingBase')) return;
 
-            html += stepLabel(n++, 'Owndays 顏色');
-            html += selectField('tColor', tintedColors.map(([name, code]) => [code, `${name} (${code})`]), state.tColor, '請選擇');
-            if (!state.tColor) { container.innerHTML = html; hideResult(); return; }
+            h += stepLbl(n++, 'Owndays 顏色');
+            h += `<select onchange="setState('tColor',this.value)" class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"><option value="" disabled ${state.tColor ? '' : 'selected'}>請選擇</option>${tintedColors.map(([nm, cd]) => `<option value="${cd}" ${state.tColor === cd ? 'selected' : ''}>${nm} (${cd})</option>`).join('')}</select>`;
+            if (need('tColor')) return;
         }
 
-        container.innerHTML = html;
+        c.innerHTML = h;
         renderResult();
     }
 
-    // ---- 各分支的代碼運算 ----
+    // ---- 計算邏輯 ----
+    function computeResult() {
+        const { category, feature } = state;
+        if (feature === 'ps') return computePS();
+        if (feature === 'tinted') return computeT();
+        if (feature === 'cheek') return computeCC();
+        if (category === 'SV') return computeSV();
+        if (category === 'PAL') return computePAL();
+        return null;
+    }
 
-    function computeSVResult() {
-        const idx = state.index;
-        const db = svDB[idx];
-
-        if (state.feature === 'myopia') return computeMYResult();
-
-        if (state.feature === 'ph') {
-            return { code: db.ph.code, note: '散光-200或以下 (PH 灰)' };
-        }
-
-        if (state.feature === 'pol') {
-            if (!state.color) return { status: 'need_color' };
-            return { code: db.pol.colors[state.color], note: 'POL 偏光 ' + state.color + '色' };
-        }
-
-        if (state.feature === 'basic') {
-            if (!state.astigBand) return { status: 'need_astig' };
-            if (state.astigBand === 'mid') {
-                return { code: db.extCyl.code, note: `左右眼散光在 ${db.extCyl.min}-${db.extCyl.max} 內` };
-            }
-            if (state.astigBand === 'low') {
-                if (state.hyperope) return { code: db.rx.code, note: `遠視+散光 ${db.rx.hyperopeMin} 以上` };
-                return { code: db.basicLow.code, note: '散光-200或以下' };
-            }
+    function computeSV() {
+        const { index, feature, astigBand, hyperope, jpn, das, color } = state;
+        const db = svDB[index];
+        if (feature === 'myopia') return computeMY();
+        if (feature === 'ph') return { code: db.ph.code, note: '散光-200或以下 (PH 灰)' };
+        if (feature === 'pol') return color ? { code: db.pol.colors[color], note: 'POL 偏光 ' + color + '色' } : { status: 'need_color' };
+        if (feature === 'basic') {
+            if (!astigBand) return { status: 'need_astig' };
+            if (astigBand === 'mid') return { code: db.extCyl.code, note: `左右眼散光在 ${db.extCyl.min}-${db.extCyl.max} 內` };
+            if (astigBand === 'low') return hyperope ? { code: db.rx.code, note: `遠視+散光 ${db.rx.hyperopeMin} 以上` } : { code: db.basicLow.code, note: '散光-200或以下' };
             return { code: db.rx.code, note: `散光 ${db.rx.min} 以上` };
         }
-
-        if (state.feature === 'uv420') {
-            if (!state.jpn) return { status: 'need_jpn' };
-
-            if (state.jpn === 'no') {
-                if (idx === '174') {
-                    return { code: db.uv420.nonJpn.all, note: '所有散光度數同一編號' };
-                }
-                if (!state.astigBand) return { status: 'need_astig' };
-                if (state.astigBand === 'low') return { code: db.uv420.nonJpn.low, note: '散光-200或以下' };
-                return { code: db.uv420.nonJpn.high, note: '散光-225或以上' };
+        if (feature === 'uv420') {
+            if (!jpn) return { status: 'need_jpn' };
+            if (jpn === 'no') {
+                if (index === '174') return { code: db.uv420.nonJpn.all, note: '所有散光度數同一編號' };
+                if (!astigBand) return { status: 'need_astig' };
+                return astigBand === 'low' ? { code: db.uv420.nonJpn.low, note: '散光-200或以下' } : { code: db.uv420.nonJpn.high, note: '散光-225或以上' };
             }
-
-            const dasAvailable = (idx === '167' || idx === '174');
-            if (dasAvailable && !state.das) return { status: 'need_das' };
-            const useDas = dasAvailable && state.das === 'yes';
-            const branch = useDas ? db.uv420.das : db.uv420.jpn;
-            if (!state.astigBand) return { status: 'need_astig' };
-            if (state.astigBand === 'low') return { code: branch.low, note: '散光-200或以下' };
-            const warn = branch.disputed ? '⚠ 資料來源有分歧 (PE/RE)，請人手核對' : null;
-            return { code: branch.high, note: '散光-225或以上', warn };
+            const da = (index === '167' || index === '174');
+            if (da && !das) return { status: 'need_das' };
+            const br = (da && das === 'yes') ? db.uv420.das : db.uv420.jpn;
+            if (!astigBand) return { status: 'need_astig' };
+            if (astigBand === 'low') return { code: br.low, note: '散光-200或以下' };
+            return { code: br.high, note: '散光-225或以上', warn: br.disputed ? '⚠ 資料來源有分歧 (PE/RE)，請人手核對' : null };
         }
-
         return null;
     }
 
-    function computePALResult() {
-        const idx = state.index;
-        const db = palDB[idx];
+    function computePAL() {
+        const { index, feature, jpn, color, corridor } = state;
+        const db = palDB[index];
         let base = null;
-
-        if (state.feature === 'basic') base = db.basic;
-        else if (state.feature === 'uv420') {
-            if (idx === '174') {
-                base = db.uv420Jpn;
-            } else {
-                if (!state.jpn) return { status: 'need_jpn' };
-                base = state.jpn === 'yes' ? db.uv420Jpn : db.uv420;
-            }
-        }
-        else if (state.feature === 'ph') {
-            if (!state.color) return { status: 'need_color' };
-            base = db.ph ? db.ph[state.color] : null;
-        }
-
+        if (feature === 'basic') base = db.basic;
+        else if (feature === 'uv420') base = index === '174' ? db.uv420Jpn : (jpn === 'yes' ? db.uv420Jpn : db.uv420);
+        else if (feature === 'ph') base = db.ph?.[color];
         if (!base) return { status: 'no_match', note: '此折射率未有此特性嘅編號' };
-        if (!state.corridor) return null;
-        return { code: base[state.corridor], note: state.corridor + ' 走廊' };
+        if (!corridor) return null;
+        return { code: base[corridor], note: corridor + ' 走廊' };
     }
 
-    function computeMYResult() {
-        const idx = state.index;
-        const db = myDB[idx];
+    function computeMY() {
+        const { index, myFeature, color } = state;
+        const db = myDB[index];
         if (!db) return { status: 'no_match', note: '此折射率未有近視控制編號' };
-
-        if (!state.myFeature) return { status: 'need_astig' };
-        if (state.myFeature === 'basic') return { code: db.basic };
-        if (state.myFeature === 'uv420') return { code: db.uv420 };
-        if (state.myFeature === 'ph') {
-            if (!state.color) return { status: 'need_color' };
-            return { code: db.ph[state.color] };
-        }
+        if (!myFeature) return { status: 'need_astig' };
+        if (myFeature === 'basic') return { code: db.basic };
+        if (myFeature === 'uv420') return { code: db.uv420 };
+        if (myFeature === 'ph') return color ? { code: db.ph[color] } : { status: 'need_color' };
         return null;
     }
 
-    function computePSResult() {
-        const effType = state.category === 'PAL' ? 'Progressive' : 'Single';
-        const effSupply = state.category === 'PAL' ? 'RX' : state.psSupply;
+    // PhotoShade — 顏色+鍍膜自動決定 Stock/RX
+    function computePS() {
+        const { index, category, psDesign, psColor, psCoating } = state;
+        if (category === 'PAL' && !psDesign) return { status: 'need_design' };
+        if (!psColor) return { status: 'need_color' };
+        if (!psCoating) return { status: 'need_coating' };
 
-        if (state.category === 'SV' && !state.psSupply) return { status: 'need_supply' };
-        if (effType === 'Progressive' && !state.psDesign) return { status: 'need_design' };
-        if (!state.psCoating) return { status: 'need_coating' };
-        if (!state.psColor) return { status: 'need_color' };
+        const cL = colorCodeLetter[psColor];
+        const iS = idxShort(index);
+        const isStock = category === 'SV' && PS_STOCK_COLORS.includes(psColor) && psCoating === 'ETC';
 
-        const cLetter = colorCodeLetter[state.psColor];
-        const idxS = idxShort(state.index);
-        let code = '';
-
-        if (effType === 'Single') {
-            if (effSupply === 'Stock') {
-                code = `FOD${idxS}ASF3${cLetter}ET`;
-            } else {
-                const coatShort = state.psCoating === 'ETC' ? 'ET' : (state.psCoating === 'UTC' ? 'UT' : 'UD');
-                code = `XOD${idxS}ASB3${cLetter}${coatShort}`;
+        if (category === 'SV') {
+            if (isStock) {
+                return { code: `FOD${iS}ASF3${cL}ET`, note: '庫存 (Stock)' };
             }
-        } else {
-            const designCode = state.psDesign === 'Progressive' ? 'IDS3' : 'ESS3';
-            const suffix = state.psDesign === 'Progressive' ? '11' : '09';
-            const coatShort = state.psCoating === 'ETC' ? 'ET' : (state.psCoating === 'UTC' ? 'UT' : 'UD');
-            code = `POD${idxS}${designCode}${cLetter}${coatShort}${suffix}`;
+            const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
+            return { code: `XOD${iS}ASB3${cL}${cs}`, note: '訂製 (RX)' };
         }
 
-        return { code, kind: 'single' };
+        // PAL — 強制 RX
+        const dC = psDesign === 'Progressive' ? 'IDS3' : 'ESS3';
+        const sfx = psDesign === 'Progressive' ? '11' : '09';
+        const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
+        return { code: `POD${iS}${dC}${cL}${cs}${sfx}`, note: '訂製 (RX)' };
     }
 
-    function computeTResult() {
-        if (!state.tSupply) return { status: 'need_supply' };
-        if (!state.tCoatingBase) return { status: 'need_coating' };
-        if (!state.tColor) return { status: 'need_color' };
-
-        const key = (state.tUv420 ? 'UV420_' : '') + state.tCoatingBase;
-        const lensCode = tintedLensCodes[state.tSupply][idxDot(state.index)][key];
-        return { code: lensCode, colorCode: state.tColor, kind: 'tinted' };
+    // 染色鏡片：散光自動判斷 Stock/RX
+    function computeT() {
+        const { astigBand, tCoatingBase, tUv420, tColor, index } = state;
+        if (!astigBand) return { status: 'need_astig' };
+        const tSupply = astigBand === 'low' ? 'Stock' : 'RX';
+        if (!tCoatingBase) return { status: 'need_coating' };
+        if (!tColor) return { status: 'need_color' };
+        const key = (tUv420 ? 'UV420_' : '') + tCoatingBase;
+        return { code: tintedLensCodes[tSupply][idxDot(index)][key], colorCode: tColor, kind: 'tinted' };
     }
 
-    function computeCCResult() {
-        const idx = state.index;
-        let table;
-        if (state.category === 'SV') {
-            table = cheekLensCodes.SV[idx];
-        } else {
-            if (!state.ccDesign) return { status: 'need_design' };
-            table = state.ccDesign === 'Progressive' ? cheekLensCodes.Progressive[idx] : cheekLensCodes.Premium[idx];
-        }
-        if (!state.ccCoating) return { status: 'need_coating' };
-        if (!state.ccColor) return { status: 'need_color' };
-
-        const key = (state.ccUv420 ? 'UV420_' : '') + state.ccCoating;
-        const lensCode = table ? table[key] : null;
-        if (!lensCode) return { status: 'no_match', note: '此組合暫未有對應編號，請人手核對' };
-        return { code: lensCode, colorCode: cheekColorCode[state.ccColor], kind: 'cheek' };
+    function computeCC() {
+        const { index, category, ccDesign, ccCoating, ccUv420, ccColor } = state;
+        let tbl;
+        if (category === 'SV') tbl = cheekLensCodes.SV[index];
+        else { if (!ccDesign) return { status: 'need_design' }; tbl = cheekLensCodes[ccDesign][index]; }
+        if (!ccCoating) return { status: 'need_coating' };
+        if (!ccColor) return { status: 'need_color' };
+        const key = (ccUv420 ? 'UV420_' : '') + ccCoating;
+        const code = tbl?.[key];
+        if (!code) return { status: 'no_match', note: '此組合暫未有對應編號，請人手核對' };
+        return { code, colorCode: cheekColorCode[ccColor], kind: 'cheek' };
     }
 
     // ---- 結果顯示 ----
+    const PROMPT_MAP = {
+        need_astig: '請先選擇散光度數', need_color: '請先選擇顏色', need_jpn: '請先選擇是否日本製',
+        need_das: '請先選擇是否雙非面', need_supply: '請先選擇供應類型',
+        need_design: '請先選擇漸進系列設計', need_coating: '請先選擇鍍膜'
+    };
 
     function renderResult() {
         if (!state.category || !state.index || !state.feature) { hideResult(); return; }
-
-        let result = null;
-        if (state.feature === 'ps') result = computePSResult();
-        else if (state.feature === 'tinted') result = computeTResult();
-        else if (state.feature === 'cheek') result = computeCCResult();
-        else if (state.category === 'SV') result = computeSVResult();
-        else if (state.category === 'PAL') result = computePALResult();
-
-        if (!result) { hideResult(); return; }
-
-        const promptMap = {
-            need_astig: '請先選擇散光度數',
-            need_color: '請先選擇顏色',
-            need_jpn: '請先選擇是否日本製',
-            need_das: '請先選擇是否雙非面',
-            need_supply: '請先選擇供應類型',
-            need_design: '請先選擇漸進系列設計',
-            need_coating: '請先選擇鍍膜'
-        };
-        if (result.status && promptMap[result.status]) { showPrompt(promptMap[result.status]); return; }
-        if (result.status === 'no_match') { showPrompt(result.note || '此度數暫未有對應編號，請人手核對'); return; }
-
-        if (result.kind === 'tinted') { showTintedResult(result.code, result.colorCode, 'Owndays 顏色代碼'); return; }
-        if (result.kind === 'cheek') { showTintedResult(result.code, result.colorCode, '腮紅色代碼'); return; }
-        if (result.code) { showResult(result.code, result.note, result.warn); return; }
-
-        hideResult();
+        const res = computeResult();
+        if (!res) { hideResult(); return; }
+        if (res.status && PROMPT_MAP[res.status]) { showPrompt(PROMPT_MAP[res.status]); return; }
+        if (res.status === 'no_match') { showPrompt(res.note || '此度數暫未有對應編號，請人手核對'); return; }
+        if (res.kind === 'tinted') { showTinted(res.code, res.colorCode, 'Owndays 顏色代碼'); return; }
+        if (res.kind === 'cheek') { showTinted(res.code, res.colorCode, '腮紅色代碼'); return; }
+        if (res.code) showResult(res.code, res.note, res.warn);
+        else hideResult();
     }
 
-    function resetCopyBtn() {
-        const copyBtn = document.getElementById('copyBtn');
-        const copyBtnText = document.getElementById('copyBtnText');
-        copyBtn.className = "mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
-        copyBtnText.textContent = "複製編號";
+    function setResultMode(mode) {
+        document.getElementById('resultSingleWrapper').classList.toggle('hidden', mode !== 'single');
+        document.getElementById('resultTintedWrapper').classList.toggle('hidden', mode !== 'tinted');
     }
-
     function showResult(code, note, warn) {
-        document.getElementById('resultSingleWrapper').classList.remove('hidden');
-        document.getElementById('resultTintedWrapper').classList.add('hidden');
+        setResultMode('single');
         document.getElementById('resultLabel').textContent = '對應 HKO 鏡片編號';
         document.getElementById('resultCode').textContent = code;
         document.getElementById('resultNote').textContent = (note || '') + (warn ? '　' + warn : '');
         resetCopyBtn();
         document.getElementById('resultBox').classList.remove('hidden');
     }
-
-    function showTintedResult(lensCode, colorCode, colorLabel) {
-        document.getElementById('resultSingleWrapper').classList.add('hidden');
-        document.getElementById('resultTintedWrapper').classList.remove('hidden');
-        document.getElementById('resultLensCode').textContent = lensCode;
-        document.getElementById('resultColorCode').textContent = colorCode;
-        document.getElementById('resultColorLabel').textContent = colorLabel || 'Owndays 顏色代碼';
+    function showTinted(lens, color, label) {
+        setResultMode('tinted');
+        document.getElementById('resultLensCode').textContent = lens;
+        document.getElementById('resultColorCode').textContent = color;
+        document.getElementById('resultColorLabel').textContent = label;
         document.getElementById('resultNote').textContent = '';
         resetCopyBtn();
         document.getElementById('resultBox').classList.remove('hidden');
     }
-
     function showPrompt(msg) {
-        document.getElementById('resultSingleWrapper').classList.remove('hidden');
-        document.getElementById('resultTintedWrapper').classList.add('hidden');
+        setResultMode('single');
         document.getElementById('resultLabel').textContent = msg;
         document.getElementById('resultCode').textContent = '------';
         document.getElementById('resultNote').textContent = '';
         document.getElementById('resultBox').classList.remove('hidden');
     }
+    function hideResult() { document.getElementById('resultBox').classList.add('hidden'); }
 
-    function hideResult() {
-        document.getElementById('resultBox').classList.add('hidden');
+    function resetCopyBtn() {
+        const btn = document.getElementById('copyBtn'), txt = document.getElementById('copyBtnText');
+        btn.className = "mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+        txt.textContent = "複製編號";
     }
-
     function copyToClipboard() {
-        const copyBtn = document.getElementById("copyBtn");
-        const copyBtnText = document.getElementById("copyBtnText");
+        const btn = document.getElementById('copyBtn'), txt = document.getElementById('copyBtnText');
         const isTinted = !document.getElementById('resultTintedWrapper').classList.contains('hidden');
-        const codeText = isTinted
-            ? document.getElementById("resultLensCode").textContent
-            : document.getElementById("resultCode").textContent;
-
-        navigator.clipboard.writeText(codeText).then(() => {
-            copyBtn.className = "mt-2 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
-            copyBtnText.textContent = "✓ 已複製";
-        }).catch(() => {
-            alert("複製失敗");
-        });
+        const code = isTinted ? document.getElementById('resultLensCode').textContent : document.getElementById('resultCode').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            btn.className = "mt-2 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+            txt.textContent = "✓ 已複製";
+        }).catch(() => alert("複製失敗"));
     }
 
-    // ---- 電腦使用時固定字體大小，卡片過高就用捲軸 ----
-    function fitCardToScreen() {
+    // ---- 自適應與滾動 ----
+    function fitCard() {
         const card = document.getElementById('mainCard');
         if (!card) return;
-        card.style.transform = 'none';
-        card.style.maxHeight = '';
-        card.style.overflowY = 'auto';
+        card.style.transform = 'none'; card.style.maxHeight = ''; card.style.overflowY = 'auto';
     }
-
-    // ---- 內容變高時自動捲落最底，唔使自己拖 ----
-    function scrollCardToBottom() {
+    function scrollCard() {
         const card = document.getElementById('mainCard');
-        if (!card) return;
-        if (card.scrollHeight > card.clientHeight) {
-            card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
-        }
+        if (card && card.scrollHeight > card.clientHeight) card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
     }
-
-    const cardResizeObserver = new ResizeObserver(() => {
-        window.requestAnimationFrame(fitCardToScreen);
-    });
-
-    // mainCard 本身高度封頂 (max-h-full)，內容變長時唔會觸發 ResizeObserver，
-    // 所以要另外監察內容變化 (步驟/結果顯示) 先可以自動捲落底
-    const mainCardMutationObserver = new MutationObserver(() => {
-        window.requestAnimationFrame(scrollCardToBottom);
-    });
+    const resizeObs = new ResizeObserver(() => requestAnimationFrame(fitCard));
+    const mutObs = new MutationObserver(() => requestAnimationFrame(scrollCard));
 
     window.addEventListener('load', () => {
         render();
-        cardResizeObserver.observe(document.getElementById('mainCard'));
-        mainCardMutationObserver.observe(document.getElementById('mainCard'), {
-            childList: true, subtree: true, attributes: true, attributeFilter: ['class']
-        });
-        fitCardToScreen();
+        resizeObs.observe(document.getElementById('mainCard'));
+        mutObs.observe(document.getElementById('mainCard'), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        fitCard();
     });
-    window.addEventListener('resize', fitCardToScreen);
+    window.addEventListener('resize', fitCard);
 </script>
-
 </body>
 </html>
