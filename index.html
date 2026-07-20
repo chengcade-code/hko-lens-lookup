@@ -17,6 +17,30 @@
 
     <div id="mainCard" class="bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
         <h1 class="text-xl sm:text-2xl font-extrabold text-center text-blue-600 mb-3 tracking-wide">HKO 鏡片代碼查詢系統</h1>
+
+        <!-- Jan Code 掃描區 -->
+        <div class="mb-3 p-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-2 0h-2m0 0H8m0 0H6m2 0v2m0-2V9m0 0V7m0 2h2M6 9h2m-2 0V7m0 2v2m0-2h2m-2 0H4m2 0v2m0-2V9m0 0V7m0 2h2M4 9h2m-2 0V7m0 2v2"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"/>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke-width="2"/>
+                </svg>
+                <input type="text" id="janInput" placeholder="掃描或輸入 Jan code..."
+                    class="flex-1 p-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onkeydown="if(event.key==='Enter'){scanJanCode();event.preventDefault();}">
+                <button onclick="scanJanCode()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shrink-0 cursor-pointer">確認</button>
+            </div>
+            <div id="janScanInfo" class="hidden mt-2 flex items-center justify-between">
+                <div class="text-sm">
+                    <span class="text-slate-500">已識別：</span>
+                    <span class="text-blue-700 font-bold" id="janScanName"></span>
+                    <span class="text-xs text-slate-400 ml-1 font-mono" id="janScanCode"></span>
+                </div>
+                <button onclick="clearJanScan()" class="text-xs text-slate-500 hover:text-red-500 underline cursor-pointer">清除掃描</button>
+            </div>
+        </div>
+
         <div id="stepsContainer"></div>
         <div class="mt-2.5 p-3 bg-slate-100 rounded-lg text-center hidden" id="resultBox">
             <div id="resultSingleWrapper">
@@ -38,12 +62,140 @@
 
 <script>
     // ============================================================
-    // HKO 鏡片代碼查詢系統 — 精簡版 v3.1
-    // 更新：PhotoShade 鍍膜按鈕移除庫存/訂製標示
+    // HKO 鏡片代碼查詢系統 — v4（加入 Jan code 條碼掃描）
     // ============================================================
 
     const A_CLS = "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer";
     const I_CLS = "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
+
+    // ---- Jan Code 映射表（來源：無標題的試算表_-_HKO-4.pdf）----
+    const janCodeMap = {
+        // ===== 單光 1.60 =====
+        "2300161251012": { name: "HK FSV160 Ext Cyl", params: { index: "160", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300144250711": { name: "HK FSV160 PH GRAY", params: { index: "160", category: "SV", feature: "ph" } },
+        "2300078230711": { name: "HK RX160", params: { index: "160", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300154180619": { name: "HK FSV160 UV420", params: { index: "160", category: "SV", feature: "uv420", jpn: "no", astigBand: "low" } },
+        "2300155180618": { name: "HK RX160 UV420", params: { index: "160", category: "SV", feature: "uv420", jpn: "no", astigBand: "high" } },
+        "2300041210917": { name: "HK RX160 UV420 (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", astigBand: "low" } },
+        "2300044210914": { name: "HK RX160 UV420 Ext Cyl (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", astigBand: "high" } },
+        "2300174180613": { name: "HK RX160 POL", params: { index: "160", category: "SV", feature: "pol", color: "灰" } },
+        // ===== 單光 1.67 =====
+        "2300162251011": { name: "HK FSV167 Ext Cyl", params: { index: "167", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300079230710": { name: "HK RX167", params: { index: "167", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300163180617": { name: "HK FSV167 UV420", params: { index: "167", category: "SV", feature: "uv420", jpn: "no", astigBand: "low" } },
+        "2300164180616": { name: "HK RX167 UV420", params: { index: "167", category: "SV", feature: "uv420", jpn: "no", astigBand: "high" } },
+        "2300042210916": { name: "HK RX167 UV420 (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
+        "2300045210913": { name: "HK RX167 UV420 Ext Cyl (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
+        // ===== 單光 1.74 =====
+        "2300163251010": { name: "HK FSV174 Ext Cyl", params: { index: "174", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300080230716": { name: "HK RX174", params: { index: "174", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300027180814": { name: "HK RX174 UV420", params: { index: "174", category: "SV", feature: "uv420", jpn: "no" } },
+        "2300043210915": { name: "HK RX174 UV420 (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
+        "2300046210912": { name: "HK RX174 UV420 Ext Cyl (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
+        // ===== DAS =====
+        "2300052210913": { name: "HK RX167 DAS UV420 (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "low" } },
+        "2300085250214": { name: "HK RX167 DAS UV420 Ext Cyl (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "high" } },
+        "2300053210912": { name: "HK RX174 DAS UV420 (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "low" } },
+        "2300086250213": { name: "HK RX174 DAS UV420 Ext Cyl (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "high" } },
+        // ===== PAL Premium Steady =====
+        "2300119241119": { name: "HK PAL Premium Steady 160", params: { index: "160", category: "PAL", feature: "basic", corridor: "09" } },
+        "2300123241112": { name: "HK PAL Premium Steady 167", params: { index: "167", category: "PAL", feature: "basic", corridor: "09" } },
+        "2300127241118": { name: "HK PAL Premium Steady 174", params: { index: "174", category: "PAL", feature: "basic", corridor: "09" } },
+        "2300120241115": { name: "HK PAL Premium Steady 160 UV420", params: { index: "160", category: "PAL", feature: "uv420", jpn: "no", corridor: "09" } },
+        "2300124241111": { name: "HK PAL Premium Steady 167 UV420", params: { index: "167", category: "PAL", feature: "uv420", jpn: "no", corridor: "09" } },
+        "2300121241114": { name: "HK PAL Premium Steady 160 UV420 (JPN)", params: { index: "160", category: "PAL", feature: "uv420", jpn: "yes", corridor: "09" } },
+        "2300125241110": { name: "HK PAL Premium Steady 167 UV420 (JPN)", params: { index: "167", category: "PAL", feature: "uv420", jpn: "yes", corridor: "09" } },
+        "2300128241117": { name: "HK PAL Premium Steady 174 UV420 (JPN)", params: { index: "174", category: "PAL", feature: "uv420", jpn: "yes", corridor: "09" } },
+        "2300122241113": { name: "HK PAL Premium Steady 160 PH", params: { index: "160", category: "PAL", feature: "ph", color: "灰", corridor: "09" } },
+        "2300126241119": { name: "HK PAL Premium Steady 167 PH", params: { index: "167", category: "PAL", feature: "ph", color: "灰", corridor: "09" } },
+        // ===== 近視控制 =====
+        "2300087240718": { name: "HK Myopia Control 160", params: { index: "160", category: "SV", feature: "myopia", myFeature: "basic" } },
+        "2300089240716": { name: "HK Myopia Control 160 UV420", params: { index: "160", category: "SV", feature: "myopia", myFeature: "uv420" } },
+        "2300091240711": { name: "HK Myopia Control 160 PH", params: { index: "160", category: "SV", feature: "myopia", myFeature: "ph", color: "灰" } },
+        "2300088240717": { name: "HK Myopia Control 167", params: { index: "167", category: "SV", feature: "myopia", myFeature: "basic" } },
+        "2300090240712": { name: "HK Myopia Control 167 UV420", params: { index: "167", category: "SV", feature: "myopia", myFeature: "uv420" } },
+        "2300092240710": { name: "HK Myopia Control 167 PH", params: { index: "167", category: "SV", feature: "myopia", myFeature: "ph", color: "灰" } },
+        // ===== PhotoShade SV Stock =====
+        "2300104260613": { name: "HK FSV160 PhotoShade GYBR", params: { index: "160", category: "SV", feature: "ps", psSupply: "Stock", psCoating: "ETC" } },
+        "2300110260614": { name: "HK FSV167 PhotoShade GYBR", params: { index: "167", category: "SV", feature: "ps", psSupply: "Stock", psCoating: "ETC" } },
+        // ===== PhotoShade SV RX =====
+        "2300105260612": { name: "HK RX160 PhotoShade", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX" } },
+        "2300107260610": { name: "HK RX160 PhotoShade Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UTC" } },
+        "2300109260618": { name: "HK RX160 PhotoShade Anti SCR WH Ext Cyl", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UDC" } },
+        "2300111260613": { name: "HK RX167 PhotoShade", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX" } },
+        "2300113260611": { name: "HK RX167 PhotoShade Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UTC" } },
+        "2300115260619": { name: "HK RX167 PhotoShade Anti SCR WH Ext Cyl", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UDC" } },
+        // ===== PhotoShade PAL Progressive =====
+        "2300116260618": { name: "HK PAL Progressive PhotoShade 160", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive" } },
+        "2300117260617": { name: "HK PAL Progressive PhotoShade 160 Anti SCR", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UTC" } },
+        "2300118260616": { name: "HK PAL Progressive PhotoShade 160 Anti SCR WH", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UDC" } },
+        "2300119260615": { name: "HK PAL Progressive PhotoShade 167", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive" } },
+        "2300120260611": { name: "HK PAL Progressive PhotoShade 167 Anti SCR", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UTC" } },
+        "2300121260610": { name: "HK PAL Progressive PhotoShade 167 Anti SCR WH", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UDC" } },
+        // ===== PhotoShade PAL Premium =====
+        "2300122260619": { name: "HK PAL Premium Steady PhotoShade 160", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium" } },
+        "2300123260618": { name: "HK PAL Premium Steady PhotoShade 160 Anti SCR", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UTC" } },
+        "2300124260617": { name: "HK PAL Premium Steady PhotoShade 160 Anti SCR WH", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UDC" } },
+        "2300125260616": { name: "HK PAL Premium Steady PhotoShade 167", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium" } },
+        "2300126260615": { name: "HK PAL Premium Steady PhotoShade 167 Anti SCR", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UTC" } },
+        "2300127260614": { name: "HK PAL Premium Steady PhotoShade 167 Anti SCR WH", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UDC" } },
+        // ===== Cheek Color SV =====
+        "2300128260613": { name: "HK RX160 Cheek Col", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "ETC" } },
+        "2300129260612": { name: "HK RX160 Cheek Col Anti SCR", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "UTC" } },
+        "2300130260618": { name: "HK RX160 Cheek Col Anti SCR WH", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "UDC" } },
+        "2300131260617": { name: "HK RX160 Cheek Col UV420", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "ETC" } },
+        "2300132260616": { name: "HK RX160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UTC" } },
+        "2300133260615": { name: "HK RX160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UDC" } },
+        "2300134260614": { name: "HK RX167 Cheek Col", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "ETC" } },
+        "2300135260613": { name: "HK RX167 Cheek Col Anti SCR", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "UTC" } },
+        "2300136260612": { name: "HK RX167 Cheek Col Anti SCR WH", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "UDC" } },
+        "2300137260611": { name: "HK RX167 Cheek Col UV420", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "ETC" } },
+        "2300138260610": { name: "HK RX167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UTC" } },
+        "2300139260619": { name: "HK RX167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UDC" } },
+        // ===== Cheek Color PAL Progressive =====
+        "2300140260615": { name: "HK PAL Progressive 160 Cheek Col", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "ETC" } },
+        "2300141260614": { name: "HK PAL Progressive 160 Cheek Col Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UTC" } },
+        "2300142260613": { name: "HK PAL Progressive 160 Cheek Col Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UDC" } },
+        "2300143260612": { name: "HK PAL Progressive 160 Cheek Col UV420", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "ETC" } },
+        "2300144260611": { name: "HK PAL Progressive 160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UTC" } },
+        "2300145260610": { name: "HK PAL Progressive 160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UDC" } },
+        "2300146260619": { name: "HK PAL Progressive 167 Cheek Col", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "ETC" } },
+        "2300147260618": { name: "HK PAL Progressive 167 Cheek Col Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UTC" } },
+        "2300148260617": { name: "HK PAL Progressive 167 Cheek Col Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UDC" } },
+        "2300149260616": { name: "HK PAL Progressive 167 Cheek Col UV420", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "ETC" } },
+        "2300150260612": { name: "HK PAL Progressive 167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UTC" } },
+        "2300151260611": { name: "HK PAL Progressive 167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UDC" } },
+        // ===== Cheek Color PAL Premium =====
+        "2300152260610": { name: "HK PAL Premium Steady 160 Cheek Col", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "ETC" } },
+        "2300153260619": { name: "HK PAL Premium Steady 160 Cheek Col Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UTC" } },
+        "2300154260618": { name: "HK PAL Premium Steady 160 Cheek Col Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UDC" } },
+        "2300155260617": { name: "HK PAL Premium Steady 160 Cheek Col UV420", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "ETC" } },
+        "2300156260616": { name: "HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UTC" } },
+        "2300157260615": { name: "HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UDC" } },
+        "2300158260614": { name: "HK PAL Premium Steady 167 Cheek Col", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "ETC" } },
+        "2300159260613": { name: "HK PAL Premium Steady 167 Cheek Col Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UTC" } },
+        "2300160260619": { name: "HK PAL Premium Steady 167 Cheek Col Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UDC" } },
+        "2300161260618": { name: "HK PAL Premium Steady 167 Cheek Col UV420", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "ETC" } },
+        "2300162260617": { name: "HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UTC" } },
+        "2300163260616": { name: "HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UDC" } },
+        // ===== Tinted (HKO RX Col) =====
+        "2300318260713": { name: "HKO RX160 Col", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300319260712": { name: "HKO RX160 Col Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300320260718": { name: "HKO RX160 Col Anti SCR", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300321260717": { name: "HKO RX160 Col Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300322260716": { name: "HKO RX160 Col UV420 Anti SCR", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "UTC" } },
+        "2300323260715": { name: "HKO RX160 Col UV420 Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "UTC" } },
+        "2300324260714": { name: "HKO RX160 Col UV420", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "ETC" } },
+        "2300325260713": { name: "HKO RX160 Col UV420 Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "ETC" } },
+        "2300326260712": { name: "HKO RX167 Col", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300327260711": { name: "HKO RX167 Col Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300328260710": { name: "HKO RX167 Col Anti SCR", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300329260719": { name: "HKO RX167 Col Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300330260715": { name: "HKO RX167 Col UV420 Anti SCR", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "UTC" } },
+        "2300331260714": { name: "HKO RX167 Col UV420 Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "UTC" } },
+        "2300332260713": { name: "HKO RX167 Col UV420", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "ETC" } },
+        "2300333260712": { name: "HKO RX167 Col UV420 Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tUv420: true, tCoatingBase: "ETC" } }
+    };
 
     // ---- 共用資料 ----
     const colorStyles = {
@@ -171,6 +323,16 @@
         ccDesign: null, ccCoating: null, ccUv420: false, ccColor: null
     };
 
+    function resetState() {
+        state = {
+            category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
+            color: null, astigBand: null, corridor: null, hyperope: false,
+            psDesign: null, psColor: null, psCoating: null,
+            tCoatingBase: null, tUv420: false, tColor: null,
+            ccDesign: null, ccCoating: null, ccUv420: false, ccColor: null
+        };
+    }
+
     function setState(field, value) {
         const i = stepOrder.indexOf(field);
         state[field] = value;
@@ -183,6 +345,36 @@
     function toggleCcUv420() { state.ccUv420 = !state.ccUv420; render(); }
     function idxShort(index) { return index === '160' ? '6' : '7'; }
     function idxDot(index) { return index === '160' ? '1.6' : '1.67'; }
+
+    // ---- Jan Code 掃描功能 ----
+    function scanJanCode() {
+        const input = document.getElementById('janInput');
+        const code = input.value.trim();
+        if (!code) return;
+        const item = janCodeMap[code];
+        if (!item) {
+            alert('找不到此 Jan code：' + code + '\n請確認條碼正確或改用手動選擇。');
+            return;
+        }
+        resetState();
+        Object.assign(state, item.params);
+        state.janScanned = true;
+        state.janName = item.name;
+        state.janCode = code;
+        input.value = '';
+        document.getElementById('janScanInfo').classList.remove('hidden');
+        document.getElementById('janScanName').textContent = item.name;
+        document.getElementById('janScanCode').textContent = code;
+        render();
+    }
+
+    function clearJanScan() {
+        resetState();
+        document.getElementById('janScanInfo').classList.add('hidden');
+        document.getElementById('janScanName').textContent = '';
+        document.getElementById('janScanCode').textContent = '';
+        render();
+    }
 
     // ---- UI 組件 ----
     function mkBtn(txt, onclk, act) {
@@ -258,7 +450,7 @@
                     h += gridBtns('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn, 2);
                     if (need('jpn')) return;
                     if (state.jpn === 'yes' && (state.index === '167' || state.index === '174')) {
-                        h += stepLbl(n++, '是否雙非面 (DAS)');
+                        h += stepLbl(n++, '是否雙非球面 (DAS)');
                         h += gridBtns('das', [['no', '否'], ['yes', '是']], state.das, 2);
                         if (need('das')) return;
                     }
@@ -289,44 +481,51 @@
             if (need('corridor')) return;
         }
 
-        // PhotoShade — 顏色 → 鍍膜（顏色+鍍膜自動決定 Stock/RX，鍍膜按鈕不顯示供應類型）
+        // PhotoShade
         if (state.feature === 'ps') {
             if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('psDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.psDesign, 2); if (need('psDesign')) return; }
 
             h += stepLbl(n++, '選擇變色色彩');
-            h += colorSwatch('psColor', ['Pebble', 'Hojicha', 'Matcha', 'Indigo', 'Sakura', 'Lavender'], state.psColor);
+            const pCols = (state.psSupply === 'Stock') ? ['Pebble', 'Hojicha'] : ['Pebble', 'Hojicha', 'Matcha', 'Indigo', 'Sakura', 'Lavender'];
+            h += colorSwatch('psColor', pCols, state.psColor);
             if (need('psColor')) return;
 
-            h += stepLbl(n++, '鍍膜 (Coating)');
-            h += gridBtns('psCoating', [
-                ['ETC', 'ETC (基本 HMC 鍍膜)'],
-                ['UTC', 'UTC (SRC 強化抗刮)'],
-                ['UDC', 'UDC (SRC WH 低反光強化抗刮)']
-            ], state.psCoating, 2);
-            if (need('psCoating')) return;
+            if (!state.psCoating) {
+                h += stepLbl(n++, '鍍膜 (Coating)');
+                h += gridBtns('psCoating', [
+                    ['ETC', 'ETC (基本 HMC 鍍膜)'],
+                    ['UTC', 'UTC (SRC 強化抗刮)'],
+                    ['UDC', 'UDC (SRC WH 低反光強化抗刮)']
+                ], state.psCoating, 2);
+                if (need('psCoating')) return;
+            }
         }
 
         // Cheek Color
         if (state.feature === 'cheek') {
-            if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign, 2); if (need('ccDesign')) return; }
-            h += stepLbl(n++, '鍍膜 (Coating)');
-            h += cheekCoatingGroup(state.ccCoating, state.ccUv420);
-            if (need('ccCoating')) return;
+            if (state.category === 'PAL' && !state.ccDesign) { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign, 2); if (need('ccDesign')) return; }
+            if (!state.ccCoating) {
+                h += stepLbl(n++, '鍍膜 (Coating)');
+                h += cheekCoatingGroup(state.ccCoating, state.ccUv420);
+                if (need('ccCoating')) return;
+            }
             h += stepLbl(n++, '腮紅顏色');
             h += colorSwatch('ccColor', ['Purple', 'Peach', 'Orange'], state.ccColor, cheekColorStyles);
             if (need('ccColor')) return;
         }
 
-        // Tinted — 散光自動判斷 Stock/RX，只顯示度數
+        // Tinted
         if (state.feature === 'tinted') {
-            h += stepLbl(n++, '散光度數');
-            h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
-            if (need('astigBand')) return;
-
-            h += stepLbl(n++, '鍍膜 (Coating)');
-            h += tintedCoatingGroup(state.tCoatingBase, state.tUv420);
-            if (need('tCoatingBase')) return;
-
+            if (!state.tSupply) {
+                h += stepLbl(n++, '散光度數');
+                h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
+                if (need('astigBand')) return;
+            }
+            if (!state.tCoatingBase) {
+                h += stepLbl(n++, '鍍膜 (Coating)');
+                h += tintedCoatingGroup(state.tCoatingBase, state.tUv420);
+                if (need('tCoatingBase')) return;
+            }
             h += stepLbl(n++, 'Owndays 顏色');
             h += `<select onchange="setState('tColor',this.value)" class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"><option value="" disabled ${state.tColor ? '' : 'selected'}>請選擇</option>${tintedColors.map(([nm, cd]) => `<option value="${cd}" ${state.tColor === cd ? 'selected' : ''}>${nm} (${cd})</option>`).join('')}</select>`;
             if (need('tColor')) return;
@@ -399,37 +598,29 @@
         return null;
     }
 
-    // PhotoShade — 顏色+鍍膜自動決定 Stock/RX
     function computePS() {
         const { index, category, psDesign, psColor, psCoating } = state;
         if (category === 'PAL' && !psDesign) return { status: 'need_design' };
         if (!psColor) return { status: 'need_color' };
         if (!psCoating) return { status: 'need_coating' };
-
         const cL = colorCodeLetter[psColor];
         const iS = idxShort(index);
         const isStock = category === 'SV' && PS_STOCK_COLORS.includes(psColor) && psCoating === 'ETC';
-
         if (category === 'SV') {
-            if (isStock) {
-                return { code: `FOD${iS}ASF3${cL}ET`, note: '庫存 (Stock)' };
-            }
+            if (isStock) return { code: `FOD${iS}ASF3${cL}ET`, note: '庫存 (Stock)' };
             const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
             return { code: `XOD${iS}ASB3${cL}${cs}`, note: '訂製 (RX)' };
         }
-
-        // PAL — 強制 RX
         const dC = psDesign === 'Progressive' ? 'IDS3' : 'ESS3';
         const sfx = psDesign === 'Progressive' ? '11' : '09';
         const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
         return { code: `POD${iS}${dC}${cL}${cs}${sfx}`, note: '訂製 (RX)' };
     }
 
-    // 染色鏡片：散光自動判斷 Stock/RX
     function computeT() {
         const { astigBand, tCoatingBase, tUv420, tColor, index } = state;
-        if (!astigBand) return { status: 'need_astig' };
-        const tSupply = astigBand === 'low' ? 'Stock' : 'RX';
+        if (!astigBand && !state.tSupply) return { status: 'need_astig' };
+        const tSupply = state.tSupply || (astigBand === 'low' ? 'Stock' : 'RX');
         if (!tCoatingBase) return { status: 'need_coating' };
         if (!tColor) return { status: 'need_color' };
         const key = (tUv420 ? 'UV420_' : '') + tCoatingBase;
@@ -462,7 +653,7 @@
         if (!res) { hideResult(); return; }
         if (res.status && PROMPT_MAP[res.status]) { showPrompt(PROMPT_MAP[res.status]); return; }
         if (res.status === 'no_match') { showPrompt(res.note || '此度數暫未有對應編號，請人手核對'); return; }
-        if (res.kind === 'tinted') { showTinted(res.code, res.colorCode, 'Owndays 顏色代碼'); return; }
+        if (res.kind === 'tinted') { showTinted(res.code, res.colorCode, 'HKO 顏色代碼'); return; }
         if (res.kind === 'cheek') { showTinted(res.code, res.colorCode, '腮紅色代碼'); return; }
         if (res.code) showResult(res.code, res.note, res.warn);
         else hideResult();
