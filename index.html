@@ -358,46 +358,6 @@
     function idxShort(index) { return index === '160' ? '6' : '7'; }
     function idxDot(index) { return index === '160' ? '1.6' : '1.67'; }
 
-    // 根據掃描結果判斷某欄位是否只有一個可能值。
-    // janCodeMap 可維持舊格式 params，也支援 params 為陣列或 options 陣列。
-    function getJanCandidates(item) {
-        if (Array.isArray(item.options)) return item.options.map(o => o.params || o);
-        if (Array.isArray(item.params)) return item.params;
-        return [item.params || {}];
-    }
-
-    function getUniqueCandidateValue(candidates, field) {
-        const values = [...new Set(candidates.map(p => p[field]).filter(v => v !== undefined && v !== null && v !== ''))];
-        return values.length === 1 ? values[0] : null;
-    }
-
-    function getAvailableCorridors(params) {
-        if (params.category !== 'PAL' || params.feature === 'ps' || params.feature === 'cheek') return [];
-        if (params.palDesign === 'ProgressiveID') return ['09', '11'];
-        return ['07', '09'];
-    }
-
-    function applyJanCandidates(item) {
-        const candidates = getJanCandidates(item);
-        const fields = [...new Set(candidates.flatMap(p => Object.keys(p)))];
-
-        // 所有候選都一致的值才自動填入；有分歧則留空。
-        for (const field of fields) state[field] = getUniqueCandidateValue(candidates, field);
-
-        // 顏色：只有一個可能值才保留；兩個或以上時要求人手選擇。
-        for (const field of ['color', 'psColor', 'tColor', 'ccColor']) {
-            const unique = getUniqueCandidateValue(candidates, field);
-            if (unique !== null) state[field] = unique;
-            else if (candidates.some(p => Object.prototype.hasOwnProperty.call(p, field))) state[field] = null;
-        }
-
-        // 走廊：只有唯一可能值才保留；同一 JAN 可對應多個走廊時不預設。
-        const explicitCorridors = [...new Set(candidates.map(p => p.corridor).filter(Boolean))];
-        const inferredCorridors = [...new Set(candidates.flatMap(p => getAvailableCorridors(p)))];
-        const possibleCorridors = inferredCorridors.length ? inferredCorridors : explicitCorridors;
-        state.corridor = possibleCorridors.length === 1 ? possibleCorridors[0] : null;
-    }
-
     function scanJanCode() {
         const input = document.getElementById('janInput');
         const code = input.value.trim();
@@ -407,9 +367,8 @@
             alert('找不到此 Jan code：' + code + '\n請確認條碼正確或改用手動選擇。');
             return;
         }
-
         resetState();
-        applyJanCandidates(item);
+        Object.assign(state, item.params);
         autoFillDerivedFields();
         state.janScanned = true;
         state.janName = item.name;
