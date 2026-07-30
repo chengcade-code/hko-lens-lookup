@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -90,7 +91,7 @@
             <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3"></div>
             <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                 <div class="flex items-center justify-between mb-2"><p class="font-bold text-slate-700">最近掃描</p><button onclick="undoLastScan()" id="undoBtn" class="text-xs font-bold text-violet-600 hover:text-violet-800 disabled:text-slate-300 cursor-pointer">撤銷上一項</button></div>
-                <div id="scanHistory" class="space-y-1.5 text-sm"></div>
+                <div id="scanHistory" class="space-y-1.5 text-sm max-h-64 overflow-y-auto pr-1"></div>
             </div>
             <button onclick="resetDailyStats()" class="mt-3 w-full py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-bold cursor-pointer">清除今日統計</button>
         </div>
@@ -1146,7 +1147,7 @@
     }
     const statLensMap = Object.fromEntries(statLensRows.map(([code, name, cats]) => [
         code,
-        { name, cats: deriveStatCategories(name, cats) }
+        { name, cats: [...deriveStatCategories(name, cats), ...(code.startsWith('2300') ? ['配件'] : [])] }
     ]));
     const STAT_CATEGORIES = [
         ['3K', '防藍光', 'bg-sky-50 border-sky-200 text-sky-700'],
@@ -1154,7 +1155,8 @@
         ['變色', '調光／PhotoShade', 'bg-amber-50 border-amber-200 text-amber-700'],
         ['PAL', '漸進鏡片', 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'],
         ['蔡司', 'ZEISS 鏡廠', 'bg-blue-50 border-blue-200 text-blue-700'],
-        ['其他', '其餘鏡片種類', 'bg-slate-50 border-slate-200 text-slate-700']
+        ['其他', '其餘鏡片種類', 'bg-slate-50 border-slate-200 text-slate-700'],
+        ['配件', '2300 開頭', 'bg-orange-50 border-orange-200 text-orange-700']
     ];
     let statsModeActive = false;
     let dailyScans = [];
@@ -1375,6 +1377,13 @@
         try { dailyScans = JSON.parse(localStorage.getItem(statsStorageKey()) || '[]'); }
         catch (_) { dailyScans = []; }
         if (!Array.isArray(dailyScans)) dailyScans = [];
+        dailyScans = dailyScans.map(scan => {
+            const current = statLensMap[scan.code];
+            if (current) return { ...scan, name: current.name, cats: current.cats };
+            if (scan.code?.startsWith('2300')) return { ...scan, cats: ['配件'] };
+            return scan;
+        });
+        saveDailyStats();
     }
     function saveDailyStats() {
         try { localStorage.setItem(statsStorageKey(), JSON.stringify(dailyScans)); } catch (_) {}
@@ -1405,7 +1414,7 @@
         const input = document.getElementById('statsJanInput');
         const code = input.value.trim();
         if (!code) return;
-        const item = statLensMap[code];
+        const item = statLensMap[code] || (code.startsWith('2300') ? { name: '配件', cats: ['配件'] } : null);
         if (!item) {
             showStatsMessage('找不到此 JAN code：' + code + '。請核對條碼。', false);
             input.select();
@@ -1417,6 +1426,7 @@
         showStatsMessage('已加入：' + item.name + '（' + item.cats.join('、') + '）', true);
         input.value = '';
         input.focus();
+        document.getElementById('mainCard').scrollTop = 0;
     }
     function renderDailyStats() {
         const counts = Object.fromEntries(STAT_CATEGORIES.map(([key]) => [key, 0]));
@@ -1427,7 +1437,7 @@
             '<div class="border rounded-xl p-3 text-center ' + cls + '"><p class="text-xs font-bold opacity-70">' + desc +
             '</p><p class="text-3xl font-black mt-1">' + counts[key] + '</p><p class="font-extrabold">' + key + '</p></div>'
         ).join('');
-        const recent = dailyScans.slice(-6).reverse();
+        const recent = dailyScans.slice().reverse();
         document.getElementById('scanHistory').innerHTML = recent.length ? recent.map(scan =>
             '<div class="bg-white border border-slate-200 rounded-lg px-2.5 py-2"><div class="flex justify-between gap-2"><span class="font-semibold truncate">' +
             escapeHtml(scan.name) + '</span><span class="font-mono text-xs text-slate-400 shrink-0">' + escapeHtml(scan.code) +
@@ -1794,6 +1804,10 @@
     }
     function scrollCard() {
         const card = document.getElementById('mainCard');
+        if (statsModeActive) {
+            if (card) card.scrollTop = 0;
+            return;
+        }
         if (card && card.scrollHeight > card.clientHeight) card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
     }
     const resizeObs = new ResizeObserver(() => requestAnimationFrame(fitCard));
