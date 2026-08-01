@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -1147,16 +1146,16 @@
     }
     const statLensMap = Object.fromEntries(statLensRows.map(([code, name, cats]) => [
         code,
-        { name, cats: [...deriveStatCategories(name, cats), ...(code.startsWith('2300') ? ['配件'] : [])] }
+        { name, cats: deriveStatCategories(name, cats) }
     ]));
     const STAT_CATEGORIES = [
+        ['配件', '未登記的 2300 條碼', 'bg-orange-50 border-orange-200 text-orange-700'],
         ['3K', '防藍光', 'bg-sky-50 border-sky-200 text-sky-700'],
-        ['DAS', '雙面非球面', 'bg-emerald-50 border-emerald-200 text-emerald-700'],
         ['變色', '調光／PhotoShade', 'bg-amber-50 border-amber-200 text-amber-700'],
-        ['PAL', '漸進鏡片', 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'],
-        ['蔡司', 'ZEISS 鏡廠', 'bg-blue-50 border-blue-200 text-blue-700'],
+        ['DAS', '雙面非球面', 'bg-emerald-50 border-emerald-200 text-emerald-700'],
         ['其他', '其餘鏡片種類', 'bg-slate-50 border-slate-200 text-slate-700'],
-        ['配件', '2300 開頭', 'bg-orange-50 border-orange-200 text-orange-700']
+        ['PAL', '漸進鏡片', 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'],
+        ['蔡司', 'ZEISS 鏡廠', 'bg-blue-50 border-blue-200 text-blue-700']
     ];
     let statsModeActive = false;
     let dailyScans = [];
@@ -1380,7 +1379,7 @@
         dailyScans = dailyScans.map(scan => {
             const current = statLensMap[scan.code];
             if (current) return { ...scan, name: current.name, cats: current.cats };
-            if (scan.code?.startsWith('2300')) return { ...scan, cats: ['配件'] };
+            if (scan.code?.startsWith('2300')) return { ...scan, name: '配件', cats: ['配件'] };
             return scan;
         });
         saveDailyStats();
