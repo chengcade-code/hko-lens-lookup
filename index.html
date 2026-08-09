@@ -1181,16 +1181,6 @@
         }
     };
 
-    const tintedColors = [
-        ["CL-Yellow","ODYL05F"],["COPR85","COPR85F"],["CS-Blue","ODBL14F"],["DGY85","ODGY85F"],
-        ["FORE50","FORE50F"],["FORE85","FORE85F"],["MG-Gray","ODMG49F"],["RB-04","ODRB44F"],
-        ["RB-06","ODRB70F"],["RBL-04","ODYG40F"],["RBL-05","ODYU45F"],["RG-03","ODRG25F"],
-        ["RG-06","ODBG45F"],["RG-12","ODRG85F"],["RO-02","ODRO20F"],["RP-03","ODYR35F"],
-        ["RS-09","ODRS68F"],["RV-01","ODYP20F"],["RV-02","ODYN34F"],["SMOK85","SMOK85F"],
-        ["V-G01","ODDP60F"],
-        ["來片對單色","對單色"],["來片對雙色","對雙色"]
-    ];
-
     const cheekLensCodes = {};
     const cheekMap = { SV: ['XOD','ASBN',''], Progressive: ['POD','IDSN','11'], Premium: ['POD','ESSN','11'] };
     for (const [ser, [pre, mid, sfx]] of Object.entries(cheekMap)) {
@@ -1614,9 +1604,6 @@
             h += tintedCoatingGroup(state.tCoatingBase);
             if (need('tCoatingBase')) return;
 
-            h += stepLbl(n++, 'Owndays 顏色');
-            h += `<select onchange="setState('tColor',this.value)" class="w-full p-2 border border-slate-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"><option value="" disabled ${state.tColor ? '' : 'selected'}>請選擇</option>${tintedColors.map(([nm, cd]) => `<option value="${cd}" ${state.tColor === cd ? 'selected' : ''}>${nm} (${cd})</option>`).join('')}</select>`;
-            if (need('tColor')) return;
         }
 
         c.innerHTML = h;
@@ -1712,12 +1699,11 @@
     }
 
     function computeT() {
-        const { astigBand, tCoatingBase, tColor, index } = state;
+        const { astigBand, tCoatingBase, index } = state;
         if (!astigBand && !state.tSupply) return { status: 'need_astig' };
         const tSupply = state.tSupply || (astigBand === 'low' ? 'Stock' : 'RX');
         if (!tCoatingBase) return { status: 'need_coating' };
-        if (!tColor) return { status: 'need_color' };
-        return { code: tintedLensCodes[tSupply][idxDot(index)][tCoatingBase], colorCode: tColor, kind: 'tinted' };
+        return { code: tintedLensCodes[tSupply][idxDot(index)][tCoatingBase] };
     }
 
     function computeCC() {
