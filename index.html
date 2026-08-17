@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -109,6 +110,7 @@
         "2300041210917": { name: "HK RX160 UV420 (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
         "2300044210914": { name: "HK RX160 UV420 Ext Cyl (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
         "2300174180613": { name: "HK RX160 POL", params: { index: "160", category: "SV", feature: "pol", color: "灰" } },
+        "2300172180615": { name: "HK FSV160 T8 GRAY", params: { index: "160", category: "SV", feature: "ph", directCode: "FTR6ASF8GET" } },
         "2300162251011": { name: "HK FSV167 Ext Cyl", params: { index: "167", category: "SV", feature: "basic", astigBand: "mid" } },
         "2300079230710": { name: "HK RX167", params: { index: "167", category: "SV", feature: "basic", astigBand: "high" } },
         "2300163180617": { name: "HK FSV167 UV420", params: { index: "167", category: "SV", feature: "uv420", jpn: "no", astigBand: "low" } },
@@ -229,6 +231,7 @@
 ["2300041210917","HKO HK RX160 UV420 (JPN)","3K"],
 ["2300044210914","HKO HK RX160 UV420 Ext Cyl (JPN)","3K"],
 ["2300174180613","HKO HK RX160 POL","其他"],
+["2300172180615","HKO HK FSV160 T8 GRAY","變色"],
 ["2300162251011","HKO HK FSV167 Ext Cyl","其他"],
 ["2300079230710","HKO HK RX167","其他"],
 ["2300163180617","HKO HK FSV167 UV420","3K"],
@@ -1287,7 +1290,7 @@
         color: null, astigBand: null, corridor: null, palDesign: null, hyperope: false,
         psDesign: null, psColor: null, psCoating: null,
         tCoatingBase: null, tColor: null,
-        ccDesign: null, ccCoating: null, ccColor: null
+        ccDesign: null, ccCoating: null, ccColor: null, directCode: null
     };
 
     function resetState() {
@@ -1296,7 +1299,7 @@
             color: null, astigBand: null, palDesign: null, corridor: null, hyperope: false,
             psDesign: null, psCoating: null, psColor: null,
             tCoatingBase: null, tColor: null,
-            ccDesign: null, ccCoating: null, ccColor: null
+            ccDesign: null, ccCoating: null, ccColor: null, directCode: null
         };
     }
 
@@ -1318,6 +1321,7 @@
 
     function setState(field, value) {
         const i = stepOrder.indexOf(field);
+        state.directCode = null;
         state[field] = value;
         for (let k = i + 1; k < stepOrder.length; k++) state[stepOrder[k]] = null;
         if (field === 'index' || field === 'category') state.hyperope = false;
@@ -1612,6 +1616,7 @@
 
     function computeResult() {
         const { category, feature } = state;
+        if (state.directCode) return { code: state.directCode, note: 'T8 調光變色' };
         if (feature === 'ps') return computePS();
         if (feature === 'tinted') return computeT();
         if (feature === 'cheek') return computeCC();
