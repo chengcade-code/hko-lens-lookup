@@ -1175,8 +1175,8 @@
 
     const tintedLensCodes = {
         Stock: {
-            '1.6':  { ETC: 'FOD6ASFNUET', UV420_ETC: 'A16ASK3ETC', UTC: 'A16ASUVUTC', UV420_UTC: 'A16ASK3UTC' },
-            '1.67': { ETC: 'FOD7ASFNUET', UV420_ETC: 'A67ASK3ETC', UTC: 'A67ASUVUTC', UV420_UTC: 'A67ASK3UTC' }
+            '1.6':  { ETC: 'FOD6ASFNUET', UV420_ETC: 'A16ASK3ETC', UTC: 'FOD6ASFNUUT', UV420_UTC: 'FOD6ASFN3UT' },
+            '1.67': { ETC: 'FOD7ASFNUET', UV420_ETC: 'A67ASK3ETC', UTC: 'FOD7ASFNUUT', UV420_UTC: 'FOD7ASFN3UT' }
         },
         RX: {
             '1.6':  { ETC: 'RXA161ASUVETC', UV420_ETC: 'RXA16BASK3ETC', UTC: 'RXA16ASUVUTC', UV420_UTC: 'RXA16BASK3UTC' },
@@ -1281,14 +1281,14 @@
 
     const stepOrder = [
         'index', 'category', 'feature', 'myFeature', 'jpn', 'das', 'color', 'astigBand', 'palDesign', 'corridor',
-        'psDesign', 'psCoating', 'psColor',
+        'psDesign', 'psCoating', 'psColor', 'psRxPower',
         'tCoatingBase', 'tColor',
         'ccDesign', 'ccCoating', 'ccColor'
     ];
     let state = {
         category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
         color: null, astigBand: null, corridor: null, palDesign: null, hyperope: false,
-        psDesign: null, psColor: null, psCoating: null,
+        psDesign: null, psColor: null, psCoating: null, psRxPower: null,
         tCoatingBase: null, tColor: null,
         ccDesign: null, ccCoating: null, ccColor: null, directCode: null
     };
@@ -1297,7 +1297,7 @@
         state = {
             category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
             color: null, astigBand: null, palDesign: null, corridor: null, hyperope: false,
-            psDesign: null, psCoating: null, psColor: null,
+            psDesign: null, psCoating: null, psColor: null, psRxPower: null,
             tCoatingBase: null, tColor: null,
             ccDesign: null, ccCoating: null, ccColor: null, directCode: null
         };
@@ -1308,6 +1308,10 @@
         // 染色鏡片：從 tSupply 推導 astigBand
         if (state.feature === 'tinted' && !state.astigBand && state.tSupply) {
             state.astigBand = state.tSupply === 'Stock' ? 'low' : 'high';
+        }
+        // PhotoShade ETC：掃描庫存／訂製 JAN code 時自動推導度數類型
+        if (state.feature === 'ps' && state.category === 'SV' && state.psSupply) {
+            state.psRxPower = state.psSupply === 'RX' ? 'yes' : 'no';
         }
         // PAL：如果預填了 corridor 但沒有 palDesign，默認 PremiumSteady
         if (state.category === 'PAL' && state.corridor && !state.palDesign && state.index !== '174') {
@@ -1587,6 +1591,11 @@
             const pCols = (state.psSupply === 'Stock') ? ['Pebble', 'Hojicha'] : ['Pebble', 'Hojicha', 'Matcha', 'Indigo', 'Sakura', 'Lavender'];
             h += colorSwatch('psColor', pCols, state.psColor);
             if (need('psColor')) return;
+            if (state.category === 'SV' && state.psCoating === 'ETC' && PS_STOCK_COLORS.includes(state.psColor)) {
+                h += stepLbl(n++, '是否正鏡或散光225度或以上？');
+                h += gridBtns('psRxPower', [['no', '否'], ['yes', '是']], state.psRxPower, 2);
+                if (need('psRxPower')) return;
+            }
         }
 
         if (state.feature === 'cheek') {
@@ -1685,13 +1694,15 @@
     }
 
     function computePS() {
-        const { index, category, psDesign, psColor, psCoating, psSupply } = state;
+        const { index, category, psDesign, psColor, psCoating, psSupply, psRxPower } = state;
         if (category === 'PAL' && !psDesign) return { status: 'need_design' };
         if (!psColor) return { status: 'need_color' };
         if (!psCoating) return { status: 'need_coating' };
         const cL = colorCodeLetter[psColor];
         const iS = idxShort(index);
-        const isStock = category === 'SV' && psCoating === 'ETC' && (psSupply === 'Stock' || (!psSupply && PS_STOCK_COLORS.includes(psColor)));
+        const needsRxPower = psRxPower === 'yes' || psSupply === 'RX';
+        const isStock = category === 'SV' && psCoating === 'ETC' && !needsRxPower &&
+            (psSupply === 'Stock' || (!psSupply && PS_STOCK_COLORS.includes(psColor)));
         if (category === 'SV') {
             if (isStock) return { code: `FOD${iS}ASF3${cL}ET`, note: '庫存 (Stock)' };
             const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
