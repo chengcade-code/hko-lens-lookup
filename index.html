@@ -1609,8 +1609,8 @@
         }
 
         if (state.feature === 'tinted') {
-            h += stepLbl(n++, '散光度數');
-            h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
+            h += stepLbl(n++, '是否正鏡或散光225度或以上？');
+            h += gridBtns('astigBand', [['low', '否'], ['high', '是']], state.astigBand, 2);
             if (need('astigBand')) return;
 
             h += stepLbl(n++, '鍍膜 (Coating)');
