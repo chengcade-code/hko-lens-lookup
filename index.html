@@ -1,1 +1,1827 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OWNDAYS 獨立更新頁</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f7ef;color:#193e34;font:16px/1.85 Arial,"Microsoft JhengHei",sans-serif}main{max-width:900px;margin:auto;padding:32px 25px}header{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #d5e0d0;padding-bottom:18px;font-weight:bold}header small{font-size:12px;color:#687c62}h1{font-size:32px;line-height:1.45;margin:28px 0 12px}h2{font-size:21px;margin:0 0 12px}a{color:#1c6046}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:26px 0}.card{background:white;border:1px solid #cadcc3;border-radius:14px;padding:24px}.bookmark{display:inline-block;text-decoration:none;padding:11px 18px;background:#1e624c;color:white;border-radius:9px;font-weight:bold;margin:6px 0}button{font:inherit;cursor:pointer;background:white;color:#1d5a43;border:1px solid #adc5a5;border-radius:8px;padding:8px 13px}.muted{font-size:14px;color:#63755f}.tip{background:#e5efdf;border-radius:10px;padding:16px 20px}.warning{background:#fff0d7;border-left:3px solid #c09242;padding:12px 18px;color:#72511c}li{margin:9px 0}footer{border-top:1px solid #d5e0d0;padding-top:20px;margin-top:30px;font-size:13px;color:#6e7e65}@media(max-width:650px){.cards{grid-template-columns:1fr}h1{font-size:27px}header{flex-direction:column}}</style></head><body><main><header><span>OWNDAYS · 獨立更新頁</span><small>線上統計 1.6.1</small></header><h1>收藏夾裝一次，之後載入最新版。</h1><p>呢個網站毋須登入 ChatGPT 或 Vercel。店舖同事照常喺 OWNDAYS 登入，再撳收藏夾使用；統計喺自己電腦分頁進行。</p><div class="cards"><section class="card"><h2>01 · 先測外部載入</h2><p>只下載測試程式，顯示成功或失敗原因。唔讀取客人、商品或登入資料。</p><a id="test" class="bookmark" draggable="true">外部載入測試</a><p class="muted">拖到收藏夾列，再留喺 OWNDAYS 分頁按。</p></section><section class="card"><h2>02 · 自動更新統計</h2><p>外部測試成功後，使用呢個固定按鈕。每次啟動載入最新程式及鏡片分類。</p><a id="counter" class="bookmark" draggable="true">OWNDAYS 自動更新統計</a><p class="muted">取代舊統計收藏夾。面板會顯示「自動更新版」。</p></section></div><button id="import">下載兩個按鈕嘅收藏夾匯入檔</button><p class="muted">拖唔到：下載後由 Edge／Chrome「匯入收藏夾 → HTML 檔案」安裝。</p><h2>設定同使用</h2><ol><li>用店舖電腦開啟本頁，確認毋須 VPN、毋須登入就睇到。</li><li>按 Ctrl + Shift + B 顯示收藏夾列，拖入「外部載入測試」，或者匯入兩個按鈕。</li><li>照常登入 <a href="https://staging.front.owndays.net/front_app/build/queue" target="_blank" rel="noopener noreferrer">OWNDAYS 當日列表</a>，再按測試收藏夾，等候最多 15 秒。</li><li>見到「外部程式載入成功」後，先使用「OWNDAYS 自動更新統計」。確認分店及今日開單日期，再按「開始統計」。</li></ol><p class="tip"><b>日後更新：</b>更新網站嘅統計程式同資料庫後，同事下一次撳固定收藏夾就會載入新版，毋須重新下載。唔會喺掃描途中更換程式。</p><p class="warning">未能保證公司網絡一定放行本網址，亦未確認 OWNDAYS 允許載入外部程式，須喺實際店舖完成以上測試。一般網絡錯誤唔等於 OWNDAYS 封鎖。首次完整統計仍需同人手數字對照。</p><h2>計數規則沿用現有版本</h2><p class="muted">HKSP 鏡框及全店鏡片商品本身已結帳先計。只用 R 名稱分類，每副計一次；包括已結帳鏡片交換。PhotoShade 計變色，蔡司只計蔡司；OD UP2 160／167／174 為普通鏡片，六類不加。顏色尾段忽略，其他按功能累加。載入問題及未識別商品保留待核對。</p><footer>更新來源：hko-lens-lookup.vercel.app/owndays/。只提供程式下載，統計結果及登入碼唔會上傳到呢個網站。原網站仍會正常載入眼鏡明細。</footer></main><script type="application/json" id="payload">{"test":"javascript:(()%20%3D%3E%20%7B%0A%20%20'use%20strict'%3B%0A%20%20if%20(location.origin%20!%3D%3D%20'https%3A%2F%2Fstaging.front.owndays.net'%20%7C%7C%20!%2F%5E%5C%2Ffront_app%5C%2Fbuild(%3F%3A%5C%2F%7C%24)%2F.test(location.pathname))%20%7B%0A%20%20%20%20alert('%E8%AB%8B%E5%85%88%E9%96%8B%E5%95%9F%20OWNDAYS%20%E7%B3%BB%E7%B5%B1%E5%88%86%E9%A0%81%EF%BC%8C%E5%86%8D%E6%8C%89%E3%80%8C%E5%A4%96%E9%83%A8%E8%BC%89%E5%85%A5%E6%B8%AC%E8%A9%A6%E3%80%8D%E6%94%B6%E8%97%8F%E5%A4%BE%E3%80%82')%3B%0A%20%20%20%20return%3B%0A%20%20%7D%0A%20%20const%20id%20%3D%20'owndays-external-probe-v1'%3B%0A%20%20document.getElementById(id)%3F.dispatchEvent(new%20Event('owndays-probe-cancel'))%3B%0A%20%20const%20token%20%3D%20Date.now().toString(36)%20%2B%20'-'%20%2B%20Math.random().toString(36).slice(2)%3B%0A%20%20const%20remote%20%3D%20'https%3A%2F%2Fhko-lens-lookup.vercel.app%2Fowndays%2Fprobe-v1.js'%3B%0A%20%20const%20panel%20%3D%20document.createElement('section')%3B%0A%20%20panel.id%20%3D%20id%3B%0A%20%20panel.style.cssText%20%3D%20'position%3Afixed!important%3Btop%3A20px!important%3Bright%3A20px!important%3Bz-index%3A2147483647!important%3Bwidth%3Amin(380px%2Ccalc(100vw%20-%2040px))!important%3Bpadding%3A22px!important%3Bbox-sizing%3Aborder-box!important%3Bborder%3A2px%20solid%20%23267357!important%3Bborder-radius%3A15px!important%3Bbackground%3A%23f4faf0!important%3Bcolor%3A%23173f34!important%3Bbox-shadow%3A0%2012px%2040px%20%230004!important%3Bfont%3A15px%2F1.8%20Arial%2Csans-serif!important%3Btext-align%3Aleft!important%3B'%3B%0A%20%20const%20title%20%3D%20document.createElement('strong')%3B%0A%20%20title.textContent%20%3D%20'%E6%AD%A3%E5%9C%A8%E6%B8%AC%E8%A9%A6%E5%A4%96%E9%83%A8%E8%BC%89%E5%85%A5%E2%80%A6'%3B%0A%20%20title.style.cssText%20%3D%20'display%3Ablock!important%3Bfont-size%3A21px!important%3B'%3B%0A%20%20const%20status%20%3D%20document.createElement('p')%3B%0A%20%20status.textContent%20%3D%20'%E6%AD%A3%E5%9C%A8%E5%BE%9E%E7%8D%A8%E7%AB%8B%E6%B8%AC%E8%A9%A6%E7%B6%B2%E7%AB%99%E8%BC%89%E5%85%A5%E7%A8%8B%E5%BC%8F%EF%BC%8C%E6%9C%80%E5%A4%9A%E7%AD%89%E5%80%99%2015%20%E7%A7%92%E3%80%82'%3B%0A%20%20const%20note%20%3D%20document.createElement('p')%3B%0A%20%20note.textContent%20%3D%20'%E5%8F%AA%E6%B8%AC%E8%A9%A6%E7%A8%8B%E5%BC%8F%E8%BC%89%E5%85%A5%EF%BC%9B%E4%B8%8D%E8%AE%80%E5%8F%96%E5%AE%A2%E4%BA%BA%E3%80%81%E5%95%86%E5%93%81%E3%80%81%E5%AF%86%E7%A2%BC%E6%88%96%E7%80%8F%E8%A6%BD%E5%99%A8%E5%84%B2%E5%AD%98%E3%80%82%E6%B8%AC%E8%A9%A6%E8%AB%8B%E6%B1%82%E4%B8%8D%E5%82%B3%E9%80%81%E6%9C%AC%E9%A0%81%E7%B6%B2%E5%9D%80%E3%80%82'%3B%0A%20%20const%20close%20%3D%20document.createElement('button')%3B%0A%20%20close.type%20%3D%20'button'%3Bclose.textContent%20%3D%20'%E9%97%9C%E9%96%89%E6%B8%AC%E8%A9%A6%E6%8F%90%E7%A4%BA'%3B%0A%20%20close.style.cssText%20%3D%20'font%3A15px%20Arial%2Csans-serif!important%3Bpadding%3A10px%2015px!important%3Bborder%3A0!important%3Bborder-radius%3A8px!important%3Bbackground%3A%231d604b!important%3Bcolor%3Awhite!important%3Bcursor%3Apointer!important%3B'%3B%0A%20%20panel.append(title%2Cstatus%2Cnote%2Cclose)%3B%0A%20%20document.documentElement.appendChild(panel)%3B%0A%20%20const%20script%20%3D%20document.createElement('script')%3B%0A%20%20script.dataset.owndaysTestId%20%3D%20token%3B%0A%20%20script.referrerPolicy%20%3D%20'no-referrer'%3B%0A%20%20script.async%20%3D%20true%3B%0A%20%20let%20finished%20%3D%20false%2C%20timer%2C%20blocked%20%3D%20''%3B%0A%20%20const%20clean%20%3D%20()%20%3D%3E%20%7B%0A%20%20%20%20clearTimeout(timer)%3B%0A%20%20%20%20document.removeEventListener('owndays-external-probe-executed'%2C%20executed)%3B%0A%20%20%20%20document.removeEventListener('securitypolicyviolation'%2C%20violation)%3B%0A%20%20%20%20script.onload%20%3D%20null%3Bscript.onerror%20%3D%20null%3Bscript.remove()%3B%0A%20%20%7D%3B%0A%20%20const%20finish%20%3D%20(headline%2C%20message)%20%3D%3E%20%7B%0A%20%20%20%20if%20(finished)%20return%3B%0A%20%20%20%20finished%20%3D%20true%3Btitle.textContent%20%3D%20headline%3Bstatus.textContent%20%3D%20message%3Bclean()%3B%0A%20%20%7D%3B%0A%20%20const%20executed%20%3D%20event%20%3D%3E%20%7B%0A%20%20%20%20if%20(event.detail%3F.token%20!%3D%3D%20token%20%7C%7C%20event.detail%3F.version%20!%3D%3D%20'1.0')%20return%3B%0A%20%20%20%20finish('%E2%9C%93%20%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F%E8%BC%89%E5%85%A5%E6%88%90%E5%8A%9F'%2C%20'%E6%9C%AC%E6%AC%A1%E6%88%90%E5%8A%9F%E5%BE%9E%E6%B8%AC%E8%A9%A6%E7%B6%B2%E7%AB%99%E4%B8%8B%E8%BC%89%E4%B8%A6%E5%9F%B7%E8%A1%8C%E7%A8%8B%E5%BC%8F%E3%80%82%E5%8F%AF%E5%86%8D%E4%BB%A5%E5%90%8C%E4%B8%80%E7%B6%B2%E7%AB%99%E6%B8%AC%E8%A9%A6%E6%AD%A3%E5%BC%8F%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%EF%BC%9B%E4%BB%8A%E6%AC%A1%E6%9C%AA%E5%9F%B7%E8%A1%8C%E7%B5%B1%E8%A8%88%E3%80%82')%3B%0A%20%20%7D%3B%0A%20%20const%20violation%20%3D%20event%20%3D%3E%20%7B%0A%20%20%20%20if%20(event.disposition%20!%3D%3D%20'enforce'%20%7C%7C%20!String(event.blockedURI%20%7C%7C%20'').startsWith(remote.split('%2Fprobe-v1.js')%5B0%5D))%20return%3B%0A%20%20%20%20blocked%20%3D%20event.effectiveDirective%20%7C%7C%20'Content%20Security%20Policy'%3B%0A%20%20%20%20finish('%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F%E8%A2%AB%E7%B6%B2%E7%AB%99%E5%AE%89%E5%85%A8%E8%A8%AD%E5%AE%9A%E5%B0%81%E9%8E%96'%2C%20'%E5%8E%9F%E7%B6%B2%E7%AB%99%E5%9B%9E%E5%A0%B1%EF%BC%9A'%20%2B%20blocked%20%2B%20'%E3%80%82%E8%AB%8B%E4%BF%9D%E7%95%99%E9%80%99%E5%80%8B%E6%8F%90%E7%A4%BA%EF%BC%9B%E4%B8%8D%E9%9C%80%E8%A6%81%E6%9B%B4%E6%94%B9%E5%AE%89%E5%85%A8%E8%A8%AD%E5%AE%9A%E3%80%82')%3B%0A%20%20%7D%3B%0A%20%20const%20cancel%20%3D%20()%20%3D%3E%20%7Bfinished%20%3D%20true%3Bclean()%3Bpanel.remove()%3B%7D%3B%0A%20%20panel.addEventListener('owndays-probe-cancel'%2C%20cancel)%3B%0A%20%20close.onclick%20%3D%20cancel%3B%0A%20%20document.addEventListener('owndays-external-probe-executed'%2C%20executed)%3B%0A%20%20document.addEventListener('securitypolicyviolation'%2C%20violation)%3B%0A%20%20script.onload%20%3D%20()%20%3D%3E%20%7B%0A%20%20%20%20if%20(!finished)%20finish('%E6%AA%94%E6%A1%88%E5%B7%B2%E8%BC%89%E5%85%A5%EF%BC%8C%E4%BD%86%E6%9C%AA%E7%A2%BA%E8%AA%8D%E5%9F%B7%E8%A1%8C'%2C%20'%E5%8F%AF%E8%83%BD%E8%BC%89%E5%85%A5%E4%BA%86%E7%99%BB%E5%85%A5%E9%A0%81%E6%88%96%E5%85%B6%E4%BB%96%E5%9B%9E%E6%87%89%E3%80%82%E9%80%99%E4%B8%8D%E7%AE%97%E6%B8%AC%E8%A9%A6%E6%88%90%E5%8A%9F%EF%BC%8C%E4%BA%A6%E6%9C%AA%E8%83%BD%E5%88%A4%E6%96%B7%E7%82%BA%20OWNDAYS%20%E5%B0%81%E9%8E%96%E3%80%82')%3B%0A%20%20%7D%3B%0A%20%20script.onerror%20%3D%20()%20%3D%3E%20%7B%0A%20%20%20%20%2F%2F%20A%20generic%20error%20is%20not%20evidence%20of%20a%20CSP%20block.%0A%20%20%20%20if%20(!finished)%20finish('%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F%E6%9C%AA%E8%83%BD%E8%BC%89%E5%85%A5'%2C%20blocked%20%7C%7C%20'%E6%9C%AA%E7%A2%BA%E8%AA%8D%E5%8E%9F%E5%9B%A0%EF%BC%8C%E5%8F%AF%E8%83%BD%E6%98%AF%E6%B8%AC%E8%A9%A6%E7%B6%B2%E5%9D%80%E5%AD%98%E5%8F%96%E6%88%96%E7%B6%B2%E7%B5%A1%E5%95%8F%E9%A1%8C%E3%80%82%E8%AB%8B%E6%88%AA%E5%9C%96%E6%AD%A4%E6%8F%90%E7%A4%BA%EF%BC%9B%E5%A6%82%E6%96%B9%E4%BE%BF%EF%BC%8C%E5%8F%AF%E4%B8%80%E4%BD%B5%E6%9F%A5%E7%9C%8B%20F12%20%E2%86%92%20Console%20%E7%9A%84%E9%8C%AF%E8%AA%A4%E3%80%82')%3B%0A%20%20%7D%3B%0A%20%20timer%20%3D%20setTimeout(()%20%3D%3E%20finish('%E5%A4%96%E9%83%A8%E8%BC%89%E5%85%A5%E9%80%BE%E6%99%82'%2C%20'15%20%E7%A7%92%E5%85%A7%E6%9C%AA%E7%A2%BA%E8%AA%8D%E7%A8%8B%E5%BC%8F%E5%9F%B7%E8%A1%8C%E3%80%82%E5%8F%AF%E8%83%BD%E6%98%AF%E9%80%A3%E7%B7%9A%E6%88%96%E5%AD%98%E5%8F%96%E5%95%8F%E9%A1%8C%EF%BC%8C%E4%B8%8D%E8%83%BD%E5%96%AE%E6%86%91%E9%80%BE%E6%99%82%E5%88%A4%E6%96%B7%20OWNDAYS%20%E5%B0%81%E9%8E%96%E3%80%82')%2C%2015000)%3B%0A%20%20script.src%20%3D%20remote%20%2B%20'%3Ftest%3D'%20%2B%20encodeURIComponent(token)%3B%0A%20%20document.documentElement.appendChild(script)%3B%0A%7D)()%3B%0A","counter":"javascript:(()%20%3D%3E%20%7B%0A%20'use%20strict'%3B%0A%20if(location.origin!%3D%3D'https%3A%2F%2Fstaging.front.owndays.net'%7C%7C!%2F%5E%5C%2Ffront_app%5C%2Fbuild%5C%2Fqueue%5C%2F%3F%24%2F.test(location.pathname))%7B%0A%20%20alert('%E8%AB%8B%E5%85%88%E7%99%BB%E5%85%A5%20OWNDAYS%20%E4%B8%A6%E9%96%8B%E5%95%9F%E7%95%B6%E6%97%A5%E5%88%97%E8%A1%A8%EF%BC%8C%E5%86%8D%E6%8C%89%E3%80%8COWNDAYS%20%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E7%B5%B1%E8%A8%88%E3%80%8D%E3%80%82')%3Breturn%3B%0A%20%7D%0A%20const%20id%3D'owndays-online-loading'%3B%0A%20const%20old%3Ddocument.getElementById(id)%3Bif(old)%7Bold.dispatchEvent(new%20Event('cancel-loader'))%3B%7D%0A%20const%20box%3Ddocument.createElement('section')%3Bbox.id%3Did%3B%0A%20box.style.cssText%3D'position%3Afixed!important%3Btop%3A20px!important%3Bright%3A20px!important%3Bz-index%3A2147483647!important%3Bwidth%3Amin(360px%2Ccalc(100vw%20-%2040px))!important%3Bpadding%3A22px!important%3Bborder%3A2px%20solid%20%23267357!important%3Bborder-radius%3A14px!important%3Bbackground%3A%23f5faf0!important%3Bcolor%3A%23193e34!important%3Bbox-shadow%3A0%2012px%2040px%20%230004!important%3Bfont%3A15px%2F1.8%20Arial%2Csans-serif!important%3Bbox-sizing%3Aborder-box!important%3B'%3B%0A%20const%20title%3Ddocument.createElement('strong')%3Btitle.textContent%3D'%E6%AD%A3%E5%9C%A8%E8%BC%89%E5%85%A5%E6%9C%80%E6%96%B0%E7%B5%B1%E8%A8%88%E7%A8%8B%E5%BC%8F%E2%80%A6'%3B%0A%20const%20text%3Ddocument.createElement('p')%3Btext.textContent%3D'%E9%80%A3%E6%8E%A5%E7%8D%A8%E7%AB%8B%E6%9B%B4%E6%96%B0%E7%B6%B2%E7%AB%99%EF%BC%8C%E6%9C%80%E5%A4%9A%E7%AD%89%E5%80%99%2015%20%E7%A7%92%E3%80%82'%3B%0A%20const%20close%3Ddocument.createElement('button')%3Bclose.textContent%3D'%E9%97%9C%E9%96%89'%3Bclose.type%3D'button'%3B%0A%20box.append(title%2Ctext%2Cclose)%3Bdocument.documentElement.appendChild(box)%3B%0A%20const%20script%3Ddocument.createElement('script')%3Bscript.async%3Dtrue%3Bscript.referrerPolicy%3D'no-referrer'%3B%0A%20let%20finished%3Dfalse%2Ctimer%3B%0A%20const%20clean%3D()%3D%3E%7BclearTimeout(timer)%3Bdocument.removeEventListener('securitypolicyviolation'%2Cviolation)%3Bscript.onload%3Dnull%3Bscript.onerror%3Dnull%3Bscript.remove()%3B%7D%3B%0A%20const%20fail%3Dmessage%3D%3E%7Bif(finished)return%3Bfinished%3Dtrue%3Bclean()%3Btitle.textContent%3D'%E6%9C%AA%E8%83%BD%E8%BC%89%E5%85%A5%E7%B5%B1%E8%A8%88%E7%A8%8B%E5%BC%8F'%3Btext.textContent%3Dmessage%3B%7D%3B%0A%20const%20cancel%3D()%3D%3E%7Bfinished%3Dtrue%3Bclean()%3Bbox.remove()%3B%7D%3B%0A%20close.onclick%3Dcancel%3Bbox.addEventListener('cancel-loader'%2Ccancel)%3B%0A%20const%20violation%3De%3D%3E%7Bif(e.disposition%3D%3D%3D'enforce'%26%26String(e.blockedURI%7C%7C'').startsWith('https%3A%2F%2Fhko-lens-lookup.vercel.app'))fail('%E5%8E%9F%E7%B6%B2%E7%AB%99%E5%AE%89%E5%85%A8%E8%A8%AD%E5%AE%9A%E5%B0%81%E9%8E%96%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F%EF%BC%88'%2B(e.effectiveDirective%7C%7C'CSP')%2B'%EF%BC%89%E3%80%82%E8%AB%8B%E4%BF%9D%E7%95%99%E6%8F%90%E7%A4%BA%EF%BC%8C%E4%B8%8D%E9%9C%80%E8%A6%81%E6%9B%B4%E6%94%B9%E5%AE%89%E5%85%A8%E8%A8%AD%E5%AE%9A%E3%80%82')%3B%7D%3B%0A%20document.addEventListener('securitypolicyviolation'%2Cviolation)%3B%0A%20script.onload%3D()%3D%3E%7Bif(finished)return%3Bconst%20panel%3Ddocument.getElementById('owndays-local-counter-v1')%3Bif(panel%3F.getAttribute('data-counter-version')%3F.startsWith('online-'))cancel()%3Belse%20fail('%E6%AA%94%E6%A1%88%E5%B7%B2%E8%BC%89%E5%85%A5%EF%BC%8C%E4%BD%86%E6%9C%AA%E6%89%BE%E5%88%B0%E7%B5%B1%E8%A8%88%E9%9D%A2%E6%9D%BF%EF%BC%9B%E4%BB%8A%E6%AC%A1%E6%9C%AA%E5%9F%B7%E8%A1%8C%E6%8E%83%E6%8F%8F%EF%BC%8C%E8%AB%8B%E9%87%8D%E6%96%B0%E6%B8%AC%E8%A9%A6%E3%80%82')%3B%7D%3B%0A%20script.onerror%3D()%3D%3Efail('%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%EF%BC%8C%E5%8F%AF%E8%83%BD%E6%98%AF%E7%B6%B2%E7%B5%A1%E6%88%96%E7%B6%B2%E5%9D%80%E5%AD%98%E5%8F%96%E5%95%8F%E9%A1%8C%E3%80%82%E8%AB%8B%E5%85%88%E7%94%A8%E3%80%8C%E5%A4%96%E9%83%A8%E8%BC%89%E5%85%A5%E6%B8%AC%E8%A9%A6%E3%80%8D%E6%AA%A2%E6%9F%A5%E3%80%82')%3B%0A%20timer%3DsetTimeout(()%3D%3Efail('15%20%E7%A7%92%E5%85%A7%E6%9C%AA%E5%AE%8C%E6%88%90%E8%BC%89%E5%85%A5%E3%80%82%E8%AB%8B%E7%A2%BA%E8%AA%8D%E5%BA%97%E8%88%96%E5%8F%AF%E4%BB%A5%E9%96%8B%E5%95%9F%E7%8D%A8%E7%AB%8B%E6%9B%B4%E6%96%B0%E7%B6%B2%E7%AB%99%EF%BC%8C%E5%86%8D%E8%A9%A6%E4%B8%80%E6%AC%A1%E3%80%82')%2C15000)%3B%0A%20script.src%3D'https%3A%2F%2Fhko-lens-lookup.vercel.app%2Fowndays%2Fruntime.js%3Fts%3D'%2BDate.now()%3B%0A%20document.documentElement.appendChild(script)%3B%0A%7D)()%3B%0A"}</script><script>const p=JSON.parse(document.getElementById('payload').textContent);for(const name of ['test','counter']){const a=document.getElementById(name);a.href=p[name];a.addEventListener('click',e=>{e.preventDefault();alert('請將呢個按鈕拖到收藏夾列，然後留喺 OWNDAYS 分頁使用。');});}document.getElementById('import').onclick=()=>{const escape=s=>s.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');const content='<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>OWNDAYS 自動更新</TITLE>\n<H1>OWNDAYS 自動更新</H1>\n<DL><p>\n<DT><A HREF="'+escape(p.test)+'">外部載入測試</A>\n<DT><A HREF="'+escape(p.counter)+'">OWNDAYS 自動更新統計</A>\n</DL><p>';const url=URL.createObjectURL(new Blob([content],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='OWNDAYS-online-bookmarks.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};</script></body></html>
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKO 鏡片代碼查詢系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        html, body { height: 100%; }
+        body { font-size: 14px; }
+        select, button, input { font-size: 14px !important; }
+        #mainCard { transform-origin: center center; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <div id="mainCard" class="bg-white p-3 sm:p-4 rounded-2xl shadow-xl w-full max-w-xl border border-slate-100 max-h-full overflow-y-auto">
+        <div class="relative mb-3">
+            <h1 id="pageTitle" class="text-xl sm:text-2xl font-extrabold text-center text-blue-600 tracking-wide pr-10">HKO 鏡片代碼查詢系統</h1>
+            <button id="modeToggle" type="button" onclick="toggleStatsMode()" aria-label="進入鏡片種類統計模式" title="鏡片種類統計"
+                class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold leading-none shadow-sm cursor-pointer">+</button>
+        </div>
+
+        <div id="lookupMode">
+        <div class="sticky top-0 z-20 mb-3 p-2.5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white border border-blue-300 text-blue-600 text-xs font-bold">1</span>
+                <span class="font-bold text-blue-700">掃描或搜尋 JAN code</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-2 0h-2m0 0H8m0 0H6m2 0v2m0-2V9m0 0V7m0 2h2M6 9h2m-2 0V7m0 2v2m0-2h2m-2 0H4m2 0v2m0-2V9m0 0V7m0 2h2M4 9h2m-2 0V7m0 2v2"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"/>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke-width="2"/>
+                </svg>
+                <input type="text" id="janInput" placeholder="掃描或輸入 Jan code..."
+                    class="flex-1 p-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onkeydown="if(event.key==='Enter'){scanJanCode();event.preventDefault();}">
+                <button onclick="scanJanCode()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shrink-0 cursor-pointer">確認</button>
+            </div>
+            <div id="janScanInfo" class="hidden mt-2 flex items-center justify-between">
+                <div class="text-sm">
+                    <span class="text-slate-500">已識別：</span>
+                    <span class="text-blue-700 font-bold" id="janScanName"></span>
+                    <span class="text-xs text-slate-400 ml-1 font-mono" id="janScanCode"></span>
+                </div>
+                <button onclick="clearJanScan()" class="text-xs text-slate-500 hover:text-red-500 underline cursor-pointer">清除掃描</button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold">2</span>
+                <h2 class="font-bold text-slate-700">手動選擇鏡片</h2>
+            </div>
+            <div id="stepsContainer"></div>
+        </div>
+
+        <div class="mt-2.5 p-3 bg-slate-100 rounded-lg text-center hidden" id="resultBox">
+            <div id="resultSingleWrapper">
+                <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase" id="resultLabel">對應 HKO 鏡片編號</p>
+                <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultCode">------</p>
+            </div>
+            <div id="resultTintedWrapper" class="hidden">
+                <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase">鏡片代碼</p>
+                <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultLensCode">------</p>
+                <p class="text-[15px] text-slate-500 font-semibold tracking-wider uppercase mt-2" id="resultColorLabel">HKO 顏色代碼</p>
+                <p class="text-2xl font-black text-slate-900 mt-1 tracking-wider select-all" id="resultColorCode">------</p>
+            </div>
+            <p class="text-xs text-slate-500 mt-1" id="resultNote"></p>
+            <button id="copyBtn" onclick="copyToClipboard()" class="mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer">
+                <span id="copyBtnText">複製編號</span>
+            </button>
+        </div>
+        </div>
+
+        <div id="statsMode" class="hidden">
+            <div class="p-3 bg-violet-50 border border-violet-200 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div><p class="font-extrabold text-violet-800">鏡片種類統計模式</p><p id="statsDate" class="text-xs text-violet-500"></p></div>
+                    <span id="scanTotal" class="bg-white border border-violet-200 text-violet-700 font-black px-3 py-1 rounded-full">0 片</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-violet-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke-width="2"/></svg>
+                    <input type="text" id="statsJanInput" inputmode="numeric" autocomplete="off" placeholder="掃描 JAN code..." class="flex-1 min-w-0 p-2 border border-violet-300 rounded-lg bg-white focus:ring-2 focus:ring-violet-500 focus:outline-none" onkeydown="if(event.key==='Enter'){countJanCode();event.preventDefault();}">
+                    <button onclick="countJanCode()" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-bold shrink-0 cursor-pointer">加入</button>
+                </div>
+                <div id="statsMessage" class="hidden mt-2 text-sm font-semibold rounded-lg px-2.5 py-2"></div>
+            </div>
+            <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3"></div>
+            <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <div class="flex items-center justify-between mb-2"><p class="font-bold text-slate-700">最近掃描</p><button onclick="undoLastScan()" id="undoBtn" class="text-xs font-bold text-violet-600 hover:text-violet-800 disabled:text-slate-300 cursor-pointer">撤銷上一項</button></div>
+                <div id="scanHistory" class="space-y-1.5 text-sm max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+            <button onclick="resetDailyStats()" class="mt-3 w-full py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-bold cursor-pointer">清除今日統計</button>
+        </div>
+    </div>
+
+<script>
+    const A_CLS = "p-2 border rounded-lg font-bold transition text-center bg-blue-50 border-blue-500 text-blue-600 shadow-xs ring-2 ring-blue-100 cursor-pointer";
+    const I_CLS = "p-2 border border-slate-200 rounded-lg font-semibold transition text-center bg-white hover:bg-slate-50 cursor-pointer";
+
+    const janCodeMap = {
+        "2300161251012": { name: "HK FSV160 Ext Cyl", params: { index: "160", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300144250711": { name: "HK FSV160 PH GRAY", params: { index: "160", category: "SV", feature: "ph" } },
+        "2300078230711": { name: "HK RX160", params: { index: "160", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300154180619": { name: "HK FSV160 UV420", params: { index: "160", category: "SV", feature: "uv420", jpn: "no", astigBand: "low" } },
+        "2300155180618": { name: "HK RX160 UV420", params: { index: "160", category: "SV", feature: "uv420", jpn: "no", astigBand: "high" } },
+        "2300041210917": { name: "HK RX160 UV420 (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
+        "2300044210914": { name: "HK RX160 UV420 Ext Cyl (JPN)", params: { index: "160", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
+        "2300174180613": { name: "HK RX160 POL", params: { index: "160", category: "SV", feature: "pol", color: "灰" } },
+        "2300172180615": { name: "HK FSV160 T8 GRAY", params: { index: "160", category: "SV", feature: "ph", directCode: "FTR6ASF8GET" } },
+        "2300162251011": { name: "HK FSV167 Ext Cyl", params: { index: "167", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300079230710": { name: "HK RX167", params: { index: "167", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300163180617": { name: "HK FSV167 UV420", params: { index: "167", category: "SV", feature: "uv420", jpn: "no", astigBand: "low" } },
+        "2300164180616": { name: "HK RX167 UV420", params: { index: "167", category: "SV", feature: "uv420", jpn: "no", astigBand: "high" } },
+        "2300042210916": { name: "HK RX167 UV420 (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
+        "2300045210913": { name: "HK RX167 UV420 Ext Cyl (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
+        "2300163251010": { name: "HK FSV174 Ext Cyl", params: { index: "174", category: "SV", feature: "basic", astigBand: "mid" } },
+        "2300080230716": { name: "HK RX174", params: { index: "174", category: "SV", feature: "basic", astigBand: "high" } },
+        "2300027180814": { name: "HK RX174 UV420", params: { index: "174", category: "SV", feature: "uv420", jpn: "no" } },
+        "2300043210915": { name: "HK RX174 UV420 (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "low" } },
+        "2300046210912": { name: "HK RX174 UV420 Ext Cyl (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "no", astigBand: "high" } },
+        "2300052210913": { name: "HK RX167 DAS UV420 (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "low" } },
+        "2300085250214": { name: "HK RX167 DAS UV420 Ext Cyl (JPN)", params: { index: "167", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "high" } },
+        "2300053210912": { name: "HK RX174 DAS UV420 (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "low" } },
+        "2300086250213": { name: "HK RX174 DAS UV420 Ext Cyl (JPN)", params: { index: "174", category: "SV", feature: "uv420", jpn: "yes", das: "yes", astigBand: "high" } },
+        "2300119241119": { name: "HK PAL Premium Steady 160", params: { index: "160", category: "PAL", feature: "basic", palDesign: "PremiumSteady", corridor: "09" } },
+        "2300123241112": { name: "HK PAL Premium Steady 167", params: { index: "167", category: "PAL", feature: "basic", palDesign: "PremiumSteady", corridor: "09" } },
+        "2300127241118": { name: "HK PAL Premium Steady 174", params: { index: "174", category: "PAL", feature: "basic", palDesign: "PremiumSteady", corridor: "09" } },
+        "2300120241115": { name: "HK PAL Premium Steady 160 UV420", params: { index: "160", category: "PAL", feature: "uv420", palDesign: "PremiumSteady", jpn: "no", corridor: "09" } },
+        "2300124241111": { name: "HK PAL Premium Steady 167 UV420", params: { index: "167", category: "PAL", feature: "uv420", palDesign: "PremiumSteady", jpn: "no", corridor: "09" } },
+        "2300121241114": { name: "HK PAL Premium Steady 160 UV420 (JPN)", params: { index: "160", category: "PAL", feature: "uv420", palDesign: "PremiumSteady", jpn: "yes", corridor: "09" } },
+        "2300125241110": { name: "HK PAL Premium Steady 167 UV420 (JPN)", params: { index: "167", category: "PAL", feature: "uv420", palDesign: "PremiumSteady", jpn: "yes", corridor: "09" } },
+        "2300128241117": { name: "HK PAL Premium Steady 174 UV420 (JPN)", params: { index: "174", category: "PAL", feature: "uv420", palDesign: "PremiumSteady", jpn: "yes", corridor: "09" } },
+        "2300122241113": { name: "HK PAL Premium Steady 160 PH", params: { index: "160", category: "PAL", feature: "ph", palDesign: "PremiumSteady", color: "灰", corridor: "09" } },
+        "2300126241119": { name: "HK PAL Premium Steady 167 PH", params: { index: "167", category: "PAL", feature: "ph", palDesign: "PremiumSteady", color: "灰", corridor: "09" } },
+        "2300087240718": { name: "HK Myopia Control 160", params: { index: "160", category: "SV", feature: "myopia", myFeature: "basic" } },
+        "2300089240716": { name: "HK Myopia Control 160 UV420", params: { index: "160", category: "SV", feature: "myopia", myFeature: "uv420" } },
+        "2300091240711": { name: "HK Myopia Control 160 PH", params: { index: "160", category: "SV", feature: "myopia", myFeature: "ph", color: "灰" } },
+        "2300088240717": { name: "HK Myopia Control 167", params: { index: "167", category: "SV", feature: "myopia", myFeature: "basic" } },
+        "2300090240712": { name: "HK Myopia Control 167 UV420", params: { index: "167", category: "SV", feature: "myopia", myFeature: "uv420" } },
+        "2300092240710": { name: "HK Myopia Control 167 PH", params: { index: "167", category: "SV", feature: "myopia", myFeature: "ph", color: "灰" } },
+        "2300104260613": { name: "HK FSV160 PhotoShade GYBR", params: { index: "160", category: "SV", feature: "ps", psSupply: "Stock", psCoating: "ETC" } },
+        "2300110260614": { name: "HK FSV167 PhotoShade GYBR", params: { index: "167", category: "SV", feature: "ps", psSupply: "Stock", psCoating: "ETC" } },
+        "2300105260612": { name: "HK RX160 PhotoShade", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX", psCoating: "ETC" } },
+        "2300107260610": { name: "HK RX160 PhotoShade Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UTC" } },
+        "2300109260618": { name: "HK RX160 PhotoShade Anti SCR WH Ext Cyl", params: { index: "160", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UDC" } },
+        "2300111260613": { name: "HK RX167 PhotoShade", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX", psCoating: "ETC" } },
+        "2300113260611": { name: "HK RX167 PhotoShade Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UTC" } },
+        "2300115260619": { name: "HK RX167 PhotoShade Anti SCR WH Ext Cyl", params: { index: "167", category: "SV", feature: "ps", psSupply: "RX", psCoating: "UDC" } },
+        "2300116260618": { name: "HK PAL Progressive PhotoShade 160", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "ETC" } },
+        "2300117260617": { name: "HK PAL Progressive PhotoShade 160 Anti SCR", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UTC" } },
+        "2300118260616": { name: "HK PAL Progressive PhotoShade 160 Anti SCR WH", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UDC" } },
+        "2300119260615": { name: "HK PAL Progressive PhotoShade 167", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "ETC" } },
+        "2300120260611": { name: "HK PAL Progressive PhotoShade 167 Anti SCR", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UTC" } },
+        "2300121260610": { name: "HK PAL Progressive PhotoShade 167 Anti SCR WH", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Progressive", psCoating: "UDC" } },
+        "2300122260619": { name: "HK PAL Premium Steady PhotoShade 160", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "ETC" } },
+        "2300123260618": { name: "HK PAL Premium Steady PhotoShade 160 Anti SCR", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UTC" } },
+        "2300124260617": { name: "HK PAL Premium Steady PhotoShade 160 Anti SCR WH", params: { index: "160", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UDC" } },
+        "2300125260616": { name: "HK PAL Premium Steady PhotoShade 167", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "ETC" } },
+        "2300126260615": { name: "HK PAL Premium Steady PhotoShade 167 Anti SCR", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UTC" } },
+        "2300127260614": { name: "HK PAL Premium Steady PhotoShade 167 Anti SCR WH", params: { index: "167", category: "PAL", feature: "ps", psDesign: "Premium", psCoating: "UDC" } },
+        "2300128260613": { name: "HK RX160 Cheek Col", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "ETC" } },
+        "2300129260612": { name: "HK RX160 Cheek Col Anti SCR", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "UTC" } },
+        "2300130260618": { name: "HK RX160 Cheek Col Anti SCR WH", params: { index: "160", category: "SV", feature: "cheek", ccCoating: "UDC" } },
+        "2300131260617": { name: "HK RX160 Cheek Col UV420", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "ETC" } },
+        "2300132260616": { name: "HK RX160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UTC" } },
+        "2300133260615": { name: "HK RX160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UDC" } },
+        "2300134260614": { name: "HK RX167 Cheek Col", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "ETC" } },
+        "2300135260613": { name: "HK RX167 Cheek Col Anti SCR", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "UTC" } },
+        "2300136260612": { name: "HK RX167 Cheek Col Anti SCR WH", params: { index: "167", category: "SV", feature: "cheek", ccCoating: "UDC" } },
+        "2300137260611": { name: "HK RX167 Cheek Col UV420", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "ETC" } },
+        "2300138260610": { name: "HK RX167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UTC" } },
+        "2300139260619": { name: "HK RX167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "SV", feature: "cheek", ccUv420: true, ccCoating: "UDC" } },
+        "2300140260615": { name: "HK PAL Progressive 160 Cheek Col", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "ETC" } },
+        "2300141260614": { name: "HK PAL Progressive 160 Cheek Col Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UTC" } },
+        "2300142260613": { name: "HK PAL Progressive 160 Cheek Col Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UDC" } },
+        "2300143260612": { name: "HK PAL Progressive 160 Cheek Col UV420", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "ETC" } },
+        "2300144260611": { name: "HK PAL Progressive 160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UTC" } },
+        "2300145260610": { name: "HK PAL Progressive 160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UDC" } },
+        "2300146260619": { name: "HK PAL Progressive 167 Cheek Col", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "ETC" } },
+        "2300147260618": { name: "HK PAL Progressive 167 Cheek Col Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UTC" } },
+        "2300148260617": { name: "HK PAL Progressive 167 Cheek Col Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccCoating: "UDC" } },
+        "2300149260616": { name: "HK PAL Progressive 167 Cheek Col UV420", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "ETC" } },
+        "2300150260612": { name: "HK PAL Progressive 167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UTC" } },
+        "2300151260611": { name: "HK PAL Progressive 167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Progressive", ccUv420: true, ccCoating: "UDC" } },
+        "2300152260610": { name: "HK PAL Premium Steady 160 Cheek Col", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "ETC" } },
+        "2300153260619": { name: "HK PAL Premium Steady 160 Cheek Col Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UTC" } },
+        "2300154260618": { name: "HK PAL Premium Steady 160 Cheek Col Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UDC" } },
+        "2300155260617": { name: "HK PAL Premium Steady 160 Cheek Col UV420", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "ETC" } },
+        "2300156260616": { name: "HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UTC" } },
+        "2300157260615": { name: "HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR WH", params: { index: "160", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UDC" } },
+        "2300158260614": { name: "HK PAL Premium Steady 167 Cheek Col", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "ETC" } },
+        "2300159260613": { name: "HK PAL Premium Steady 167 Cheek Col Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UTC" } },
+        "2300160260619": { name: "HK PAL Premium Steady 167 Cheek Col Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccCoating: "UDC" } },
+        "2300161260618": { name: "HK PAL Premium Steady 167 Cheek Col UV420", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "ETC" } },
+        "2300162260617": { name: "HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UTC" } },
+        "2300163260616": { name: "HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR WH", params: { index: "167", category: "PAL", feature: "cheek", ccDesign: "Premium", ccUv420: true, ccCoating: "UDC" } },
+        "2300318260713": { name: "HKO RX160 Col", params: { index: "160", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "ETC" } },
+        "2300319260712": { name: "HKO RX160 Col Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300320260718": { name: "HKO RX160 Col Anti SCR", params: { index: "160", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UTC" } },
+        "2300321260717": { name: "HKO RX160 Col Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300322260716": { name: "HKO RX160 Col UV420 Anti SCR", params: { index: "160", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UV420_UTC" } },
+        "2300323260715": { name: "HKO RX160 Col UV420 Anti SCR Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UV420_UTC" } },
+        "2300324260714": { name: "HKO RX160 Col UV420", params: { index: "160", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UV420_ETC" } },
+        "2300325260713": { name: "HKO RX160 Col UV420 Ext Cyl", params: { index: "160", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UV420_ETC" } },
+        "2300326260712": { name: "HKO RX167 Col", params: { index: "167", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "ETC" } },
+        "2300327260711": { name: "HKO RX167 Col Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "ETC" } },
+        "2300328260710": { name: "HKO RX167 Col Anti SCR", params: { index: "167", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UTC" } },
+        "2300329260719": { name: "HKO RX167 Col Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UTC" } },
+        "2300330260715": { name: "HKO RX167 Col UV420 Anti SCR", params: { index: "167", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UV420_UTC" } },
+        "2300331260714": { name: "HKO RX167 Col UV420 Anti SCR Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UV420_UTC" } },
+        "2300332260713": { name: "HKO RX167 Col UV420", params: { index: "167", category: "SV", feature: "tinted", tSupply: "Stock", tCoatingBase: "UV420_ETC" } },
+        "2300333260712": { name: "HKO RX167 Col UV420 Ext Cyl", params: { index: "167", category: "SV", feature: "tinted", tSupply: "RX", tCoatingBase: "UV420_ETC" } },
+        // 新增 PAL Progressive ID
+        "2300160180610": { name: "HK PAL Progressive ID 160 UV420", params: { index: "160", category: "PAL", feature: "uv420", palDesign: "ProgressiveID", jpn: "no", corridor: "09" } },
+        "2300054210911": { name: "HK PAL Progressive ID 160 UV420 (JPN)", params: { index: "160", category: "PAL", feature: "uv420", palDesign: "ProgressiveID", jpn: "yes", corridor: "09" } },
+        "2300169180611": { name: "HK PAL Progressive ID 167 UV420", params: { index: "167", category: "PAL", feature: "uv420", palDesign: "ProgressiveID", jpn: "no", corridor: "09" } },
+        "2300055210910": { name: "HK PAL Progressive ID 167 UV420 (JPN)", params: { index: "167", category: "PAL", feature: "uv420", palDesign: "ProgressiveID", jpn: "yes", corridor: "09" } }
+    };
+
+    // 由「鏡片對照表 202607 ver-2」全 14 頁建立，共 905 個 JAN code。
+    const statLensRows = [
+["2300161251012","HKO HK FSV160 Ext Cyl","其他"],
+["2300078230711","HKO HK RX160","其他"],
+["2300144250711","HKO HK FSV160 PH GRAY","變色"],
+["2300154180619","HKO HK FSV160 UV420","3K"],
+["2300155180618","HKO HK RX160 UV420","3K"],
+["2300041210917","HKO HK RX160 UV420 (JPN)","3K"],
+["2300044210914","HKO HK RX160 UV420 Ext Cyl (JPN)","3K"],
+["2300174180613","HKO HK RX160 POL","其他"],
+["2300172180615","HKO HK FSV160 T8 GRAY","變色"],
+["2300162251011","HKO HK FSV167 Ext Cyl","其他"],
+["2300079230710","HKO HK RX167","其他"],
+["2300163180617","HKO HK FSV167 UV420","3K"],
+["2300164180616","HKO HK RX167 UV420","3K"],
+["2300042210916","HKO HK RX167 UV420 (JPN)","3K"],
+["2300045210913","HKO HK RX167 UV420 Ext Cyl (JPN)","3K"],
+["2300163251010","HKO HK FSV174 Ext Cyl","其他"],
+["2300080230716","HKO HK RX174","其他"],
+["2300027180814","HKO HK RX174 UV420","3K"],
+["2300043210915","HKO HK RX174 UV420 (JPN)","3K"],
+["2300046210912","HKO HK RX174 UV420 Ext Cyl (JPN)","3K"],
+["2300052210913","HKO HK RX167 DAS UV420 (JPN)","3K,DAS"],
+["2300085250214","HKO HK RX167 DAS UV420 Ext Cyl (JPN)","3K,DAS"],
+["2300053210912","HKO HK RX174 DAS UV420 (JPN)","3K,DAS"],
+["2300086250213","HKO HK RX174 DAS UV420 Ext Cyl (JPN)","3K,DAS"],
+["2300160180610","HKO HK PAL Progressive ID 160 UV420","3K,PAL"],
+["2300054210911","HKO HK PAL Progressive ID 160 UV420 (JPN)","3K,PAL"],
+["2300169180611","HKO HK PAL Progressive ID 167 UV420","3K,PAL"],
+["2300055210910","HKO HK PAL Progressive ID 167 UV420 (JPN)","3K,PAL"],
+["2300119241119","HKO HK PAL Premium Steady 160","PAL"],
+["2300123241112","HKO HK PAL Premium Steady 167","PAL"],
+["2300127241118","HKO HK PAL Premium Steady 174","PAL"],
+["2300120241115","HKO HK PAL Premium Steady 160 UV420","3K,PAL"],
+["2300124241111","HKO HK PAL Premium Steady 167 UV420","3K,PAL"],
+["2300121241114","HKO HK PAL Premium Steady 160 UV420 (JPN)","3K,PAL"],
+["2300125241110","HKO HK PAL Premium Steady 167 UV420 (JPN)","3K,PAL"],
+["2300128241117","HKO HK PAL Premium Steady 174 UV420 (JPN)","3K,PAL"],
+["2300122241113","HKO HK PAL Premium Steady 160 PH","變色,PAL"],
+["2300126241119","HKO HK PAL Premium Steady 167 PH","變色,PAL"],
+["2300087240718","HKO HK Myopia Control 160","其他"],
+["2300089240716","HKO HK Myopia Control 160 UV420","3K"],
+["2300091240711","HKO HK Myopia Control 160 PH","變色"],
+["2300088240717","HKO HK Myopia Control 167","其他"],
+["2300090240712","HKO HK Myopia Control 167 UV420","3K"],
+["2300092240710","HKO HK Myopia Control 167 PH","變色"],
+["2300104260613","HKO HK FSV160 PhotoShade GYBR","變色"],
+["2300105260612","HKO HK RX160 PhotoShade","變色"],
+["2300107260610","HKO HK RX160 PhotoShade Anti SCR Ext Cyl","變色"],
+["2300109260618","HKO HK RX160 PhotoShade Anti SCR WH Ext Cyl","變色"],
+["2300110260614","HKO HK FSV167 PhotoShade GYBR","變色"],
+["2300111260613","HKO HK RX167 PhotoShade","變色"],
+["2300113260611","HKO HK RX167 PhotoShade Anti SCR Ext Cyl","變色"],
+["2300115260619","HKO HK RX167 PhotoShade Anti SCR WH Ext Cyl","變色"],
+["2300116260618","HKO HK PAL Progressive PhotoShade 160","變色,PAL"],
+["2300117260617","HKO HK PAL Progressive PhotoShade 160 Anti SCR","變色,PAL"],
+["2300118260616","HKO HK PAL Progressive PhotoShade 160 Anti SCR WH","變色,PAL"],
+["2300119260615","HKO HK PAL Progressive PhotoShade 167","變色,PAL"],
+["2300120260611","HKO HK PAL Progressive PhotoShade 167 Anti SCR","變色,PAL"],
+["2300121260610","HKO HK PAL Progressive PhotoShade 167 Anti SCR WH","變色,PAL"],
+["2300122260619","HKO HK PAL Premium Steady PhotoShade 160","變色,PAL"],
+["2300123260618","HKO HK PAL Premium Steady PhotoShade 160 Anti SCR","變色,PAL"],
+["2300124260617","HKO HK PAL Premium Steady PhotoShade 160 Anti SCR WH","變色,PAL"],
+["2300125260616","HKO HK PAL Premium Steady PhotoShade 167","變色,PAL"],
+["2300126260615","HKO HK PAL Premium Steady PhotoShade 167 Anti SCR","變色,PAL"],
+["2300127260614","HKO HK PAL Premium Steady PhotoShade 167 Anti SCR WH","變色,PAL"],
+["2300128260613","HKO HK RX160 Cheek Col","其他"],
+["2300129260612","HKO HK RX160 Cheek Col Anti SCR","其他"],
+["2300130260618","HKO HK RX160 Cheek Col Anti SCR WH","其他"],
+["2300131260617","HKO HK RX160 Cheek Col UV420","3K"],
+["2300132260616","HKO HK RX160 Cheek Col UV420 Anti SCR","3K"],
+["2300133260615","HKO HK RX160 Cheek Col UV420 Anti SCR WH","3K"],
+["2300134260614","HKO HK RX167 Cheek Col","其他"],
+["2300135260613","HKO HK RX167 Cheek Col Anti SCR","其他"],
+["2300136260612","HKO HK RX167 Cheek Col Anti SCR WH","其他"],
+["2300137260611","HKO HK RX167 Cheek Col UV420","3K"],
+["2300138260610","HKO HK RX167 Cheek Col UV420 Anti SCR","3K"],
+["2300139260619","HKO HK RX167 Cheek Col UV420 Anti SCR WH","3K"],
+["2300140260615","HKO HK PAL Progressive 160 Cheek Col","PAL"],
+["2300141260614","HKO HK PAL Progressive 160 Cheek Col Anti SCR","PAL"],
+["2300142260613","HKO HK PAL Progressive 160 Cheek Col Anti SCR WH","PAL"],
+["2300143260612","HKO HK PAL Progressive 160 Cheek Col UV420","3K,PAL"],
+["2300144260611","HKO HK PAL Progressive 160 Cheek Col UV420 Anti SCR","3K,PAL"],
+["2300145260610","HKO HK PAL Progressive 160 Cheek Col UV420 Anti SCR WH","3K,PAL"],
+["2300146260619","HKO HK PAL Progressive 167 Cheek Col","PAL"],
+["2300147260618","HKO HK PAL Progressive 167 Cheek Col Anti SCR","PAL"],
+["2300148260617","HKO HK PAL Progressive 167 Cheek Col Anti SCR WH","PAL"],
+["2300149260616","HKO HK PAL Progressive 167 Cheek Col UV420","3K,PAL"],
+["2300150260612","HKO HK PAL Progressive 167 Cheek Col UV420 Anti SCR","3K,PAL"],
+["2300151260611","HKO HK PAL Progressive 167 Cheek Col UV420 Anti SCR WH","3K,PAL"],
+["2300152260610","HKO HK PAL Premium Steady 160 Cheek Col","PAL"],
+["2300153260619","HKO HK PAL Premium Steady 160 Cheek Col Anti SCR","PAL"],
+["2300154260618","HKO HK PAL Premium Steady 160 Cheek Col Anti SCR WH","PAL"],
+["2300155260617","HKO HK PAL Premium Steady 160 Cheek Col UV420","3K,PAL"],
+["2300156260616","HKO HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR","3K,PAL"],
+["2300157260615","HKO HK PAL Premium Steady 160 Cheek Col UV420 Anti SCR WH","3K,PAL"],
+["2300158260614","HKO HK PAL Premium Steady 167 Cheek Col","PAL"],
+["2300159260613","HKO HK PAL Premium Steady 167 Cheek Col Anti SCR","PAL"],
+["2300160260619","HKO HK PAL Premium Steady 167 Cheek Col Anti SCR WH","PAL"],
+["2300161260618","HKO HK PAL Premium Steady 167 Cheek Col UV420","3K,PAL"],
+["2300162260617","HKO HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR","3K,PAL"],
+["2300163260616","HKO HK PAL Premium Steady 167 Cheek Col UV420 Anti SCR WH","3K,PAL"],
+["2300318260713","HKO HKO RX160 Col","其他"],
+["2300319260712","HKO HKO RX160 Col Ext Cyl","其他"],
+["2300320260718","HKO HKO RX160 Col Anti SCR","其他"],
+["2300321260717","HKO HKO RX160 Col Anti SCR Ext Cyl","其他"],
+["2300322260716","HKO HKO RX160 Col UV420 Anti SCR","3K"],
+["2300323260715","HKO HKO RX160 Col UV420 Anti SCR Ext Cyl","3K"],
+["2300324260714","HKO HKO RX160 Col UV420","3K"],
+["2300325260713","HKO HKO RX160 Col UV420 Ext Cyl","3K"],
+["2300326260712","HKO HKO RX167 Col","其他"],
+["2300327260711","HKO HKO RX167 Col Ext Cyl","其他"],
+["2300328260710","HKO HKO RX167 Col Anti SCR","其他"],
+["2300329260719","HKO HKO RX167 Col Anti SCR Ext Cyl","其他"],
+["2300330260715","HKO HKO RX167 Col UV420 Anti SCR","3K"],
+["2300331260714","HKO HKO RX167 Col UV420 Anti SCR Ext Cyl","3K"],
+["2300332260713","HKO HKO RX167 Col UV420","3K"],
+["2300333260712","HKO HKO RX167 Col UV420 Ext Cyl","3K"],
+["2121500001842","SEIKO HK FSV160","其他"],
+["2300164251019","SEIKO HK RX160 Anti SCR","其他"],
+["2300165251018","SEIKO HK RX160 Anti SCR Ext Cyl","其他"],
+["2300166251017","SEIKO HK RX160 Anti SCR BC","其他"],
+["2300167251016","SEIKO HK RX160 Anti SCR BC Ext Cyl","其他"],
+["2300168251015","SEIKO HK RX160 Anti SCR WH","其他"],
+["2300169251014","SEIKO HK RX160 Anti SCR WH Ext Cyl","其他"],
+["2300170251010","SEIKO HK RX160 WH","其他"],
+["2300171251019","SEIKO HK RX160 WH Ext Cyl","其他"],
+["2300247231211","SEIKO HK RX160 PH","變色"],
+["2300172251018","SEIKO HK RX160 PH Anti SCR","變色"],
+["2300173251017","SEIKO HK RX160 PH Anti SCR BC","變色"],
+["2300174251016","SEIKO HK RX160 PH Anti SCR WH","變色"],
+["2300175251015","SEIKO HK RX160 PH BC","變色"],
+["2300176251014","SEIKO HK RX160 PH WH","變色"],
+["2300177251013","SEIKO HK RX160 UV420 Anti SCR","3K"],
+["2300178251012","SEIKO HK RX160 UV420 Anti SCR Ext Cyl","3K"],
+["2300179251011","SEIKO HK RX160 UV420 Anti SCR WH","3K"],
+["2300180251017","SEIKO HK RX160 UV420 Anti SCR WH Ext Cyl","3K"],
+["2300181251016","SEIKO HK RX160 UV420 WH","3K"],
+["2300182251015","SEIKO HK RX160 UV420 WH Ext Cyl","3K"],
+["2121500000661","SEIKO HK RX160 Col 1","其他"],
+["2300183251014","SEIKO HK RX160 Col 1 Ext Cyl","其他"],
+["2300184251013","SEIKO HK RX160 Col 1 Anti SCR","其他"],
+["2300185251012","SEIKO HK RX160 Col 1 Anti SCR Ext Cyl","其他"],
+["2300186251011","SEIKO HK RX160 Col 1 Anti SCR BC","其他"],
+["2300187251010","SEIKO HK RX160 Col 1 Anti SCR BC Ext Cyl","其他"],
+["2300188251019","SEIKO HK RX160 Col 1 Anti SCR WH","其他"],
+["2300189251018","SEIKO HK RX160 Col 1 Anti SCR WH Ext Cyl","其他"],
+["2300190251014","SEIKO HK RX160 Col 1 BC","其他"],
+["2300191251013","SEIKO HK RX160 Col 1 BC Ext Cyl","其他"],
+["2300192251012","SEIKO HK RX160 Col 1 WH","其他"],
+["2300193251011","SEIKO HK RX160 Col 1 WH Ext Cyl","其他"],
+["2300194251010","SEIKO HK RX160 Col 2","其他"],
+["2300195251019","SEIKO HK RX160 Col 2 Ext Cyl","其他"],
+["2300196251018","SEIKO HK RX160 Col 2 Anti SCR","其他"],
+["2300197251017","SEIKO HK RX160 Col 2 Anti SCR Ext Cyl","其他"],
+["2300198251016","SEIKO HK RX160 Col 2 Anti SCR BC","其他"],
+["2300199251015","SEIKO HK RX160 Col 2 Anti SCR BC Ext Cyl","其他"],
+["2300200251010","SEIKO HK RX160 Col 2 Anti SCR WH","其他"],
+["2300201251019","SEIKO HK RX160 Col 2 Anti SCR WH Ext Cyl","其他"],
+["2300202251018","SEIKO HK RX160 Col 2 BC","其他"],
+["2300203251017","SEIKO HK RX160 Col 2 BC Ext Cyl","其他"],
+["2300204251016","SEIKO HK RX160 Col 2 WH","其他"],
+["2300205251015","SEIKO HK RX160 Col 2 WH Ext Cyl","其他"],
+["2121500001903","SEIKO HK FSV167","其他"],
+["2300206251014","SEIKO HK RX167 Anti SCR","其他"],
+["2300207251013","SEIKO HK RX167 Anti SCR Ext Cyl","其他"],
+["2300208251012","SEIKO HK RX167 Anti SCR BC","其他"],
+["2300209251011","SEIKO HK RX167 Anti SCR BC Ext Cyl","其他"],
+["2300210251017","SEIKO HK RX167 Anti SCR WH","其他"],
+["2300211251016","SEIKO HK RX167 Anti SCR WH Ext Cyl","其他"],
+["2300212251015","SEIKO HK RX167 WH","其他"],
+["2300213251014","SEIKO HK RX167 WH Ext Cyl","其他"],
+["2300248231210","SEIKO HK RX167 PH","變色"],
+["2300214251013","SEIKO HK RX167 PH Anti SCR","變色"],
+["2300215251012","SEIKO HK RX167 PH Anti SCR BC","變色"],
+["2300216251011","SEIKO HK RX167 PH Anti SCR WH","變色"],
+["2300217251010","SEIKO HK RX167 PH BC","變色"],
+["2300218251019","SEIKO HK RX167 PH WH","變色"],
+["2300219251018","SEIKO HK RX167 UV420 Anti SCR","3K"],
+["2300220251014","SEIKO HK RX167 UV420 Anti SCR Ext Cyl","3K"],
+["2300221251013","SEIKO HK RX167 UV420 Anti SCR WH","3K"],
+["2300222251012","SEIKO HK RX167 UV420 Anti SCR WH Ext Cyl","3K"],
+["2300223251011","SEIKO HK RX167 UV420 WH","3K"],
+["2300224251010","SEIKO HK RX167 UV420 WH Ext Cyl","3K"],
+["2121500000708","SEIKO HK RX167 Col 1","其他"],
+["2300225251019","SEIKO HK RX167 Col 1 Ext Cyl","其他"],
+["2300226251018","SEIKO HK RX167 Col 1 Anti SCR","其他"],
+["2300227251017","SEIKO HK RX167 Col 1 Anti SCR Ext Cyl","其他"],
+["2300228251016","SEIKO HK RX167 Col 1 Anti SCR BC","其他"],
+["2300229251015","SEIKO HK RX167 Col 1 Anti SCR BC Ext Cyl","其他"],
+["2300230251011","SEIKO HK RX167 Col 1 Anti SCR WH","其他"],
+["2300231251010","SEIKO HK RX167 Col 1 Anti SCR WH Ext Cyl","其他"],
+["2300232251019","SEIKO HK RX167 Col 1 BC","其他"],
+["2300233251018","SEIKO HK RX167 Col 1 BC Ext Cyl","其他"],
+["2300234251017","SEIKO HK RX167 Col 1 WH","其他"],
+["2300235251016","SEIKO HK RX167 Col 1 WH Ext Cyl","其他"],
+["2300236251015","SEIKO HK RX167 Col 2","其他"],
+["2300237251014","SEIKO HK RX167 Col 2 Ext Cyl","其他"],
+["2300238251013","SEIKO HK RX167 Col 2 Anti SCR","其他"],
+["2300239251012","SEIKO HK RX167 Col 2 Anti SCR Ext Cyl","其他"],
+["2300240251018","SEIKO HK RX167 Col 2 Anti SCR BC","其他"],
+["2300241251017","SEIKO HK RX167 Col 2 Anti SCR BC Ext Cyl","其他"],
+["2300242251016","SEIKO HK RX167 Col 2 Anti SCR WH","其他"],
+["2300243251015","SEIKO HK RX167 Col 2 Anti SCR WH Ext Cyl","其他"],
+["2300244251014","SEIKO HK RX167 Col 2 BC","其他"],
+["2300245251013","SEIKO HK RX167 Col 2 BC Ext Cyl","其他"],
+["2300246251012","SEIKO HK RX167 Col 2 WH","其他"],
+["2300247251011","SEIKO HK RX167 Col 2 WH Ext Cyl","其他"],
+["2300010212072","SEIKO HK FSV174","其他"],
+["2300248251010","SEIKO HK RX174 Anti SCR","其他"],
+["2300249251019","SEIKO HK RX174 Anti SCR Ext Cyl","其他"],
+["2300250251015","SEIKO HK RX174 Anti SCR BC","其他"],
+["2300251251014","SEIKO HK RX174 Anti SCR BC Ext Cyl","其他"],
+["2300252251013","SEIKO HK RX174 UV420 Anti SCR","3K"],
+["2300253251012","SEIKO HK RX174 UV420 Anti SCR Ext Cyl","3K"],
+["2121500000937","SEIKO HK RX174 Col 1","其他"],
+["2300254251011","SEIKO HK RX174 Col 1 Ext Cyl","其他"],
+["2300255251010","SEIKO HK RX174 Col 1 Anti SCR","其他"],
+["2300256251019","SEIKO HK RX174 Col 1 Anti SCR Ext Cyl","其他"],
+["2300257251018","SEIKO HK RX174 Col 1 Anti SCR BC","其他"],
+["2300258251017","SEIKO HK RX174 Col 1 Anti SCR BC Ext Cyl","其他"],
+["2300259251016","SEIKO HK RX174 Col 1 BC","其他"],
+["2300260251012","SEIKO HK RX174 Col 1 BC Ext Cyl","其他"],
+["2300261251011","SEIKO HK RX174 Col 2","其他"],
+["2300262251010","SEIKO HK RX174 Col 2 Ext Cyl","其他"],
+["2300263251019","SEIKO HK RX174 Col 2 Anti SCR","其他"],
+["2300264251018","SEIKO HK RX174 Col 2 Anti SCR Ext Cyl","其他"],
+["2300265251017","SEIKO HK RX174 Col 2 Anti SCR BC","其他"],
+["2300266251016","SEIKO HK RX174 Col 2 Anti SCR BC Ext Cyl","其他"],
+["2300267251015","SEIKO HK RX174 Col 2 BC","其他"],
+["2300268251014","SEIKO HK RX174 Col 2 BC Ext Cyl","其他"],
+["2300021200419","SEIKO HK FSV160 DAS","DAS"],
+["2300269251013","SEIKO HK RX160 DAS","DAS"],
+["2300270251019","SEIKO HK RX160 DAS Anti SCR","DAS"],
+["2300271251018","SEIKO HK RX160 DAS Anti SCR Ext Cyl","DAS"],
+["2300272251017","SEIKO HK RX160 DAS Anti SCR BC","DAS"],
+["2300273251016","SEIKO HK RX160 DAS Anti SCR BC Ext Cyl","DAS"],
+["2300274251015","SEIKO HK RX160 DAS Anti SCR WH","DAS"],
+["2300275251014","SEIKO HK RX160 DAS Anti SCR WH Ext Cyl","DAS"],
+["2300276251013","SEIKO HK RX160 DAS WH","DAS"],
+["2300277251012","SEIKO HK RX160 DAS WH Ext Cyl","DAS"],
+["2300067231118","SEIKO HK RX160 DAS PH","DAS,變色"],
+["2300278251011","SEIKO HK RX160 DAS PH Anti SCR","DAS,變色"],
+["2300279251010","SEIKO HK RX160 DAS PH Anti SCR BC","DAS,變色"],
+["2300280251016","SEIKO HK RX160 DAS PH Anti SCR WH","DAS,變色"],
+["2300281251015","SEIKO HK RX160 DAS PH BC","DAS,變色"],
+["2300282251014","SEIKO HK RX160 DAS PH WH","DAS,變色"],
+["2300283251013","SEIKO HK RX160 DAS BC","DAS"],
+["2300284251012","SEIKO HK RX160 DAS BC Ext Cyl","DAS"],
+["2300093251111","SEIKO HK RX160 DAS UV420","3K,DAS"],
+["2300094251110","SEIKO HK RX160 DAS UV420 Ext Cyl","3K,DAS"],
+["2300285251011","SEIKO HK RX160 DAS UV420 Anti SCR","3K,DAS"],
+["2300286251010","SEIKO HK RX160 DAS UV420 Anti SCR Ext Cyl","3K,DAS"],
+["2300287251019","SEIKO HK RX160 DAS UV420 Anti SCR WH","3K,DAS"],
+["2300288251018","SEIKO HK RX160 DAS UV420 Anti SCR WH Ext Cyl","3K,DAS"],
+["2300289251017","SEIKO HK RX160 DAS UV420 WH","3K,DAS"],
+["2300290251013","SEIKO HK RX160 DAS UV420 WH Ext Cyl","3K,DAS"],
+["2300030200417","SEIKO HK RX160 DAS Col 1","DAS"],
+["2300291251012","SEIKO HK RX160 DAS Col 1 Ext Cyl","DAS"],
+["2300292251011","SEIKO HK RX160 DAS Col 1 Anti SCR","DAS"],
+["2300293251010","SEIKO HK RX160 DAS Col 1 Anti SCR Ext Cyl","DAS"],
+["2300294251019","SEIKO HK RX160 DAS Col 1 Anti SCR BC","DAS"],
+["2300295251018","SEIKO HK RX160 DAS Col 1 Anti SCR BC Ext Cyl","DAS"],
+["2300296251017","SEIKO HK RX160 DAS Col 1 Anti SCR WH","DAS"],
+["2300297251016","SEIKO HK RX160 DAS Col 1 Anti SCR WH Ext Cyl","DAS"],
+["2300298251015","SEIKO HK RX160 DAS Col 1 BC","DAS"],
+["2300299251014","SEIKO HK RX160 DAS Col 1 BC Ext Cyl","DAS"],
+["2300300251019","SEIKO HK RX160 DAS Col 1 WH","DAS"],
+["2300301251018","SEIKO HK RX160 DAS Col 1 WH Ext Cyl","DAS"],
+["2300302251017","SEIKO HK RX160 DAS Col 2","DAS"],
+["2300303251016","SEIKO HK RX160 DAS Col 2 Ext Cyl","DAS"],
+["2300304251015","SEIKO HK RX160 DAS Col 2 Anti SCR","DAS"],
+["2300305251014","SEIKO HK RX160 DAS Col 2 Anti SCR Ext Cyl","DAS"],
+["2300306251013","SEIKO HK RX160 DAS Col 2 Anti SCR BC","DAS"],
+["2300307251012","SEIKO HK RX160 DAS Col 2 Anti SCR BC Ext Cyl","DAS"],
+["2300308251011","SEIKO HK RX160 DAS Col 2 Anti SCR WH","DAS"],
+["2300309251010","SEIKO HK RX160 DAS Col 2 Anti SCR WH Ext Cyl","DAS"],
+["2300310251016","SEIKO HK RX160 DAS Col 2 BC","DAS"],
+["2300311251015","SEIKO HK RX160 DAS Col 2 BC Ext Cyl","DAS"],
+["2300312251014","SEIKO HK RX160 DAS Col 2 WH","DAS"],
+["2300313251013","SEIKO HK RX160 DAS Col 2 WH Ext Cyl","DAS"],
+["2300022200418","SEIKO HK FSV167 DAS","DAS"],
+["2300314251012","SEIKO HK RX167 DAS","DAS"],
+["2300315251011","SEIKO HK RX167 DAS Anti SCR","DAS"],
+["2300316251010","SEIKO HK RX167 DAS Anti SCR Ext Cyl","DAS"],
+["2300317251019","SEIKO HK RX167 DAS Anti SCR BC","DAS"],
+["2300318251018","SEIKO HK RX167 DAS Anti SCR BC Ext Cyl","DAS"],
+["2300319251017","SEIKO HK RX167 DAS Anti SCR WH","DAS"],
+["2300320251013","SEIKO HK RX167 DAS Anti SCR WH Ext Cyl","DAS"],
+["2300321251012","SEIKO HK RX167 DAS WH","DAS"],
+["2300322251011","SEIKO HK RX167 DAS WH Ext Cyl","DAS"],
+["2300068231117","SEIKO HK RX167 DAS PH","DAS,變色"],
+["2300323251010","SEIKO HK RX167 DAS PH Anti SCR","DAS,變色"],
+["2300324251019","SEIKO HK RX167 DAS PH Anti SCR BC","DAS,變色"],
+["2300325251018","SEIKO HK RX167 DAS PH Anti SCR WH","DAS,變色"],
+["2300326251017","SEIKO HK RX167 DAS PH BC","DAS,變色"],
+["2300327251016","SEIKO HK RX167 DAS PH WH","DAS,變色"],
+["2300328251015","SEIKO HK RX167 DAS BC","DAS"],
+["2300329251014","SEIKO HK RX167 DAS BC Ext Cyl","DAS"],
+["2300095251119","SEIKO HK RX167 DAS UV420","3K,DAS"],
+["2300096251118","SEIKO HK RX167 DAS UV420 Ext Cyl","3K,DAS"],
+["2300330251010","SEIKO HK RX167 DAS UV420 Anti SCR","3K,DAS"],
+["2300331251019","SEIKO HK RX167 DAS UV420 Anti SCR Ext Cyl","3K,DAS"],
+["2300332251018","SEIKO HK RX167 DAS UV420 Anti SCR WH","3K,DAS"],
+["2300333251017","SEIKO HK RX167 DAS UV420 Anti SCR WH Ext Cyl","3K,DAS"],
+["2300334251016","SEIKO HK RX167 DAS UV420 WH","3K,DAS"],
+["2300335251015","SEIKO HK RX167 DAS UV420 WH Ext Cyl","3K,DAS"],
+["2300031200416","SEIKO HK RX167 DAS Col 1","DAS"],
+["2300336251014","SEIKO HK RX167 DAS Col 1 Ext Cyl","DAS"],
+["2300337251013","SEIKO HK RX167 DAS Col 1 Anti SCR","DAS"],
+["2300338251012","SEIKO HK RX167 DAS Col 1 Anti SCR Ext Cyl","DAS"],
+["2300339251011","SEIKO HK RX167 DAS Col 1 Anti SCR BC","DAS"],
+["2300340251017","SEIKO HK RX167 DAS Col 1 Anti SCR BC Ext Cyl","DAS"],
+["2300341251016","SEIKO HK RX167 DAS Col 1 Anti SCR WH","DAS"],
+["2300342251015","SEIKO HK RX167 DAS Col 1 Anti SCR WH Ext Cyl","DAS"],
+["2300343251014","SEIKO HK RX167 DAS Col 1 BC","DAS"],
+["2300344251013","SEIKO HK RX167 DAS Col 1 BC Ext Cyl","DAS"],
+["2300345251012","SEIKO HK RX167 DAS Col 1 WH","DAS"],
+["2300346251011","SEIKO HK RX167 DAS Col 1 WH Ext Cyl","DAS"],
+["2300347251010","SEIKO HK RX167 DAS Col 2","DAS"],
+["2300348251019","SEIKO HK RX167 DAS Col 2 Ext Cyl","DAS"],
+["2300349251018","SEIKO HK RX167 DAS Col 2 Anti SCR","DAS"],
+["2300350251014","SEIKO HK RX167 DAS Col 2 Anti SCR Ext Cyl","DAS"],
+["2300351251013","SEIKO HK RX167 DAS Col 2 Anti SCR BC","DAS"],
+["2300352251012","SEIKO HK RX167 DAS Col 2 Anti SCR BC Ext Cyl","DAS"],
+["2300353251011","SEIKO HK RX167 DAS Col 2 Anti SCR WH","DAS"],
+["2300354251010","SEIKO HK RX167 DAS Col 2 Anti SCR WH Ext Cyl","DAS"],
+["2300355251019","SEIKO HK RX167 DAS Col 2 BC","DAS"],
+["2300356251018","SEIKO HK RX167 DAS Col 2 BC Ext Cyl","DAS"],
+["2300357251017","SEIKO HK RX167 DAS Col 2 WH","DAS"],
+["2300358251016","SEIKO HK RX167 DAS Col 2 WH Ext Cyl","DAS"],
+["2300023200417","SEIKO HK FSV174 DAS","DAS"],
+["2300359251015","SEIKO HK RX174 DAS","DAS"],
+["2300360251011","SEIKO HK RX174 DAS Anti SCR","DAS"],
+["2300361251010","SEIKO HK RX174 DAS Anti SCR Ext Cyl","DAS"],
+["2300362251019","SEIKO HK RX174 DAS Anti SCR BC","DAS"],
+["2300363251018","SEIKO HK RX174 DAS Anti SCR BC Ext Cyl","DAS"],
+["2300364251017","SEIKO HK RX174 DAS BC","DAS"],
+["2300365251016","SEIKO HK RX174 DAS BC Ext Cyl","DAS"],
+["2300097251117","SEIKO HK RX174 DAS UV420","3K,DAS"],
+["2300098251116","SEIKO HK RX174 DAS UV420 Ext Cyl","3K,DAS"],
+["2300366251015","SEIKO HK RX174 DAS UV420 Anti SCR","3K,DAS"],
+["2300367251014","SEIKO HK RX174 DAS UV420 Anti SCR Ext Cyl","3K,DAS"],
+["2300032200415","SEIKO HK RX174 DAS Col 1","DAS"],
+["2300368251013","SEIKO HK RX174 DAS Col 1 Ext Cyl","DAS"],
+["2300369251012","SEIKO HK RX174 DAS Col 1 Anti SCR","DAS"],
+["2300370251018","SEIKO HK RX174 DAS Col 1 Anti SCR Ext Cyl","DAS"],
+["2300371251017","SEIKO HK RX174 DAS Col 1 Anti SCR BC","DAS"],
+["2300372251016","SEIKO HK RX174 DAS Col 1 Anti SCR BC Ext Cyl","DAS"],
+["2300373251015","SEIKO HK RX174 DAS Col 1 BC","DAS"],
+["2300374251014","SEIKO HK RX174 DAS Col 1 BC Ext Cyl","DAS"],
+["2300375251013","SEIKO HK RX174 DAS Col 2","DAS"],
+["2300376251012","SEIKO HK RX174 DAS Col 2 Ext Cyl","DAS"],
+["2300377251011","SEIKO HK RX174 DAS Col 2 Anti SCR","DAS"],
+["2300378251010","SEIKO HK RX174 DAS Col 2 Anti SCR Ext Cyl","DAS"],
+["2300379251019","SEIKO HK RX174 DAS Col 2 Anti SCR BC","DAS"],
+["2300380251015","SEIKO HK RX174 DAS Col 2 Anti SCR BC Ext Cyl","DAS"],
+["2300381251014","SEIKO HK RX174 DAS Col 2 BC","DAS"],
+["2300382251013","SEIKO HK RX174 DAS Col 2 BC Ext Cyl","DAS"],
+["2300009616072","SEIKO HK PAL Progressive 160","PAL"],
+["2300383251012","SEIKO HK PAL Progressive 160 Anti SCR","PAL"],
+["2300384251011","SEIKO HK PAL Progressive 160 Anti SCR BC","PAL"],
+["2300385251010","SEIKO HK PAL Progressive 160 Anti SCR WH","PAL"],
+["2300386251019","SEIKO HK PAL Progressive 160 WH","PAL"],
+["2300071231111","SEIKO HK PAL Progressive 160 PH","變色,PAL"],
+["2300387251018","SEIKO HK PAL Progressive 160 PH Anti SCR","變色,PAL"],
+["2300388251017","SEIKO HK PAL Progressive 160 PH Anti SCR BC","變色,PAL"],
+["2300389251016","SEIKO HK PAL Progressive 160 PH Anti SCR WH","變色,PAL"],
+["2300390251012","SEIKO HK PAL Progressive 160 PH BC","變色,PAL"],
+["2300391251011","SEIKO HK PAL Progressive 160 PH WH","變色,PAL"],
+["2300804251010","SEIKO HK PAL Progressive 160 BC","PAL"],
+["2300805251019","SEIKO HK PAL Progressive 160 UV420","3K,PAL"],
+["2300392251010","SEIKO HK PAL Progressive 160 UV420 Anti SCR","3K,PAL"],
+["2300393251019","SEIKO HK PAL Progressive 160 UV420 Anti SCR WH","3K,PAL"],
+["2300394251018","SEIKO HK PAL Progressive 160 UV420 WH","3K,PAL"],
+["2300009716079","SEIKO HK PAL Progressive 160 Col 1","PAL"],
+["2300395251017","SEIKO HK PAL Progressive 160 Col 1 Anti SCR","PAL"],
+["2300396251016","SEIKO HK PAL Progressive 160 Col 1 Anti SCR BC","PAL"],
+["2300397251015","SEIKO HK PAL Progressive 160 Col 1 Anti SCR WH","PAL"],
+["2300398251014","SEIKO HK PAL Progressive 160 Col 1 BC","PAL"],
+["2300399251013","SEIKO HK PAL Progressive 160 Col 1 WH","PAL"],
+["2300400251018","SEIKO HK PAL Progressive 160 Col 2","PAL"],
+["2300401251017","SEIKO HK PAL Progressive 160 Col 2 Anti SCR","PAL"],
+["2300402251016","SEIKO HK PAL Progressive 160 Col 2 Anti SCR BC","PAL"],
+["2300403251015","SEIKO HK PAL Progressive 160 Col 2 Anti SCR WH","PAL"],
+["2300404251014","SEIKO HK PAL Progressive 160 Col 2 BC","PAL"],
+["2300405251013","SEIKO HK PAL Progressive 160 Col 2 WH","PAL"],
+["2300009816076","SEIKO HK PAL Progressive 167","PAL"],
+["2300406251012","SEIKO HK PAL Progressive 167 Anti SCR","PAL"],
+["2300407251011","SEIKO HK PAL Progressive 167 Anti SCR BC","PAL"],
+["2300408251010","SEIKO HK PAL Progressive 167 Anti SCR WH","PAL"],
+["2300409251019","SEIKO HK PAL Progressive 167 WH","PAL"],
+["2300072231110","SEIKO HK PAL Progressive 167 PH","變色,PAL"],
+["2300410251015","SEIKO HK PAL Progressive 167 PH Anti SCR","變色,PAL"],
+["2300411251014","SEIKO HK PAL Progressive 167 PH Anti SCR BC","變色,PAL"],
+["2300412251013","SEIKO HK PAL Progressive 167 PH Anti SCR WH","變色,PAL"],
+["2300413251012","SEIKO HK PAL Progressive 167 PH BC","變色,PAL"],
+["2300414251011","SEIKO HK PAL Progressive 167 PH WH","變色,PAL"],
+["2300806251018","SEIKO HK PAL Progressive 167 BC","PAL"],
+["2300807251017","SEIKO HK PAL Progressive 167 UV420","3K,PAL"],
+["2300415251010","SEIKO HK PAL Progressive 167 UV420 Anti SCR","3K,PAL"],
+["2300416251019","SEIKO HK PAL Progressive 167 UV420 Anti SCR WH","3K,PAL"],
+["2300417251018","SEIKO HK PAL Progressive 167 UV420 WH","3K,PAL"],
+["2300009916073","SEIKO HK PAL Progressive 167 Col 1","PAL"],
+["2300418251017","SEIKO HK PAL Progressive 167 Col 1 Anti SCR","PAL"],
+["2300419251016","SEIKO HK PAL Progressive 167 Col 1 Anti SCR BC","PAL"],
+["2300420251012","SEIKO HK PAL Progressive 167 Col 1 Anti SCR WH","PAL"],
+["2300421251011","SEIKO HK PAL Progressive 167 Col 1 BC","PAL"],
+["2300422251010","SEIKO HK PAL Progressive 167 Col 1 WH","PAL"],
+["2300423251019","SEIKO HK PAL Progressive 167 Col 2","PAL"],
+["2300424251018","SEIKO HK PAL Progressive 167 Col 2 Anti SCR","PAL"],
+["2300425251017","SEIKO HK PAL Progressive 167 Col 2 Anti SCR BC","PAL"],
+["2300426251016","SEIKO HK PAL Progressive 167 Col 2 Anti SCR WH","PAL"],
+["2300427251015","SEIKO HK PAL Progressive 167 Col 2 BC","PAL"],
+["2300428251014","SEIKO HK PAL Progressive 167 Col 2 WH","PAL"],
+["2300143190315","SEIKO HK PAL Premium 160","PAL"],
+["2300429251013","SEIKO HK PAL Premium 160 Anti SCR","PAL"],
+["2300430251019","SEIKO HK PAL Premium 160 Anti SCR BC","PAL"],
+["2300431251018","SEIKO HK PAL Premium 160 Anti SCR WH","PAL"],
+["2300432251017","SEIKO HK PAL Premium 160 WH","PAL"],
+["2300149190319","SEIKO HK PAL Premium 160 PH","變色,PAL"],
+["2300433251016","SEIKO HK PAL Premium 160 PH Anti SCR","變色,PAL"],
+["2300434251015","SEIKO HK PAL Premium 160 PH Anti SCR BC","變色,PAL"],
+["2300435251014","SEIKO HK PAL Premium 160 PH Anti SCR WH","變色,PAL"],
+["2300436251013","SEIKO HK PAL Premium 160 PH BC","變色,PAL"],
+["2300437251012","SEIKO HK PAL Premium 160 PH WH","變色,PAL"],
+["2300438251011","SEIKO HK PAL Premium 160 BC","PAL"],
+["2300439251010","SEIKO HK PAL Premium 160 UV420","3K,PAL"],
+["2300440251016","SEIKO HK PAL Premium 160 UV420 Anti SCR","3K,PAL"],
+["2300441251015","SEIKO HK PAL Premium 160 UV420 Anti SCR WH","3K,PAL"],
+["2300442251014","SEIKO HK PAL Premium 160 UV420 WH","3K,PAL"],
+["2300146190312","SEIKO HK PAL Premium 160 Col 1","PAL"],
+["2300443251013","SEIKO HK PAL Premium 160 Col 1 Anti SCR","PAL"],
+["2300444251012","SEIKO HK PAL Premium 160 Col 1 Anti SCR BC","PAL"],
+["2300445251011","SEIKO HK PAL Premium 160 Col 1 Anti SCR WH","PAL"],
+["2300446251010","SEIKO HK PAL Premium 160 Col 1 BC","PAL"],
+["2300447251019","SEIKO HK PAL Premium 160 Col 1 WH","PAL"],
+["2300448251018","SEIKO HK PAL Premium 160 Col 2","PAL"],
+["2300449251017","SEIKO HK PAL Premium 160 Col 2 Anti SCR","PAL"],
+["2300450251013","SEIKO HK PAL Premium 160 Col 2 Anti SCR BC","PAL"],
+["2300451251012","SEIKO HK PAL Premium 160 Col 2 Anti SCR WH","PAL"],
+["2300452251011","SEIKO HK PAL Premium 160 Col 2 BC","PAL"],
+["2300453251010","SEIKO HK PAL Premium 160 Col 2 WH","PAL"],
+["2300144190314","SEIKO HK PAL Premium 167","PAL"],
+["2300454251019","SEIKO HK PAL Premium 167 Anti SCR","PAL"],
+["2300455251018","SEIKO HK PAL Premium 167 Anti SCR BC","PAL"],
+["2300456251017","SEIKO HK PAL Premium 167 Anti SCR WH","PAL"],
+["2300457251016","SEIKO HK PAL Premium 167 WH","PAL"],
+["2300150190315","SEIKO HK PAL Premium 167 PH","變色,PAL"],
+["2300458251015","SEIKO HK PAL Premium 167 PH Anti SCR","變色,PAL"],
+["2300459251014","SEIKO HK PAL Premium 167 PH Anti SCR BC","變色,PAL"],
+["2300460251010","SEIKO HK PAL Premium 167 PH Anti SCR WH","變色,PAL"],
+["2300461251019","SEIKO HK PAL Premium 167 PH BC","變色,PAL"],
+["2300462251018","SEIKO HK PAL Premium 167 PH WH","變色,PAL"],
+["2300463251017","SEIKO HK PAL Premium 167 BC","PAL"],
+["2300464251016","SEIKO HK PAL Premium 167 UV420","3K,PAL"],
+["2300465251015","SEIKO HK PAL Premium 167 UV420 Anti SCR","3K,PAL"],
+["2300466251014","SEIKO HK PAL Premium 167 UV420 Anti SCR WH","3K,PAL"],
+["2300467251013","SEIKO HK PAL Premium 167 UV420 WH","3K,PAL"],
+["2300147190311","SEIKO HK PAL Premium 167 Col 1","PAL"],
+["2300468251012","SEIKO HK PAL Premium 167 Col 1 Anti SCR","PAL"],
+["2300469251011","SEIKO HK PAL Premium 167 Col 1 Anti SCR BC","PAL"],
+["2300470251017","SEIKO HK PAL Premium 167 Col 1 Anti SCR WH","PAL"],
+["2300471251016","SEIKO HK PAL Premium 167 Col 1 BC","PAL"],
+["2300472251015","SEIKO HK PAL Premium 167 Col 1 WH","PAL"],
+["2300473251014","SEIKO HK PAL Premium 167 Col 2","PAL"],
+["2300474251013","SEIKO HK PAL Premium 167 Col 2 Anti SCR","PAL"],
+["2300475251012","SEIKO HK PAL Premium 167 Col 2 Anti SCR BC","PAL"],
+["2300476251011","SEIKO HK PAL Premium 167 Col 2 Anti SCR WH","PAL"],
+["2300477251010","SEIKO HK PAL Premium 167 Col 2 BC","PAL"],
+["2300478251019","SEIKO HK PAL Premium 167 Col 2 WH","PAL"],
+["2300145190313","SEIKO HK PAL Premium 174","PAL"],
+["2300479251018","SEIKO HK PAL Premium 174 Anti SCR","PAL"],
+["2300480251014","SEIKO HK PAL Premium 174 Anti SCR BC","PAL"],
+["2300481251013","SEIKO HK PAL Premium 174 BC","PAL"],
+["2300482251012","SEIKO HK PAL Premium 174 UV420","3K,PAL"],
+["2300483251011","SEIKO HK PAL Premium 174 UV420 Anti SCR","3K,PAL"],
+["2300148190310","SEIKO HK PAL Premium 174 Col 1","PAL"],
+["2300484251010","SEIKO HK PAL Premium 174 Col 1 Anti SCR","PAL"],
+["2300485251019","SEIKO HK PAL Premium 174 Col 1 Anti SCR BC","PAL"],
+["2300486251018","SEIKO HK PAL Premium 174 Col 1 BC","PAL"],
+["2300487251017","SEIKO HK PAL Premium 174 Col 2","PAL"],
+["2300488251016","SEIKO HK PAL Premium 174 Col 2 Anti SCR","PAL"],
+["2300489251015","SEIKO HK PAL Premium 174 Col 2 Anti SCR BC","PAL"],
+["2300490251011","SEIKO HK PAL Premium 174 Col 2 BC","PAL"],
+["2300135190316","SEIKO HK PAL PremiumPro 160","PAL"],
+["2300491251010","SEIKO HK PAL PremiumPro 160 Anti SCR","PAL"],
+["2300492251019","SEIKO HK PAL PremiumPro 160 Anti SCR BC","PAL"],
+["2300493251018","SEIKO HK PAL PremiumPro 160 Anti SCR WH","PAL"],
+["2300494251017","SEIKO HK PAL PremiumPro 160 WH","PAL"],
+["2300141190317","SEIKO HK PAL PremiumPro 160 PH","變色,PAL"],
+["2300495251016","SEIKO HK PAL PremiumPro 160 PH Anti SCR","變色,PAL"],
+["2300496251015","SEIKO HK PAL PremiumPro 160 PH Anti SCR BC","變色,PAL"],
+["2300497251014","SEIKO HK PAL PremiumPro 160 PH Anti SCR WH","變色,PAL"],
+["2300498251013","SEIKO HK PAL PremiumPro 160 PH BC","變色,PAL"],
+["2300499251012","SEIKO HK PAL PremiumPro 160 PH WH","變色,PAL"],
+["2300500251017","SEIKO HK PAL PremiumPro 160 BC","PAL"],
+["2300501251016","SEIKO HK PAL PremiumPro 160 UV420","3K,PAL"],
+["2300502251015","SEIKO HK PAL PremiumPro 160 UV420 Anti SCR","3K,PAL"],
+["2300503251014","SEIKO HK PAL PremiumPro 160 UV420 Anti SCR WH","3K,PAL"],
+["2300504251013","SEIKO HK PAL PremiumPro 160 UV420 WH","3K,PAL"],
+["2300138190313","SEIKO HK PAL PremiumPro 160 Col 1","PAL"],
+["2300505251012","SEIKO HK PAL PremiumPro 160 Col 1 Anti SCR","PAL"],
+["2300506251011","SEIKO HK PAL PremiumPro 160 Col 1 Anti SCR BC","PAL"],
+["2300507251010","SEIKO HK PAL PremiumPro 160 Col 1 Anti SCR WH","PAL"],
+["2300508251019","SEIKO HK PAL PremiumPro 160 Col 1 BC","PAL"],
+["2300509251018","SEIKO HK PAL PremiumPro 160 Col 1 WH","PAL"],
+["2300510251014","SEIKO HK PAL PremiumPro 160 Col 2","PAL"],
+["2300511251013","SEIKO HK PAL PremiumPro 160 Col 2 Anti SCR","PAL"],
+["2300512251012","SEIKO HK PAL PremiumPro 160 Col 2 Anti SCR BC","PAL"],
+["2300513251011","SEIKO HK PAL PremiumPro 160 Col 2 Anti SCR WH","PAL"],
+["2300514251010","SEIKO HK PAL PremiumPro 160 Col 2 BC","PAL"],
+["2300515251019","SEIKO HK PAL PremiumPro 160 Col 2 WH","PAL"],
+["2300136190315","SEIKO HK PAL PremiumPro 167","PAL"],
+["2300516251018","SEIKO HK PAL PremiumPro 167 Anti SCR","PAL"],
+["2300517251017","SEIKO HK PAL PremiumPro 167 Anti SCR BC","PAL"],
+["2300518251016","SEIKO HK PAL PremiumPro 167 Anti SCR WH","PAL"],
+["2300519251015","SEIKO HK PAL PremiumPro 167 WH","PAL"],
+["2300142190316","SEIKO HK PAL PremiumPro 167 PH","變色,PAL"],
+["2300520251011","SEIKO HK PAL PremiumPro 167 PH Anti SCR","變色,PAL"],
+["2300521251010","SEIKO HK PAL PremiumPro 167 PH Anti SCR BC","變色,PAL"],
+["2300522251019","SEIKO HK PAL PremiumPro 167 PH Anti SCR WH","變色,PAL"],
+["2300523251018","SEIKO HK PAL PremiumPro 167 PH BC","變色,PAL"],
+["2300524251017","SEIKO HK PAL PremiumPro 167 PH WH","變色,PAL"],
+["2300525251016","SEIKO HK PAL PremiumPro 167 BC","PAL"],
+["2300526251015","SEIKO HK PAL PremiumPro 167 UV420","3K,PAL"],
+["2300527251014","SEIKO HK PAL PremiumPro 167 UV420 Anti SCR","3K,PAL"],
+["2300528251013","SEIKO HK PAL PremiumPro 167 UV420 Anti SCR WH","3K,PAL"],
+["2300529251012","SEIKO HK PAL PremiumPro 167 UV420 WH","3K,PAL"],
+["2300139190312","SEIKO HK PAL PremiumPro 167 Col 1","PAL"],
+["2300530251018","SEIKO HK PAL PremiumPro 167 Col 1 Anti SCR","PAL"],
+["2300531251017","SEIKO HK PAL PremiumPro 167 Col 1 Anti SCR BC","PAL"],
+["2300532251016","SEIKO HK PAL PremiumPro 167 Col 1 Anti SCR WH","PAL"],
+["2300533251015","SEIKO HK PAL PremiumPro 167 Col 1 BC","PAL"],
+["2300534251014","SEIKO HK PAL PremiumPro 167 Col 1 WH","PAL"],
+["2300535251013","SEIKO HK PAL PremiumPro 167 Col 2","PAL"],
+["2300536251012","SEIKO HK PAL PremiumPro 167 Col 2 Anti SCR","PAL"],
+["2300537251011","SEIKO HK PAL PremiumPro 167 Col 2 Anti SCR BC","PAL"],
+["2300538251010","SEIKO HK PAL PremiumPro 167 Col 2 Anti SCR WH","PAL"],
+["2300539251019","SEIKO HK PAL PremiumPro 167 Col 2 BC","PAL"],
+["2300540251015","SEIKO HK PAL PremiumPro 167 Col 2 WH","PAL"],
+["2300137190314","SEIKO HK PAL PremiumPro 174","PAL"],
+["2300541251014","SEIKO HK PAL PremiumPro 174 Anti SCR","PAL"],
+["2300542251013","SEIKO HK PAL PremiumPro 174 Anti SCR BC","PAL"],
+["2300543251012","SEIKO HK PAL PremiumPro 174 BC","PAL"],
+["2300544251011","SEIKO HK PAL PremiumPro 174 UV420","3K,PAL"],
+["2300545251010","SEIKO HK PAL PremiumPro 174 UV420 Anti SCR","3K,PAL"],
+["2300140190318","SEIKO HK PAL PremiumPro 174 Col 1","PAL"],
+["2300546251019","SEIKO HK PAL PremiumPro 174 Col 1 Anti SCR","PAL"],
+["2300547251018","SEIKO HK PAL PremiumPro 174 Col 1 Anti SCR BC","PAL"],
+["2300548251017","SEIKO HK PAL PremiumPro 174 Col 1 BC","PAL"],
+["2300549251016","SEIKO HK PAL PremiumPro 174 Col 2","PAL"],
+["2300550251012","SEIKO HK PAL PremiumPro 174 Col 2 Anti SCR","PAL"],
+["2300551251011","SEIKO HK PAL PremiumPro 174 Col 2 Anti SCR BC","PAL"],
+["2300552251010","SEIKO HK PAL PremiumPro 174 Col 2 BC","PAL"],
+["2300033116074","SEIKO HK PAL Office 160","PAL"],
+["2300553251019","SEIKO HK PAL Office 160 Anti SCR","PAL"],
+["2300554251018","SEIKO HK PAL Office 160 Anti SCR BC","PAL"],
+["2300555251017","SEIKO HK PAL Office 160 Anti SCR WH","PAL"],
+["2300556251016","SEIKO HK PAL Office 160 WH","PAL"],
+["2300808251016","SEIKO HK PAL Office 160 BC","PAL"],
+["2300809251015","SEIKO HK PAL Office 160 UV420","3K,PAL"],
+["2300557251015","SEIKO HK PAL Office 160 UV420 Anti SCR","3K,PAL"],
+["2300558251014","SEIKO HK PAL Office 160 UV420 Anti SCR WH","3K,PAL"],
+["2300559251013","SEIKO HK PAL Office 160 UV420 WH","3K,PAL"],
+["2300033216071","SEIKO HK PAL Office 160 Col 1","PAL"],
+["2300560251019","SEIKO HK PAL Office 160 Col 1 Anti SCR","PAL"],
+["2300561251018","SEIKO HK PAL Office 160 Col 1 Anti SCR BC","PAL"],
+["2300562251017","SEIKO HK PAL Office 160 Col 1 Anti SCR WH","PAL"],
+["2300563251016","SEIKO HK PAL Office 160 Col 1 BC","PAL"],
+["2300564251015","SEIKO HK PAL Office 160 Col 1 WH","PAL"],
+["2300565251014","SEIKO HK PAL Office 160 Col 2","PAL"],
+["2300566251013","SEIKO HK PAL Office 160 Col 2 Anti SCR","PAL"],
+["2300567251012","SEIKO HK PAL Office 160 Col 2 Anti SCR BC","PAL"],
+["2300568251011","SEIKO HK PAL Office 160 Col 2 Anti SCR WH","PAL"],
+["2300569251010","SEIKO HK PAL Office 160 Col 2 BC","PAL"],
+["2300570251016","SEIKO HK PAL Office 160 Col 2 WH","PAL"],
+["2300571251015","SEIKO HK PAL Office 167","PAL"],
+["2300572251014","SEIKO HK PAL Office 167 Anti SCR","PAL"],
+["2300573251013","SEIKO HK PAL Office 167 Anti SCR BC","PAL"],
+["2300574251012","SEIKO HK PAL Office 167 Anti SCR WH","PAL"],
+["2300575251011","SEIKO HK PAL Office 167 WH","PAL"],
+["2300810251011","SEIKO HK PAL Office 167 BC","PAL"],
+["2300811251010","SEIKO HK PAL Office 167 UV420","3K,PAL"],
+["2300576251010","SEIKO HK PAL Office 167 UV420 Anti SCR","3K,PAL"],
+["2300577251019","SEIKO HK PAL Office 167 UV420 Anti SCR WH","3K,PAL"],
+["2300578251018","SEIKO HK PAL Office 167 UV420 WH","3K,PAL"],
+["2300579251017","SEIKO HK PAL Office 167 Col 1","PAL"],
+["2300580251013","SEIKO HK PAL Office 167 Col 1 Anti SCR","PAL"],
+["2300581251012","SEIKO HK PAL Office 167 Col 1 Anti SCR BC","PAL"],
+["2300582251011","SEIKO HK PAL Office 167 Col 1 Anti SCR WH","PAL"],
+["2300583251010","SEIKO HK PAL Office 167 Col 1 BC","PAL"],
+["2300584251019","SEIKO HK PAL Office 167 Col 1 WH","PAL"],
+["2300585251018","SEIKO HK PAL Office 167 Col 2","PAL"],
+["2300586251017","SEIKO HK PAL Office 167 Col 2 Anti SCR","PAL"],
+["2300587251016","SEIKO HK PAL Office 167 Col 2 Anti SCR BC","PAL"],
+["2300588251015","SEIKO HK PAL Office 167 Col 2 Anti SCR WH","PAL"],
+["2300589251014","SEIKO HK PAL Office 167 Col 2 BC","PAL"],
+["2300590251010","SEIKO HK PAL Office 167 Col 2 WH","PAL"],
+["2300000520156","SEIKO HK PAL Regressive 160","PAL"],
+["2300591251019","SEIKO HK PAL Regressive 160 Anti SCR","PAL"],
+["2300592251018","SEIKO HK PAL Regressive 160 Anti SCR BC","PAL"],
+["2300593251017","SEIKO HK PAL Regressive 160 Anti SCR WH","PAL"],
+["2300594251016","SEIKO HK PAL Regressive 160 WH","PAL"],
+["2300812251019","SEIKO HK PAL Regressive 160 BC","PAL"],
+["2300813251018","SEIKO HK PAL Regressive 160 UV420","3K,PAL"],
+["2300595251015","SEIKO HK PAL Regressive 160 UV420 Anti SCR","3K,PAL"],
+["2300596251014","SEIKO HK PAL Regressive 160 UV420 Anti SCR WH","3K,PAL"],
+["2300597251013","SEIKO HK PAL Regressive 160 UV420 WH","3K,PAL"],
+["2300000820157","SEIKO HK PAL Regressive 160 Col 1","PAL"],
+["2300598251012","SEIKO HK PAL Regressive 160 Col 1 Anti SCR","PAL"],
+["2300599251011","SEIKO HK PAL Regressive 160 Col 1 Anti SCR BC","PAL"],
+["2300600251016","SEIKO HK PAL Regressive 160 Col 1 Anti SCR WH","PAL"],
+["2300601251015","SEIKO HK PAL Regressive 160 Col 1 BC","PAL"],
+["2300602251014","SEIKO HK PAL Regressive 160 Col 1 WH","PAL"],
+["2300603251013","SEIKO HK PAL Regressive 160 Col 2","PAL"],
+["2300604251012","SEIKO HK PAL Regressive 160 Col 2 Anti SCR","PAL"],
+["2300605251011","SEIKO HK PAL Regressive 160 Col 2 Anti SCR BC","PAL"],
+["2300606251010","SEIKO HK PAL Regressive 160 Col 2 Anti SCR WH","PAL"],
+["2300607251019","SEIKO HK PAL Regressive 160 Col 2 BC","PAL"],
+["2300608251018","SEIKO HK PAL Regressive 160 Col 2 WH","PAL"],
+["2300000720150","SEIKO HK PAL Regressive 167","PAL"],
+["2300609251017","SEIKO HK PAL Regressive 167 Anti SCR","PAL"],
+["2300610251013","SEIKO HK PAL Regressive 167 Anti SCR BC","PAL"],
+["2300611251012","SEIKO HK PAL Regressive 167 Anti SCR WH","PAL"],
+["2300612251011","SEIKO HK PAL Regressive 167 WH","PAL"],
+["2300814251017","SEIKO HK PAL Regressive 167 BC","PAL"],
+["2300815251016","SEIKO HK PAL Regressive 167 UV420","3K,PAL"],
+["2300613251010","SEIKO HK PAL Regressive 167 UV420 Anti SCR","3K,PAL"],
+["2300614251019","SEIKO HK PAL Regressive 167 UV420 Anti SCR WH","3K,PAL"],
+["2300615251018","SEIKO HK PAL Regressive 167 UV420 WH","3K,PAL"],
+["2300000620153","SEIKO HK PAL Regressive 167 Col 1","PAL"],
+["2300616251017","SEIKO HK PAL Regressive 167 Col 1 Anti SCR","PAL"],
+["2300617251016","SEIKO HK PAL Regressive 167 Col 1 Anti SCR BC","PAL"],
+["2300618251015","SEIKO HK PAL Regressive 167 Col 1 Anti SCR WH","PAL"],
+["2300619251014","SEIKO HK PAL Regressive 167 Col 1 BC","PAL"],
+["2300620251010","SEIKO HK PAL Regressive 167 Col 1 WH","PAL"],
+["2300621251019","SEIKO HK PAL Regressive 167 Col 2","PAL"],
+["2300622251018","SEIKO HK PAL Regressive 167 Col 2 Anti SCR","PAL"],
+["2300623251017","SEIKO HK PAL Regressive 167 Col 2 Anti SCR BC","PAL"],
+["2300624251016","SEIKO HK PAL Regressive 167 Col 2 Anti SCR WH","PAL"],
+["2300625251015","SEIKO HK PAL Regressive 167 Col 2 BC","PAL"],
+["2300626251014","SEIKO HK PAL Regressive 167 Col 2 WH","PAL"],
+["2300005200411","SEIKO HK PAL Relax 160","PAL"],
+["2300627251013","SEIKO HK PAL Relax 160 Anti SCR","PAL"],
+["2300628251012","SEIKO HK PAL Relax 160 Anti SCR BC","PAL"],
+["2300629251011","SEIKO HK PAL Relax 160 Anti SCR WH","PAL"],
+["2300630251017","SEIKO HK PAL Relax 160 WH","PAL"],
+["2300069231116","SEIKO HK PAL Relax 160 PH","變色,PAL"],
+["2300631251016","SEIKO HK PAL Relax 160 PH Anti SCR","變色,PAL"],
+["2300632251015","SEIKO HK PAL Relax 160 PH Anti SCR BC","變色,PAL"],
+["2300633251014","SEIKO HK PAL Relax 160 PH Anti SCR WH","變色,PAL"],
+["2300634251013","SEIKO HK PAL Relax 160 PH BC","變色,PAL"],
+["2300635251012","SEIKO HK PAL Relax 160 PH WH","變色,PAL"],
+["2300816251015","SEIKO HK PAL Relax 160 BC","PAL"],
+["2300817251014","SEIKO HK PAL Relax 160 UV420","3K,PAL"],
+["2300636251011","SEIKO HK PAL Relax 160 UV420 Anti SCR","3K,PAL"],
+["2300637251010","SEIKO HK PAL Relax 160 UV420 Anti SCR WH","3K,PAL"],
+["2300638251019","SEIKO HK PAL Relax 160 UV420 WH","3K,PAL"],
+["2300012200411","SEIKO HK PAL Relax 160 Col 1","PAL"],
+["2300639251018","SEIKO HK PAL Relax 160 Col 1 Anti SCR","PAL"],
+["2300640251014","SEIKO HK PAL Relax 160 Col 1 Anti SCR BC","PAL"],
+["2300641251013","SEIKO HK PAL Relax 160 Col 1 Anti SCR WH","PAL"],
+["2300642251012","SEIKO HK PAL Relax 160 Col 1 BC","PAL"],
+["2300643251011","SEIKO HK PAL Relax 160 Col 1 WH","PAL"],
+["2300644251010","SEIKO HK PAL Relax 160 Col 2","PAL"],
+["2300645251019","SEIKO HK PAL Relax 160 Col 2 Anti SCR","PAL"],
+["2300646251018","SEIKO HK PAL Relax 160 Col 2 Anti SCR BC","PAL"],
+["2300647251017","SEIKO HK PAL Relax 160 Col 2 Anti SCR WH","PAL"],
+["2300648251016","SEIKO HK PAL Relax 160 Col 2 BC","PAL"],
+["2300649251015","SEIKO HK PAL Relax 160 Col 2 WH","PAL"],
+["2300006200410","SEIKO HK PAL Relax 167","PAL"],
+["2300650251011","SEIKO HK PAL Relax 167 Anti SCR","PAL"],
+["2300651251010","SEIKO HK PAL Relax 167 Anti SCR BC","PAL"],
+["2300652251019","SEIKO HK PAL Relax 167 Anti SCR WH","PAL"],
+["2300653251018","SEIKO HK PAL Relax 167 WH","PAL"],
+["2300070231112","SEIKO HK PAL Relax 167 PH","變色,PAL"],
+["2300654251017","SEIKO HK PAL Relax 167 PH Anti SCR","變色,PAL"],
+["2300655251016","SEIKO HK PAL Relax 167 PH Anti SCR BC","變色,PAL"],
+["2300656251015","SEIKO HK PAL Relax 167 PH Anti SCR WH","變色,PAL"],
+["2300657251014","SEIKO HK PAL Relax 167 PH BC","變色,PAL"],
+["2300658251013","SEIKO HK PAL Relax 167 PH WH","變色,PAL"],
+["2300818251013","SEIKO HK PAL Relax 167 BC","PAL"],
+["2300819251012","SEIKO HK PAL Relax 167 UV420","3K,PAL"],
+["2300659251012","SEIKO HK PAL Relax 167 UV420 Anti SCR","3K,PAL"],
+["2300660251018","SEIKO HK PAL Relax 167 UV420 Anti SCR WH","3K,PAL"],
+["2300661251017","SEIKO HK PAL Relax 167 UV420 WH","3K,PAL"],
+["2300013200410","SEIKO HK PAL Relax 167 Col 1","PAL"],
+["2300662251016","SEIKO HK PAL Relax 167 Col 1 Anti SCR","PAL"],
+["2300663251015","SEIKO HK PAL Relax 167 Col 1 Anti SCR BC","PAL"],
+["2300664251014","SEIKO HK PAL Relax 167 Col 1 Anti SCR WH","PAL"],
+["2300665251013","SEIKO HK PAL Relax 167 Col 1 BC","PAL"],
+["2300666251012","SEIKO HK PAL Relax 167 Col 1 WH","PAL"],
+["2300667251011","SEIKO HK PAL Relax 167 Col 2","PAL"],
+["2300668251010","SEIKO HK PAL Relax 167 Col 2 Anti SCR","PAL"],
+["2300669251019","SEIKO HK PAL Relax 167 Col 2 Anti SCR BC","PAL"],
+["2300670251015","SEIKO HK PAL Relax 167 Col 2 Anti SCR WH","PAL"],
+["2300671251014","SEIKO HK PAL Relax 167 Col 2 BC","PAL"],
+["2300672251013","SEIKO HK PAL Relax 167 Col 2 WH","PAL"],
+["2300124260310","SEIKO HK PAL Advanced 160","PAL"],
+["2300125260319","SEIKO HK PAL Advanced 160 Anti SCR","PAL"],
+["2300126260318","SEIKO HK PAL Advanced 160 Anti SCR BC","PAL"],
+["2300127260317","SEIKO HK PAL Advanced 160 Anti SCR WH","PAL"],
+["2300128260316","SEIKO HK PAL Advanced 160 WH","PAL"],
+["2300129260315","SEIKO HK PAL Advanced 160 PH","變色,PAL"],
+["2300130260311","SEIKO HK PAL Advanced 160 PH Anti SCR","變色,PAL"],
+["2300131260310","SEIKO HK PAL Advanced 160 PH Anti SCR BC","變色,PAL"],
+["2300132260319","SEIKO HK PAL Advanced 160 PH Anti SCR WH","變色,PAL"],
+["2300133260318","SEIKO HK PAL Advanced 160 PH BC","變色,PAL"],
+["2300134260317","SEIKO HK PAL Advanced 160 PH WH","變色,PAL"],
+["2300135260316","SEIKO HK PAL Advanced 160 BC","PAL"],
+["2300136260315","SEIKO HK PAL Advanced 160 UV420","3K,PAL"],
+["2300137260314","SEIKO HK PAL Advanced 160 UV420 Anti SCR","3K,PAL"],
+["2300138260313","SEIKO HK PAL Advanced 160 UV420 Anti SCR WH","3K,PAL"],
+["2300139260312","SEIKO HK PAL Advanced 160 UV420 WH","3K,PAL"],
+["2300140260318","SEIKO HK PAL Advanced 160 Col 1","PAL"],
+["2300141260317","SEIKO HK PAL Advanced 160 Col 1 Anti SCR","PAL"],
+["2300142260316","SEIKO HK PAL Advanced 160 Col 1 Anti SCR BC","PAL"],
+["2300143260315","SEIKO HK PAL Advanced 160 Col 1 Anti SCR WH","PAL"],
+["2300144260314","SEIKO HK PAL Advanced 160 Col 1 BC","PAL"],
+["2300145260313","SEIKO HK PAL Advanced 160 Col 1 WH","PAL"],
+["2300146260312","SEIKO HK PAL Advanced 160 Col 2","PAL"],
+["2300147260311","SEIKO HK PAL Advanced 160 Col 2 Anti SCR","PAL"],
+["2300148260310","SEIKO HK PAL Advanced 160 Col 2 Anti SCR BC","PAL"],
+["2300149260319","SEIKO HK PAL Advanced 160 Col 2 Anti SCR WH","PAL"],
+["2300150260315","SEIKO HK PAL Advanced 160 Col 2 BC","PAL"],
+["2300151260314","SEIKO HK PAL Advanced 160 Col 2 WH","PAL"],
+["2300152260313","SEIKO HK PAL Advanced 167","PAL"],
+["2300153260312","SEIKO HK PAL Advanced 167 Anti SCR","PAL"],
+["2300154260311","SEIKO HK PAL Advanced 167 Anti SCR BC","PAL"],
+["2300155260310","SEIKO HK PAL Advanced 167 Anti SCR WH","PAL"],
+["2300156260319","SEIKO HK PAL Advanced 167 WH","PAL"],
+["2300157260318","SEIKO HK PAL Advanced 167 PH","變色,PAL"],
+["2300158260317","SEIKO HK PAL Advanced 167 PH Anti SCR","變色,PAL"],
+["2300159260316","SEIKO HK PAL Advanced 167 PH Anti SCR BC","變色,PAL"],
+["2300160260312","SEIKO HK PAL Advanced 167 PH Anti SCR WH","變色,PAL"],
+["2300161260311","SEIKO HK PAL Advanced 167 PH BC","變色,PAL"],
+["2300162260310","SEIKO HK PAL Advanced 167 PH WH","變色,PAL"],
+["2300163260319","SEIKO HK PAL Advanced 167 BC","PAL"],
+["2300164260318","SEIKO HK PAL Advanced 167 UV420","3K,PAL"],
+["2300165260317","SEIKO HK PAL Advanced 167 UV420 Anti SCR","3K,PAL"],
+["2300166260316","SEIKO HK PAL Advanced 167 UV420 Anti SCR WH","3K,PAL"],
+["2300167260315","SEIKO HK PAL Advanced 167 UV420 WH","3K,PAL"],
+["2300168260314","SEIKO HK PAL Advanced 167 Col 1","PAL"],
+["2300169260313","SEIKO HK PAL Advanced 167 Col 1 Anti SCR","PAL"],
+["2300170260319","SEIKO HK PAL Advanced 167 Col 1 Anti SCR BC","PAL"],
+["2300171260318","SEIKO HK PAL Advanced 167 Col 1 Anti SCR WH","PAL"],
+["2300172260317","SEIKO HK PAL Advanced 167 Col 1 BC","PAL"],
+["2300173260316","SEIKO HK PAL Advanced 167 Col 1 WH","PAL"],
+["2300174260315","SEIKO HK PAL Advanced 167 Col 2","PAL"],
+["2300175260314","SEIKO HK PAL Advanced 167 Col 2 Anti SCR","PAL"],
+["2300176260313","SEIKO HK PAL Advanced 167 Col 2 Anti SCR BC","PAL"],
+["2300177260312","SEIKO HK PAL Advanced 167 Col 2 Anti SCR WH","PAL"],
+["2300178260311","SEIKO HK PAL Advanced 167 Col 2 BC","PAL"],
+["2300179260310","SEIKO HK PAL Advanced 167 Col 2 WH","PAL"],
+["2300673251012","ZEISS HKZS FSV160 DVB","3K,蔡司"],
+["2300674251011","ZEISS HKZS FSV167 DVB","3K,蔡司"],
+["2300675251010","ZEISS HKZS FSV174 DVB","3K,蔡司"],
+["2300676251019","ZEISS HKZS PAL 3Dv 160 DVC","PAL,蔡司"],
+["2300677251018","ZEISS HKZS PAL 3Dv 167 DVC","PAL,蔡司"],
+["2300678251017","ZEISS HKZS PAL 3Dv 174 DVC","PAL,蔡司"],
+["2300680251012","ZEISS HKZS PAL 3Dv 160 DVP","PAL,蔡司"],
+["2300682251010","ZEISS HKZS PAL 3Dv 167 DVP","PAL,蔡司"],
+["2300684251018","ZEISS HKZS PAL 3Dv 174 DVP","PAL,蔡司"],
+["2300685251017","ZEISS HKZS PAL 3Dv 160 DVG","PAL,蔡司"],
+["2300686251016","ZEISS HKZS PAL 3Dv 167 DVG","PAL,蔡司"],
+["2300687251015","ZEISS HKZS PAL 3Dv 174 DVG","PAL,蔡司"],
+["2300688251014","ZEISS HKZS PAL 3Dv 160 BG DVP","3K,PAL,蔡司"],
+["2300690251019","ZEISS HKZS PAL 3Dv 167 BG DVP","3K,PAL,蔡司"],
+["2300692251017","ZEISS HKZS PAL 3Dv 174 BG DVP","3K,PAL,蔡司"],
+["2300694251015","ZEISS HKZS PAL 3Dv 160 PhotoF DVC","變色,PAL,蔡司"],
+["2300695251014","ZEISS HKZS PAL 3Dv 160 AptSun DVC","PAL,蔡司"],
+["2300697251012","ZEISS HKZS PAL 3Dv 167 PhotoF DVC","變色,PAL,蔡司"],
+["2300698251011","ZEISS HKZS PAL 3Dv 167 AptSun DVC","PAL,蔡司"],
+["2300700251015","ZEISS HKZS PAL 3Dv 174 PhotoF DVC","變色,PAL,蔡司"],
+["2300701251014","ZEISS HKZS PAL 3Dv 160 PhotoF DVP","變色,PAL,蔡司"],
+["2300703251012","ZEISS HKZS PAL 3Dv 160 AptSun DVP","PAL,蔡司"],
+["2300705251010","ZEISS HKZS PAL 3Dv 167 PhotoF DVP","變色,PAL,蔡司"],
+["2300707251018","ZEISS HKZS PAL 3Dv 167 AptSun DVP","PAL,蔡司"],
+["2300709251016","ZEISS HKZS PAL 3Dv 174 PhotoF DVP","變色,PAL,蔡司"],
+["2300711251011","ZEISS HKZS PAL 3Dv 160 PhotoF DVG","變色,PAL,蔡司"],
+["2300712251010","ZEISS HKZS PAL 3Dv 167 PhotoF DVG","變色,PAL,蔡司"],
+["2300713251019","ZEISS HKZS PAL 3Dv 174 PhotoF DVG","變色,PAL,蔡司"],
+["2300716251016","ZEISS HKZS PAL 3Dv 160 Pol DVP","PAL,蔡司"],
+["2300719251013","ZEISS HKZS PAL 3Dv 160 AptSun Pol DVP","PAL,蔡司"],
+["2300722251017","ZEISS HKZS PAL 3Dv 167 Pol DVP","PAL,蔡司"],
+["2300723251016","ZEISS HKZS PAL 3Dv 160 Pol DVG","PAL,蔡司"],
+["2300724251015","ZEISS HKZS PAL 3Dv 160 AptSun Pol DVG","PAL,蔡司"],
+["2300725251014","ZEISS HKZS PAL 3Dv 167 Pol DVG","PAL,蔡司"],
+["2300726251013","ZEISS HKZS PAL 3Dve 160 DVC","PAL,蔡司"],
+["2300727251012","ZEISS HKZS PAL 3Dve 167 DVC","PAL,蔡司"],
+["2300728251011","ZEISS HKZS PAL 3Dve 174 DVC","PAL,蔡司"],
+["2300730251016","ZEISS HKZS PAL 3Dve 160 DVP","PAL,蔡司"],
+["2300732251014","ZEISS HKZS PAL 3Dve 167 DVP","PAL,蔡司"],
+["2300734251012","ZEISS HKZS PAL 3Dve 174 DVP","PAL,蔡司"],
+["2300735251011","ZEISS HKZS PAL 3Dve 160 DVG","PAL,蔡司"],
+["2300736251010","ZEISS HKZS PAL 3Dve 167 DVG","PAL,蔡司"],
+["2300737251019","ZEISS HKZS PAL 3Dve 174 DVG","PAL,蔡司"],
+["2300738251018","ZEISS HKZS PAL 3Dve 160 BG DVP","3K,PAL,蔡司"],
+["2300740251013","ZEISS HKZS PAL 3Dve 167 BG DVP","3K,PAL,蔡司"],
+["2300742251011","ZEISS HKZS PAL 3Dve 174 BG DVP","3K,PAL,蔡司"],
+["2300744251019","ZEISS HKZS PAL 3Dve 160 PhotoF DVC","變色,PAL,蔡司"],
+["2300745251018","ZEISS HKZS PAL 3Dve 160 AptSun DVC","PAL,蔡司"],
+["2300747251016","ZEISS HKZS PAL 3Dve 167 PhotoF DVC","變色,PAL,蔡司"],
+["2300748251015","ZEISS HKZS PAL 3Dve 167 AptSun DVC","PAL,蔡司"],
+["2300750251010","ZEISS HKZS PAL 3Dve 174 PhotoF DVC","變色,PAL,蔡司"],
+["2300751251019","ZEISS HKZS PAL 3Dve 160 PhotoF DVP","變色,PAL,蔡司"],
+["2300753251017","ZEISS HKZS PAL 3Dve 160 AptSun DVP","PAL,蔡司"],
+["2300755251015","ZEISS HKZS PAL 3Dve 167 PhotoF DVP","變色,PAL,蔡司"],
+["2300757251013","ZEISS HKZS PAL 3Dve 167 AptSun DVP","PAL,蔡司"],
+["2300759251011","ZEISS HKZS PAL 3Dve 174 PhotoF DVP","變色,PAL,蔡司"],
+["2300761251016","ZEISS HKZS PAL 3Dve 160 PhotoF DVG","變色,PAL,蔡司"],
+["2300762251015","ZEISS HKZS PAL 3Dve 167 PhotoF DVG","變色,PAL,蔡司"],
+["2300763251014","ZEISS HKZS PAL 3Dve 174 PhotoF DVG","變色,PAL,蔡司"],
+["2300766251011","ZEISS HKZS PAL 3Dve 160 Pol DVP","PAL,蔡司"],
+["2300769251018","ZEISS HKZS PAL 3Dve 160 AptSun Pol DVP","PAL,蔡司"],
+["2300772251012","ZEISS HKZS PAL 3Dve 167 Pol DVP","PAL,蔡司"],
+["2300773251011","ZEISS HKZS PAL 3Dve 160 Pol DVG","PAL,蔡司"],
+["2300774251010","ZEISS HKZS PAL 3Dve 160 AptSun Pol DVG","PAL,蔡司"],
+["2300775251019","ZEISS HKZS PAL 3Dve 167 Pol DVG","PAL,蔡司"],
+["2300285250113","ZEISS HKZS PAL Relax 2D 160 DVP","PAL,蔡司"],
+["2300286250112","ZEISS HKZS PAL Relax 2D 167 DVP","PAL,蔡司"],
+["2300287250111","ZEISS HKZS PAL Relax 2D 174 DVP","PAL,蔡司"],
+["2300288250110","ZEISS HKZS PAL Relax 2D 160 BG DVP","3K,PAL,蔡司"],
+["2300289250119","ZEISS HKZS PAL Relax 2D 167 BG DVP","3K,PAL,蔡司"],
+["2300290250115","ZEISS HKZS PAL Relax 2D 174 BG DVP","3K,PAL,蔡司"],
+["2300291250114","ZEISS HKZS PAL Relax 2D 160 PhotoF DVP","變色,PAL,蔡司"],
+["2300292250113","ZEISS HKZS PAL Relax 2D 167 PhotoF DVP","變色,PAL,蔡司"],
+["2300293250112","ZEISS HKZS PAL Relax 2D 174 PhotoF DVP","變色,PAL,蔡司"],
+["2300330250112","ZEISS HKZS MC 150 DVKids","蔡司"],
+["2300332250110","ZEISS HKZS MC 160 DVKids","蔡司"],
+["2300333250119","ZEISS HKZS MC 167 DVKids","蔡司"],
+["2300334250118","ZEISS HKZS MCS 150 DVKids","蔡司"],
+["2300336250116","ZEISS HKZS MCS 160 DVKids","蔡司"],
+["2300337250115","ZEISS HKZS MCS 167 DVKids","蔡司"],
+["2300338250114","ZEISS HKZS MC 150 DVB","3K,蔡司"],
+["2300340250119","ZEISS HKZS MC 160 DVB","3K,蔡司"],
+["2300341250118","ZEISS HKZS MC 167 DVB","3K,蔡司"],
+["2300342250117","ZEISS HKZS MCS 150 DVB","3K,蔡司"],
+["2300344250115","ZEISS HKZS MCS 160 DVB","3K,蔡司"],
+["2300345250114","ZEISS HKZS MCS 167 DVB","3K,蔡司"],
+["2300346250113","ZEISS HKZS MC 150 DVP","蔡司"],
+["2300348250111","ZEISS HKZS MC 160 DVP","蔡司"],
+["2300349250110","ZEISS HKZS MC 167 DVP","蔡司"],
+["2300350250116","ZEISS HKZS MCS 150 DVP","蔡司"],
+["2300352250114","ZEISS HKZS MCS 160 DVP","蔡司"],
+["2300353250113","ZEISS HKZS MCS 167 DVP","蔡司"],
+["2300277250114","ZEISS HKZS CV 160 DVP","蔡司"],
+["2300278250113","ZEISS HKZS CV 167 DVP","蔡司"],
+["2300279250112","ZEISS HKZS CV 174 DVP","蔡司"],
+["2300280250118","ZEISS HKZS CV 160 BG DVP","3K,蔡司"],
+["2300281250117","ZEISS HKZS CV 167 BG DVP","3K,蔡司"],
+["2300282250116","ZEISS HKZS CV 174 BG DVP","3K,蔡司"],
+["2300283250115","ZEISS HKZS CV 160 PhotoF DVP","變色,蔡司"],
+["2300284250114","ZEISS HKZS CV 167 PhotoF DVP","變色,蔡司"],
+["2300052260314","ZEISS HKZS PAL 3D 160 DVC","PAL,蔡司"],
+["2300053260313","ZEISS HKZS PAL 3D 167 DVC","PAL,蔡司"],
+["2300054260312","ZEISS HKZS PAL 3D 174 DVC","PAL,蔡司"],
+["2300056260310","ZEISS HKZS PAL 3D 160 DVP","PAL,蔡司"],
+["2300058260318","ZEISS HKZS PAL 3D 167 DVP","PAL,蔡司"],
+["2300060260313","ZEISS HKZS PAL 3D 174 DVP","PAL,蔡司"],
+["2300061260312","ZEISS HKZS PAL 3D 160 DVG","PAL,蔡司"],
+["2300062260311","ZEISS HKZS PAL 3D 167 DVG","PAL,蔡司"],
+["2300063260310","ZEISS HKZS PAL 3D 174 DVG","PAL,蔡司"],
+["2300064260319","ZEISS HKZS PAL 3D 160 BG DVP","3K,PAL,蔡司"],
+["2300066260317","ZEISS HKZS PAL 3D 167 BG DVP","3K,PAL,蔡司"],
+["2300068260315","ZEISS HKZS PAL 3D 174 BG DVP","3K,PAL,蔡司"],
+["2300070260310","ZEISS HKZS PAL 3D 160 PhotoF DVC","變色,PAL,蔡司"],
+["2300071260319","ZEISS HKZS PAL 3D 160 AptSun DVC","PAL,蔡司"],
+["2300073260317","ZEISS HKZS PAL 3D 167 PhotoF DVC","變色,PAL,蔡司"],
+["2300074260316","ZEISS HKZS PAL 3D 167 AptSun DVC","PAL,蔡司"],
+["2300076260314","ZEISS HKZS PAL 3D 174 PhotoF DVC","變色,PAL,蔡司"],
+["2300077260313","ZEISS HKZS PAL 3D 160 PhotoF DVP","變色,PAL,蔡司"],
+["2300079260311","ZEISS HKZS PAL 3D 160 AptSun DVP","PAL,蔡司"],
+["2300081260316","ZEISS HKZS PAL 3D 167 PhotoF DVP","變色,PAL,蔡司"],
+["2300083260314","ZEISS HKZS PAL 3D 167 AptSun DVP","PAL,蔡司"],
+["2300085260312","ZEISS HKZS PAL 3D 174 PhotoF DVP","變色,PAL,蔡司"],
+["2300087260310","ZEISS HKZS PAL 3D 160 PhotoF DVG","變色,PAL,蔡司"],
+["2300088260319","ZEISS HKZS PAL 3D 167 PhotoF DVG","變色,PAL,蔡司"],
+["2300089260318","ZEISS HKZS PAL 3D 174 PhotoF DVG","變色,PAL,蔡司"],
+["2300092260312","ZEISS HKZS PAL 3D 160 Pol DVP","PAL,蔡司"],
+["2300095260319","ZEISS HKZS PAL 3D 160 AptSun Pol DVP","PAL,蔡司"],
+["2300098260316","ZEISS HKZS PAL 3D 167 Pol DVP","PAL,蔡司"],
+["2300099260315","ZEISS HKZS PAL 3D 160 Pol DVG","PAL,蔡司"],
+["2300100260310","ZEISS HKZS PAL 3D 160 AptSun Pol DVG","PAL,蔡司"],
+["2300101260319","ZEISS HKZS PAL 3D 167 Pol DVG","PAL,蔡司"],
+["2300164260615","ZEISS HKZS CV 160 DVC","蔡司"],
+["2300165260614","ZEISS HKZS CV 167 DVC","蔡司"],
+["2300166260613","ZEISS HKZS CV RX160 DVC","蔡司"],
+["2300167260612","ZEISS HKZS CV RX167 DVC","蔡司"],
+["2300168260611","ZEISS HKZS CV RX174 DVC","蔡司"],
+["2300169260610","ZEISS HKZS CV RX160 DVP","蔡司"],
+["2300170260616","ZEISS HKZS CV RX167 DVP","蔡司"],
+["2300171260615","ZEISS HKZS CV RX174 DVP","蔡司"],
+["2300172260614","ZEISS HKZS CV RX160 BG DVP","3K,蔡司"],
+["2300173260613","ZEISS HKZS CV RX167 BG DVP","3K,蔡司"],
+["2300174260612","ZEISS HKZS CV RX174 BG DVP","3K,蔡司"],
+["2300175260611","ZEISS HKZS CV RX160 PhotoF DVP","變色,蔡司"],
+["2300176260610","ZEISS HKZS CV RX167 PhotoF DVP","變色,蔡司"],
+["2300177260619","ZEISS HKZS CV RX174 PhotoF DVP","變色,蔡司"],
+["2300178260618","ZEISS HKZS CV RX160 AptSun DVP","蔡司"],
+["2300179260617","ZEISS HKZS CV RX167 AptSun DVP","蔡司"],
+["2300180260613","ZEISS HKZS CV RX160 Pol DVP","蔡司"],
+["2300181260612","ZEISS HKZS CV RX167 Pol DVP","蔡司"],
+["2300182260611","ZEISS HKZS CV RX160 AptSun Pol DVP","蔡司"],
+["2300183260610","ZEISS HKZS MA 159 DVKids","蔡司"],
+["2300184260619","ZEISS HKZS MA 159 DVP","蔡司"],
+["2300185260618","ZEISS HKZS MA 159 DVB","3K,蔡司"],
+    ];
+    function deriveStatCategories(name, cats) {
+        if (name.startsWith('ZEISS ')) return ['蔡司'];
+        let result = cats.split(',').filter(category => category !== '其他');
+        const upperName = name.toUpperCase();
+        if (/\bBC\b/.test(upperName) && !result.includes('3K')) result.push('3K');
+        const otherCount = [
+            upperName.includes('ANTI SCR'),
+            /\bWH\b/.test(upperName),
+            /\bCOL(?:\s|$)/.test(upperName),
+            /\bPOL\b/.test(upperName),
+            upperName.includes('MYOPIA CONTROL')
+        ].filter(Boolean).length;
+        if (otherCount > 0) {
+            result.push(...Array(otherCount).fill('其他'));
+        }
+        return result;
+    }
+    const statLensMap = Object.fromEntries(statLensRows.map(([code, name, cats]) => [
+        code,
+        { name, cats: deriveStatCategories(name, cats) }
+    ]));
+    const STAT_CATEGORIES = [
+        ['配件', '未登記的 2300 條碼', 'bg-orange-50 border-orange-200 text-orange-700'],
+        ['3K', '防藍光', 'bg-sky-50 border-sky-200 text-sky-700'],
+        ['變色', '調光／PhotoShade', 'bg-amber-50 border-amber-200 text-amber-700'],
+        ['DAS', '雙面非球面', 'bg-emerald-50 border-emerald-200 text-emerald-700'],
+        ['其他', '其餘鏡片種類', 'bg-slate-50 border-slate-200 text-slate-700'],
+        ['PAL', '漸進鏡片', 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'],
+        ['蔡司', 'ZEISS 鏡廠', 'bg-blue-50 border-blue-200 text-blue-700']
+    ];
+    let statsModeActive = false;
+    let dailyScans = [];
+
+    const colorStyles = {
+        "Pebble": { label: "Pebble (灰)", bg: "bg-slate-200 text-slate-800", active: "bg-slate-500 border-slate-700 text-white font-black ring-2 ring-slate-200" },
+        "Hojicha": { label: "Hojicha (棕)", bg: "bg-amber-100 text-amber-900", active: "bg-amber-600 border-amber-800 text-white font-black ring-2 ring-amber-100" },
+        "Matcha": { label: "Matcha (綠)", bg: "bg-emerald-100 text-emerald-900", active: "bg-emerald-600 border-emerald-800 text-white font-black ring-2 ring-emerald-100" },
+        "Indigo": { label: "Indigo (藍)", bg: "bg-sky-100 text-sky-800", active: "bg-sky-500 border-sky-700 text-white font-black ring-2 ring-sky-100" },
+        "Sakura": { label: "Sakura (粉)", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
+        "Lavender": { label: "Lavender (紫)", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" }
+    };
+    const colorCodeLetter = { "Pebble": "G", "Hojicha": "B", "Matcha": "R", "Indigo": "L", "Sakura": "N", "Lavender": "P" };
+
+    const tintedLensCodes = {
+        Stock: {
+            '1.6':  { ETC: 'FOD6ASFNUET', UV420_ETC: 'A16ASK3ETC', UTC: 'FOD6ASFNUUT', UV420_UTC: 'FOD6ASFN3UT' },
+            '1.67': { ETC: 'FOD7ASFNUET', UV420_ETC: 'A67ASK3ETC', UTC: 'FOD7ASFNUUT', UV420_UTC: 'FOD7ASFN3UT' }
+        },
+        RX: {
+            '1.6':  { ETC: 'RXA161ASUVETC', UV420_ETC: 'RXA16BASK3ETC', UTC: 'RXA16ASUVUTC', UV420_UTC: 'RXA16BASK3UTC' },
+            '1.67': { ETC: 'RXA167ASUVETC', UV420_ETC: 'RXA67BASK3ETC', UTC: 'RXA67ASUVUTC', UV420_UTC: 'RXA67BASK3UTC' }
+        }
+    };
+
+    const cheekLensCodes = {};
+    const cheekMap = { SV: ['XOD','ASBN',''], Progressive: ['POD','IDSN','11'], Premium: ['POD','ESSN','09'] };
+    for (const [ser, [pre, mid, sfx]] of Object.entries(cheekMap)) {
+        cheekLensCodes[ser] = {};
+        for (const idx of ['160','167']) {
+            const i = idx === '160' ? '6' : '7';
+            cheekLensCodes[ser][idx] = {};
+            for (const coat of ['ETC','UTC','UDC']) {
+                const c0 = coat[0], c1 = coat[1];
+                cheekLensCodes[ser][idx][coat] = `${pre}${i}${mid}U${c0}${c1}${sfx}`;
+                cheekLensCodes[ser][idx][`UV420_${coat}`] = `${pre}${i}${mid}3${c0}${c1}${sfx}`;
+            }
+        }
+    }
+    const cheekColorStyles = {
+        "Purple": { label: "紫色 Purple", bg: "bg-purple-100 text-purple-800", active: "bg-purple-500 border-purple-700 text-white font-black ring-2 ring-purple-100" },
+        "Peach":  { label: "蜜桃色 Peach", bg: "bg-rose-100 text-rose-800", active: "bg-rose-400 border-rose-600 text-white font-black ring-2 ring-rose-100" },
+        "Orange": { label: "橙色 Orange", bg: "bg-orange-100 text-orange-800", active: "bg-orange-500 border-orange-700 text-white font-black ring-2 ring-orange-100" }
+    };
+    const cheekColorCode = { "Purple": "HKPP10R", "Peach": "HKPE10R", "Orange": "HKOR10R" };
+
+    const svDB = {
+        '160': {
+            extCyl: { code: 'FOD6ASFNUHM', min: 225, max: 300 },
+            basicLow: { code: 'FOD6ASFNUET', max: 200 },
+            rx:     { code: 'RXA161ASUVETC', min: 300, hyperopeMin: 200 },
+            ph:     { code: 'FOD6ASFNGHM', max: 200 },
+            pol:    { colors: { '灰': 'RXA16BASPLGYETC', '茶': 'RXA16BASPLBRETC' } },
+            uv420: {
+                nonJpn: { low: 'A16ASK3ETC', high: 'RXA16BASK3ETC' },
+                jpn:    { low: 'FOD6ASFU3ET', high: 'XOD6ASBU3ET' }
+            }
+        },
+        '167': {
+            extCyl: { code: 'FOD7ASFNUET', min: 225, max: 300 },
+            basicLow: { code: 'FOD7ASFNUET', max: 200 },
+            rx:     { code: 'RXA167ASUVETC', min: 300, hyperopeMin: 200 },
+            uv420: {
+                nonJpn: { low: 'A67ASK3ETC', high: 'RXA67BASK3ETC' },
+                jpn:    { low: 'FOD7ASFU3ET', high: 'XOD7ASBU3ET' },
+                das:    { low: 'FOD7ASDU3ET', high: 'XOD7ASDU3ET' }
+            }
+        },
+        '174': {
+            extCyl: { code: 'FOD8ASFNUET', min: 225, max: 300 },
+            basicLow: { code: 'FOD8ASFNUET', max: 200 },
+            rx:     { code: 'RXA174ASUVETC', min: 300, hyperopeMin: 200 },
+            uv420: {
+                nonJpn: { all: 'RXA74BASU3ETC' },
+                jpn:    { low: 'FOD8ASFU3ET', high: 'XOD8ASBU3PE', disputed: true },
+                das:    { low: 'FOD8ASDU3ET', high: 'XOD8ASDU3ET' }
+            }
+        }
+    };
+
+    const palDB = {
+        '160': {
+            PremiumSteady: {
+                basic:    { '07': 'POD6ESSNUET07', '09': 'POD6ESSNUET09' },
+                uv420:    { '07': 'POD6ESSN3ET07', '09': 'POD6ESSN3ET09' },
+                uv420Jpn: { '07': 'POD6ESSU3ET07', '09': 'POD6ESSU3ET09' },
+                ph: { '灰': { '07': 'POD6ESSIGET07', '09': 'POD6ESSIGET09' }, '棕': { '07': 'POD6ESSIBET07', '09': 'POD6ESSIBET09' } }
+            },
+            ProgressiveID: {
+                uv420:    { '09': 'A16K3IDS9ETC', '11': 'A16K3IDS11ETC' },
+                uv420Jpn: { '09': 'POD6IDSU3ET09', '11': 'POD6IDSU3ET11' }
+            }
+        },
+        '167': {
+            PremiumSteady: {
+                basic:    { '07': 'POD7ESSNUET07', '09': 'POD7ESSNUET09' },
+                uv420:    { '07': 'POD7ESSN3ET07', '09': 'POD7ESSN3ET09' },
+                uv420Jpn: { '07': 'POD7ESSU3ET07', '09': 'POD7ESSU3ET09' },
+                ph: { '灰': { '07': 'POD7ESSIGET07', '09': 'POD7ESSIGET09' }, '棕': { '07': 'POD7ESSIBET07', '09': 'POD7ESSIBET09' } }
+            },
+            ProgressiveID: {
+                uv420:    { '09': 'A67K3IDS9ETC', '11': 'A67K3IDS11ETC' },
+                uv420Jpn: { '09': 'POD7IDSU3ET09', '11': 'POD7IDSU3ET11' }
+            }
+        },
+        '174': {
+            PremiumSteady: {
+                basic:    { '07': 'POD8ESSNUET07', '09': 'POD8ESSNUET09' },
+                uv420Jpn: { '07': 'POD8ESSU3ET07', '09': 'POD8ESSU3ET09' }
+            }
+        }
+    };
+
+    const myDB = {
+        '160': { basic: 'POD6MYLNUET', uv420: 'POD6MYLN3ET', ph: { '灰': 'POD6MYLIGET', '棕': 'POD6MYLIBET' } },
+        '167': { basic: 'POD7MYLNUET', uv420: 'POD7MYLN3ET', ph: { '灰': 'POD7MYLIGET', '棕': 'POD7MYLIBET' } }
+    };
+
+    const PS_STOCK_COLORS = ['Pebble', 'Hojicha'];
+
+    const stepOrder = [
+        'index', 'category', 'feature', 'myFeature', 'jpn', 'das', 'color', 'astigBand', 'palDesign', 'corridor',
+        'psDesign', 'psCoating', 'psColor', 'psRxPower',
+        'tCoatingBase', 'tColor',
+        'ccDesign', 'ccCoating', 'ccColor'
+    ];
+    let state = {
+        category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
+        color: null, astigBand: null, corridor: null, palDesign: null, hyperope: false,
+        psDesign: null, psColor: null, psCoating: null, psRxPower: null,
+        tCoatingBase: null, tColor: null,
+        ccDesign: null, ccCoating: null, ccColor: null, directCode: null
+    };
+
+    function resetState() {
+        state = {
+            category: null, index: null, feature: null, myFeature: null, jpn: null, das: null,
+            color: null, astigBand: null, palDesign: null, corridor: null, hyperope: false,
+            psDesign: null, psCoating: null, psColor: null, psRxPower: null,
+            tCoatingBase: null, tColor: null,
+            ccDesign: null, ccCoating: null, ccColor: null, directCode: null
+        };
+    }
+
+    // 掃描 Jan code 後，自動推導依賴字段
+    function autoFillDerivedFields() {
+        // 染色鏡片：從 tSupply 推導 astigBand
+        if (state.feature === 'tinted' && !state.astigBand && state.tSupply) {
+            state.astigBand = state.tSupply === 'Stock' ? 'low' : 'high';
+        }
+        // PhotoShade ETC：掃描庫存／訂製 JAN code 時自動推導度數類型
+        if (state.feature === 'ps' && state.category === 'SV' && state.psSupply) {
+            state.psRxPower = state.psSupply === 'RX' ? 'yes' : 'no';
+        }
+        // PAL：如果預填了 corridor 但沒有 palDesign，默認 PremiumSteady
+        if (state.category === 'PAL' && state.corridor && !state.palDesign && state.index !== '174') {
+            state.palDesign = 'PremiumSteady';
+        }
+        if (state.feature === 'cheek' && state.ccUv420) {
+            state.ccCoating = (state.ccCoating || 'ETC').startsWith('UV420_') ? state.ccCoating : 'UV420_' + (state.ccCoating || 'ETC');
+            state.ccUv420 = false;
+        }
+    }
+
+    function setState(field, value) {
+        const i = stepOrder.indexOf(field);
+        state.directCode = null;
+        state[field] = value;
+        for (let k = i + 1; k < stepOrder.length; k++) state[stepOrder[k]] = null;
+        if (field === 'index' || field === 'category') state.hyperope = false;
+        render();
+    }
+    function onHyperopeToggle() { state.hyperope = !state.hyperope; render(); }
+    function idxShort(index) { return index === '160' ? '6' : '7'; }
+    function idxDot(index) { return index === '160' ? '1.6' : '1.67'; }
+
+    function scanJanCode() {
+        const input = document.getElementById('janInput');
+        const code = input.value.trim();
+        if (!code) return;
+        const item = janCodeMap[code];
+        if (!item) {
+            alert('找不到此 Jan code：' + code + '\n請確認條碼正確或改用手動選擇。');
+            return;
+        }
+        resetState();
+        Object.assign(state, item.params);
+        autoFillDerivedFields();
+        state.janScanned = true;
+        state.janName = item.name;
+        state.janCode = code;
+        input.value = '';
+        document.getElementById('janScanInfo').classList.remove('hidden');
+        document.getElementById('janScanName').textContent = item.name;
+        document.getElementById('janScanCode').textContent = code;
+        render();
+    }
+
+    function clearJanScan() {
+        resetState();
+        document.getElementById('janScanInfo').classList.add('hidden');
+        document.getElementById('janScanName').textContent = '';
+        document.getElementById('janScanCode').textContent = '';
+        render();
+    }
+
+    function localDateKey() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function statsStorageKey() { return 'hko-lens-stats-' + localDateKey(); }
+    function loadDailyStats() {
+        try { dailyScans = JSON.parse(localStorage.getItem(statsStorageKey()) || '[]'); }
+        catch (_) { dailyScans = []; }
+        if (!Array.isArray(dailyScans)) dailyScans = [];
+        dailyScans = dailyScans.map(scan => {
+            const current = statLensMap[scan.code];
+            if (current) return { ...scan, name: current.name, cats: current.cats };
+            if (scan.code?.startsWith('2300')) return { ...scan, name: '配件', cats: ['配件'] };
+            return scan;
+        });
+        saveDailyStats();
+    }
+    function saveDailyStats() {
+        try { localStorage.setItem(statsStorageKey(), JSON.stringify(dailyScans)); } catch (_) {}
+    }
+    function toggleStatsMode() {
+        statsModeActive = !statsModeActive;
+        document.getElementById('lookupMode').classList.toggle('hidden', statsModeActive);
+        document.getElementById('statsMode').classList.toggle('hidden', !statsModeActive);
+        document.getElementById('pageTitle').textContent = statsModeActive ? 'HKO 鏡片種類統計' : 'HKO 鏡片代碼查詢系統';
+        const btn = document.getElementById('modeToggle');
+        btn.textContent = statsModeActive ? '×' : '+';
+        btn.setAttribute('aria-label', statsModeActive ? '返回鏡片代碼查詢' : '進入鏡片種類統計模式');
+        if (statsModeActive) {
+            loadDailyStats();
+            renderDailyStats();
+            setTimeout(() => document.getElementById('statsJanInput').focus(), 0);
+        } else {
+            setTimeout(() => document.getElementById('janInput').focus(), 0);
+        }
+    }
+    function showStatsMessage(message, ok) {
+        const el = document.getElementById('statsMessage');
+        el.textContent = message;
+        el.className = 'mt-2 text-sm font-semibold rounded-lg px-2.5 py-2 ' +
+            (ok ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700');
+    }
+    function countJanCode() {
+        const input = document.getElementById('statsJanInput');
+        const code = input.value.trim();
+        if (!code) return;
+        const item = statLensMap[code] || (code.startsWith('2300') ? { name: '配件', cats: ['配件'] } : null);
+        if (!item) {
+            showStatsMessage('找不到此 JAN code：' + code + '。請核對條碼。', false);
+            input.select();
+            return;
+        }
+        dailyScans.push({ code, name: item.name, cats: item.cats, at: new Date().toISOString() });
+        saveDailyStats();
+        renderDailyStats();
+        showStatsMessage('已加入：' + item.name + '（' + item.cats.join('、') + '）', true);
+        input.value = '';
+        input.focus();
+        document.getElementById('mainCard').scrollTop = 0;
+    }
+    function renderDailyStats() {
+        const counts = Object.fromEntries(STAT_CATEGORIES.map(([key]) => [key, 0]));
+        dailyScans.forEach(scan => (scan.cats || []).forEach(cat => { if (cat in counts) counts[cat]++; }));
+        document.getElementById('statsDate').textContent = new Intl.DateTimeFormat('zh-HK', { dateStyle: 'full' }).format(new Date());
+        document.getElementById('scanTotal').textContent = dailyScans.length + ' 片';
+        document.getElementById('statsGrid').innerHTML = STAT_CATEGORIES.map(([key, desc, cls]) =>
+            '<div class="border rounded-xl p-3 text-center ' + cls + '"><p class="text-xs font-bold opacity-70">' + desc +
+            '</p><p class="text-3xl font-black mt-1">' + counts[key] + '</p><p class="font-extrabold">' + key + '</p></div>'
+        ).join('');
+        const recent = dailyScans.slice().reverse();
+        document.getElementById('scanHistory').innerHTML = recent.length ? recent.map(scan =>
+            '<div class="bg-white border border-slate-200 rounded-lg px-2.5 py-2"><div class="flex justify-between gap-2"><span class="font-semibold truncate">' +
+            escapeHtml(scan.name) + '</span><span class="font-mono text-xs text-slate-400 shrink-0">' + escapeHtml(scan.code) +
+            '</span></div><p class="text-xs text-violet-600 mt-0.5">' + (scan.cats || []).map(escapeHtml).join(' · ') + '</p></div>'
+        ).join('') : '<p class="text-center text-slate-400 py-3">尚未掃描鏡片</p>';
+        document.getElementById('undoBtn').disabled = !dailyScans.length;
+    }
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function undoLastScan() {
+        if (!dailyScans.length) return;
+        const removed = dailyScans.pop();
+        saveDailyStats();
+        renderDailyStats();
+        showStatsMessage('已撤銷：' + removed.name, true);
+        document.getElementById('statsJanInput').focus();
+    }
+    function resetDailyStats() {
+        if (!dailyScans.length) return;
+        if (!confirm('確定清除今日全部統計？此操作不能復原。')) return;
+        dailyScans = [];
+        saveDailyStats();
+        renderDailyStats();
+        showStatsMessage('今日統計已清除。', true);
+    }
+
+    function mkBtn(txt, onclk, act) {
+        return `<button type="button" onclick="${onclk}" class="${act ? A_CLS : I_CLS}">${txt}</button>`;
+    }
+    function gridBtns(field, opts, cur, cols) {
+        const c = { 2: 'grid-cols-2', 3: 'grid-cols-3', 6: 'grid-cols-3 sm:grid-cols-6' }[cols] || 'grid-cols-2';
+        return `<div class="grid ${c} gap-1.5">${opts.map(([v, l]) => mkBtn(l, `setState('${field}','${v}')`, cur === v)).join('')}</div>`;
+    }
+    function stepLbl(n, t) { return `<label class="block font-bold text-slate-700 mb-1 text-sm mt-2.5">${n}. ${t}</label>`; }
+
+    function colorSwatch(field, colors, current, stylesMap) {
+        const sm = stylesMap || colorStyles;
+        return `<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">` + colors.map(c => {
+            const s = sm[c];
+            const cls = current === c
+                ? `p-2 border rounded-lg text-center shadow-md transition cursor-pointer ${s.active}`
+                : `p-2 border border-slate-200 rounded-lg text-center font-semibold transition cursor-pointer ${s.bg} hover:brightness-95`;
+            return `<button type="button" onclick="setState('${field}','${c}')" class="${cls}">${s.label}</button>`;
+        }).join('') + `</div>`;
+    }
+
+    function tintedCoatingGroup(cur) {
+        return `<div class="grid grid-cols-2 gap-1.5">` +
+            mkBtn('基本 (ETC)', "setState('tCoatingBase','ETC')", cur === 'ETC') +
+            mkBtn('UV420', "setState('tCoatingBase','UV420_ETC')", cur === 'UV420_ETC') +
+            mkBtn('抗刮 (UTC)', "setState('tCoatingBase','UTC')", cur === 'UTC') +
+            mkBtn('UV420 + 抗刮', "setState('tCoatingBase','UV420_UTC')", cur === 'UV420_UTC') +
+        `</div>`;
+    }
+    function cheekCoatingGroup(cur) {
+        return `<div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">` +
+            mkBtn('基本', "setState('ccCoating','ETC')", cur === 'ETC') +
+            mkBtn('抗刮', "setState('ccCoating','UTC')", cur === 'UTC') +
+            mkBtn('抗刮 + 超透光', "setState('ccCoating','UDC')", cur === 'UDC') +
+            mkBtn('UV420', "setState('ccCoating','UV420_ETC')", cur === 'UV420_ETC') +
+            mkBtn('UV420 + 抗刮', "setState('ccCoating','UV420_UTC')", cur === 'UV420_UTC') +
+            mkBtn('UV420 + 抗刮 + 超透光', "setState('ccCoating','UV420_UDC')", cur === 'UV420_UDC') +
+        `</div>`;
+    }
+
+    function render() {
+        const c = document.getElementById('stepsContainer');
+        let h = '', n = 1;
+        const need = (f) => { if (!state[f]) { c.innerHTML = h; hideResult(); return true; } return false; };
+
+        h += stepLbl(n++, '折射率 (Index)');
+        h += gridBtns('index', [['160', '1.60'], ['167', '1.67'], ['174', '1.74']], state.index, 2);
+        if (need('index')) return;
+
+        h += stepLbl(n++, '鏡片系列');
+        h += gridBtns('category', [['SV', '單光 SV'], ['PAL', '漸進 PAL']], state.category, 2);
+        if (need('category')) return;
+
+        let fopts = [['basic', '基本'], ['uv420', 'UV420']];
+        if (state.index !== '174') fopts.push(['ps', 'PhotoShade'], ['cheek', '腮紅鏡片']);
+        if (state.category === 'SV' && state.index !== '174') fopts.push(['tinted', '染色鏡片']);
+        if ((state.category === 'SV' && state.index === '160') || (state.category === 'PAL' && state.index !== '174')) fopts.push(['ph', 'PH 變色']);
+        if (state.category === 'SV' && state.index !== '174') fopts.push(['myopia', '近視控制']);
+        if (state.category === 'SV' && state.index === '160') fopts.push(['pol', 'POL 偏光']);
+        h += stepLbl(n++, '鏡片特性');
+        h += gridBtns('feature', fopts, state.feature, 2);
+        if (need('feature')) return;
+
+        if (state.category === 'SV' && state.feature !== 'ps' && state.feature !== 'tinted') {
+            if (state.feature === 'myopia') {
+                h += stepLbl(n++, '近視控制 - 鏡片特性');
+                h += gridBtns('myFeature', [['basic', '基本'], ['uv420', 'UV420 防藍光'], ['ph', 'PH 變色']], state.myFeature, 2);
+                if (need('myFeature')) return;
+                if (state.myFeature === 'ph') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['棕', '棕色']], state.color, 2); if (need('color')) return; }
+            } else {
+                if (state.feature === 'uv420') {
+                    h += stepLbl(n++, '是否日本製 (JPN)');
+                    h += gridBtns('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn, 2);
+                    if (need('jpn')) return;
+                    if (state.jpn === 'yes' && (state.index === '167' || state.index === '174')) {
+                        h += stepLbl(n++, '是否雙非球面 (DAS)');
+                        h += gridBtns('das', [['no', '否'], ['yes', '是']], state.das, 2);
+                        if (need('das')) return;
+                    }
+                }
+                if (state.feature === 'pol') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['茶', '茶色']], state.color, 2); if (need('color')) return; }
+
+                const skip174 = (state.feature === 'uv420' && state.jpn === 'no' && state.index === '174');
+                const needAstig = (state.feature === 'basic') || (state.feature === 'uv420' && !skip174);
+                if (needAstig) {
+                    h += stepLbl(n++, '散光度數');
+                    if (state.feature === 'basic') {
+                        h += gridBtns('astigBand', [['low', '-200度或以下'], ['mid', '-225至-300度'], ['high', '-325或以上']], state.astigBand, 3);
+                        h += `<label class="flex items-center gap-2 mt-1.5 text-sm text-slate-600 cursor-pointer"><input type="checkbox" ${state.hyperope ? 'checked' : ''} onchange="onHyperopeToggle()" class="w-4 h-4"/>處方同時有遠視 (Plus 度數)</label>`;
+                    } else {
+                        h += gridBtns('astigBand', [['low', '-200度或以下'], ['high', '-225或以上']], state.astigBand, 2);
+                    }
+                    if (need('astigBand')) return;
+                }
+            }
+        }
+
+        if (state.category === 'PAL' && state.feature !== 'ps' && state.feature !== 'cheek') {
+            if (state.feature === 'ph') { h += stepLbl(n++, '顏色'); h += gridBtns('color', [['灰', '灰色'], ['棕', '棕色']], state.color, 2); if (need('color')) return; }
+            if (state.feature === 'uv420' && state.index !== '174') { h += stepLbl(n++, '是否日本製 (JPN)'); h += gridBtns('jpn', [['no', '否 (一般)'], ['yes', '是 (日本製)']], state.jpn, 2); if (need('jpn')) return; }
+
+            if (state.index !== '174' && state.feature === 'uv420') {
+                h += stepLbl(n++, '漸進設計');
+                h += gridBtns('palDesign', [['PremiumSteady', 'Premium Steady'], ['ProgressiveID', 'Progressive ID']], state.palDesign, 2);
+                if (need('palDesign')) return;
+            }
+
+            h += stepLbl(n++, '漸進走廊 (Corridor)');
+            const corridorOpts = (state.palDesign === 'ProgressiveID')
+                ? [['09', '09'], ['11', '11']]
+                : [['07', '07'], ['09', '09']];
+            h += gridBtns('corridor', corridorOpts, state.corridor, 2);
+            if (need('corridor')) return;
+        }
+
+        if (state.feature === 'ps') {
+            if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('psDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.psDesign, 2); if (need('psDesign')) return; }
+
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += gridBtns('psCoating', [
+                ['ETC', 'ETC (基本 HMC 鍍膜)'],
+                ['UTC', 'UTC (SRC 強化抗刮)'],
+                ['UDC', 'UDC (SRC WH 低反光強化抗刮)']
+            ], state.psCoating, 2);
+            if (need('psCoating')) return;
+
+            h += stepLbl(n++, '選擇變色色彩');
+            const pCols = (state.psSupply === 'Stock') ? ['Pebble', 'Hojicha'] : ['Pebble', 'Hojicha', 'Matcha', 'Indigo', 'Sakura', 'Lavender'];
+            h += colorSwatch('psColor', pCols, state.psColor);
+            if (need('psColor')) return;
+            if (state.category === 'SV' && state.psCoating === 'ETC' && PS_STOCK_COLORS.includes(state.psColor)) {
+                h += stepLbl(n++, '是否正鏡或散光225度或以上？');
+                h += gridBtns('psRxPower', [['no', '否'], ['yes', '是']], state.psRxPower, 2);
+                if (need('psRxPower')) return;
+            }
+        }
+
+        if (state.feature === 'cheek') {
+            if (state.category === 'PAL') { h += stepLbl(n++, '漸進系列設計'); h += gridBtns('ccDesign', [['Progressive', 'Progressive'], ['Premium', 'Premium Steady']], state.ccDesign, 2); if (need('ccDesign')) return; }
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += cheekCoatingGroup(state.ccCoating);
+            if (need('ccCoating')) return;
+            h += stepLbl(n++, '腮紅顏色');
+            h += colorSwatch('ccColor', ['Purple', 'Peach', 'Orange'], state.ccColor, cheekColorStyles);
+            if (need('ccColor')) return;
+        }
+
+        if (state.feature === 'tinted') {
+            h += stepLbl(n++, '是否正鏡或散光225度或以上？');
+            h += gridBtns('astigBand', [['low', '否'], ['high', '是']], state.astigBand, 2);
+            if (need('astigBand')) return;
+
+            h += stepLbl(n++, '鍍膜 (Coating)');
+            h += tintedCoatingGroup(state.tCoatingBase);
+            if (need('tCoatingBase')) return;
+
+        }
+
+        c.innerHTML = h;
+        renderResult();
+    }
+
+    function computeResult() {
+        const { category, feature } = state;
+        if (state.directCode) return { code: state.directCode, note: 'T8 調光變色' };
+        if (feature === 'ps') return computePS();
+        if (feature === 'tinted') return computeT();
+        if (feature === 'cheek') return computeCC();
+        if (category === 'SV') return computeSV();
+        if (category === 'PAL') return computePAL();
+        return null;
+    }
+
+    function computeSV() {
+        const { index, feature, astigBand, hyperope, jpn, das, color } = state;
+        const db = svDB[index];
+        if (feature === 'myopia') return computeMY();
+        if (feature === 'ph') return { code: db.ph.code, note: '散光-200或以下 (PH 灰)' };
+        if (feature === 'pol') return color ? { code: db.pol.colors[color], note: 'POL 偏光 ' + color + '色' } : { status: 'need_color' };
+        if (feature === 'basic') {
+            if (!astigBand) return { status: 'need_astig' };
+            if (astigBand === 'mid') return { code: db.extCyl.code, note: `左右眼散光在 ${db.extCyl.min}-${db.extCyl.max} 內` };
+            if (astigBand === 'low') return hyperope ? { code: db.rx.code, note: `遠視+散光 ${db.rx.hyperopeMin} 以上` } : { code: db.basicLow.code, note: '散光-200或以下' };
+            return { code: db.rx.code, note: `散光 ${db.rx.min} 以上` };
+        }
+        if (feature === 'uv420') {
+            if (!jpn) return { status: 'need_jpn' };
+            if (jpn === 'no') {
+                if (index === '174') return { code: db.uv420.nonJpn.all, note: '所有散光度數同一編號' };
+                if (!astigBand) return { status: 'need_astig' };
+                return astigBand === 'low' ? { code: db.uv420.nonJpn.low, note: '散光-200或以下' } : { code: db.uv420.nonJpn.high, note: '散光-225或以上' };
+            }
+            const da = (index === '167' || index === '174');
+            if (da && !das) return { status: 'need_das' };
+            const br = (da && das === 'yes') ? db.uv420.das : db.uv420.jpn;
+            if (!astigBand) return { status: 'need_astig' };
+            if (astigBand === 'low') return { code: br.low, note: '散光-200或以下' };
+            return { code: br.high, note: '散光-225或以上', warn: br.disputed ? '⚠ 資料來源有分歧 (PE/RE)，請人手核對' : null };
+        }
+        return null;
+    }
+
+    function computePAL() {
+        const { index, feature, jpn, color, corridor, palDesign } = state;
+        const db = palDB[index];
+        let design = palDesign || 'PremiumSteady';
+        if (feature !== 'uv420') design = 'PremiumSteady';
+        const designData = db[design];
+        if (!designData) return { status: 'no_match', note: '此設計暫不支援' };
+        let base = null;
+        if (feature === 'basic') base = designData.basic;
+        else if (feature === 'uv420') {
+            if (index === '174') base = designData.uv420Jpn;
+            else base = jpn === 'yes' ? designData.uv420Jpn : designData.uv420;
+        }
+        else if (feature === 'ph') base = designData.ph?.[color];
+        if (!base) return { status: 'no_match', note: '此設計未有此特性嘅編號' };
+        if (!corridor) return null;
+        return { code: base[corridor], note: corridor + ' 走廊' };
+    }
+
+    function computeMY() {
+        const { index, myFeature, color } = state;
+        const db = myDB[index];
+        if (!db) return { status: 'no_match', note: '此折射率未有近視控制編號' };
+        if (!myFeature) return { status: 'need_astig' };
+        if (myFeature === 'basic') return { code: db.basic };
+        if (myFeature === 'uv420') return { code: db.uv420 };
+        if (myFeature === 'ph') return color ? { code: db.ph[color] } : { status: 'need_color' };
+        return null;
+    }
+
+    function computePS() {
+        const { index, category, psDesign, psColor, psCoating, psSupply, psRxPower } = state;
+        if (category === 'PAL' && !psDesign) return { status: 'need_design' };
+        if (!psColor) return { status: 'need_color' };
+        if (!psCoating) return { status: 'need_coating' };
+        const cL = colorCodeLetter[psColor];
+        const iS = idxShort(index);
+        const needsRxPower = psRxPower === 'yes' || psSupply === 'RX';
+        const isStock = category === 'SV' && psCoating === 'ETC' && !needsRxPower &&
+            (psSupply === 'Stock' || (!psSupply && PS_STOCK_COLORS.includes(psColor)));
+        if (category === 'SV') {
+            if (isStock) return { code: `FOD${iS}ASF3${cL}ET`, note: '庫存 (Stock)' };
+            const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
+            return { code: `XOD${iS}ASB3${cL}${cs}`, note: '訂製 (RX)' };
+        }
+        const dC = psDesign === 'Progressive' ? 'IDS3' : 'ESS3';
+        const sfx = psDesign === 'Progressive' ? '11' : '09';
+        const cs = psCoating === 'ETC' ? 'ET' : (psCoating === 'UTC' ? 'UT' : 'UD');
+        return { code: `POD${iS}${dC}${cL}${cs}${sfx}`, note: '訂製 (RX)' };
+    }
+
+    function computeT() {
+        const { astigBand, tCoatingBase, index } = state;
+        if (!astigBand && !state.tSupply) return { status: 'need_astig' };
+        const tSupply = state.tSupply || (astigBand === 'low' ? 'Stock' : 'RX');
+        if (!tCoatingBase) return { status: 'need_coating' };
+        return { code: tintedLensCodes[tSupply][idxDot(index)][tCoatingBase] };
+    }
+
+    function computeCC() {
+        const { index, category, ccDesign, ccCoating, ccColor } = state;
+        let tbl;
+        if (category === 'SV') tbl = cheekLensCodes.SV[index];
+        else { if (!ccDesign) return { status: 'need_design' }; tbl = cheekLensCodes[ccDesign][index]; }
+        if (!ccCoating) return { status: 'need_coating' };
+        if (!ccColor) return { status: 'need_color' };
+        const key = ccCoating;
+        const code = tbl?.[key];
+        if (!code) return { status: 'no_match', note: '此組合暫未有對應編號，請人手核對' };
+        return { code, colorCode: cheekColorCode[ccColor], kind: 'cheek' };
+    }
+
+    const PROMPT_MAP = {
+        need_astig: '請先選擇散光度數', need_color: '請先選擇顏色', need_jpn: '請先選擇是否日本製',
+        need_das: '請先選擇是否雙非球面', need_supply: '請先選擇供應類型',
+        need_design: '請先選擇漸進系列設計', need_coating: '請先選擇鍍膜'
+    };
+
+    function renderResult() {
+        if (!state.category || !state.index || !state.feature) { hideResult(); return; }
+        const res = computeResult();
+        if (!res) { hideResult(); return; }
+        if (res.status && PROMPT_MAP[res.status]) { showPrompt(PROMPT_MAP[res.status]); return; }
+        if (res.status === 'no_match') { showPrompt(res.note || '此度數暫未有對應編號，請人手核對'); return; }
+        if (res.kind === 'tinted') { showTinted(res.code, res.colorCode, 'HKO 顏色代碼'); return; }
+        if (res.kind === 'cheek') { showTinted(res.code, res.colorCode, '腮紅色代碼'); return; }
+        if (res.code) showResult(res.code, res.note, res.warn);
+        else hideResult();
+    }
+
+    function setResultMode(mode) {
+        document.getElementById('resultSingleWrapper').classList.toggle('hidden', mode !== 'single');
+        document.getElementById('resultTintedWrapper').classList.toggle('hidden', mode !== 'tinted');
+    }
+    function showResult(code, note, warn) {
+        setResultMode('single');
+        document.getElementById('resultLabel').textContent = '對應 HKO 鏡片編號';
+        document.getElementById('resultCode').textContent = code;
+        document.getElementById('resultNote').textContent = (note || '') + (warn ? '　' + warn : '');
+        resetCopyBtn();
+        document.getElementById('resultBox').classList.remove('hidden');
+    }
+    function showTinted(lens, color, label) {
+        setResultMode('tinted');
+        document.getElementById('resultLensCode').textContent = lens;
+        document.getElementById('resultColorCode').textContent = color;
+        document.getElementById('resultColorLabel').textContent = label;
+        document.getElementById('resultNote').textContent = '';
+        resetCopyBtn();
+        document.getElementById('resultBox').classList.remove('hidden');
+    }
+    function showPrompt(msg) {
+        setResultMode('single');
+        document.getElementById('resultLabel').textContent = msg;
+        document.getElementById('resultCode').textContent = '------';
+        document.getElementById('resultNote').textContent = '';
+        document.getElementById('resultBox').classList.remove('hidden');
+    }
+    function hideResult() { document.getElementById('resultBox').classList.add('hidden'); }
+
+    function resetCopyBtn() {
+        const btn = document.getElementById('copyBtn'), txt = document.getElementById('copyBtnText');
+        btn.className = "mt-2 inline-flex items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+        txt.textContent = "複製編號";
+    }
+    function copyToClipboard() {
+        const btn = document.getElementById('copyBtn'), txt = document.getElementById('copyBtnText');
+        const isTinted = !document.getElementById('resultTintedWrapper').classList.contains('hidden');
+        const code = isTinted ? document.getElementById('resultLensCode').textContent : document.getElementById('resultCode').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            btn.className = "mt-2 inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-6 rounded-lg transition duration-150 text-sm cursor-pointer";
+            txt.textContent = "✓ 已複製";
+        }).catch(() => alert("複製失敗"));
+    }
+
+    function fitCard() {
+        const card = document.getElementById('mainCard');
+        if (!card) return;
+        card.style.transform = 'none'; card.style.maxHeight = ''; card.style.overflowY = 'auto';
+    }
+    function scrollCard() {
+        const card = document.getElementById('mainCard');
+        if (statsModeActive) {
+            if (card) card.scrollTop = 0;
+            return;
+        }
+        if (card && card.scrollHeight > card.clientHeight) card.scrollTo({ top: card.scrollHeight, behavior: 'smooth' });
+    }
+    const resizeObs = new ResizeObserver(() => requestAnimationFrame(fitCard));
+    const mutObs = new MutationObserver(() => requestAnimationFrame(scrollCard));
+
+    window.addEventListener('load', () => {
+        render();
+        loadDailyStats();
+        renderDailyStats();
+        resizeObs.observe(document.getElementById('mainCard'));
+        mutObs.observe(document.getElementById('mainCard'), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        fitCard();
+    });
+    window.addEventListener('resize', fitCard);
+</script>
+</body>
+</html>
